@@ -19,7 +19,7 @@ import altair as alt
 import plotly.express as px
 from streamlit_folium import folium_static
 import plotly.express as px
-import PIL
+
 
 # Passo 0 - funções para carregar csv unico com com todos os dados de água de 2023 ao momento presente
 
@@ -59,11 +59,22 @@ def pasta_figuras_func(pasta_projeto):
 
 
 dados_agua_df = main_abrir_csv_unico_func()
-dados_agua_df['ANO'] = dados_agua_df['ANO'].astype('int')
-dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'HIDROMETRO'})
 
 anos = dados_agua_df['ANO'].unique()
 meses = dados_agua_df['MES_N'].unique()
+
+dados_agua_df['Dtime'] = pd.to_datetime(dados_agua_df['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
+maior_tempo = dados_agua_df['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
+
+maior_ano = maior_tempo.year
+index_ano = anos.tolist().index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
+maior_mes = maior_tempo.month
+index_mes = meses.tolist().index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
+
+dados_agua_df['ANO'] = dados_agua_df['ANO'].astype('int')
+dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'HIDROMETRO'})
+
+
 
 dados_agua_df = dados_agua_df.rename(columns={'HIDROMETRO': 'Hidrometro'})
 
@@ -578,11 +589,11 @@ map = folium.Map(width = 800, height=400, location=[-27.6, -48.52], zoom_start=1
     
     
 with st.sidebar:    
-    link_logoUFSC = os.path.join(pasta_projeto,'Auxiliar', 'Logo','brasao_ufsc.png')
-    st.sidebar.image('link_logoUFSC')
+    #link_logoUFSC = os.path.join(pasta_projeto,'Auxiliar', 'Logo','brasao_ufsc.png')
+    #st.sidebar.image('link_logoUFSC')
     st.sidebar.title("Coordenadoria de Gestão Ambiental UFSC v. 03/2025")
     st.sidebar.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal por hidrômetro no mapa")
-    ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos)
+    ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos )
     mes_selecionado = st.sidebar.selectbox('Selecione o mes', meses)
     # Filter the dataframe based on the selected year
     dados_agua_df_ano_mes_selecionado = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado) & (dados_agua_df_sHU['MES_N'] == mes_selecionado)].iloc[:,[2,3,4,5,7,10,18,26,19]]
