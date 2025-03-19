@@ -59,6 +59,7 @@ def pasta_figuras_func(pasta_projeto):
 
 
 dados_agua_df = main_abrir_csv_unico_func()
+dados_agua_df['ANO'] = dados_agua_df['ANO'].astype('int')
 
 anos = dados_agua_df['ANO'].unique()
 meses = dados_agua_df['MES_N'].unique()
@@ -71,7 +72,7 @@ index_ano = anos.tolist().index(maior_ano) #encontra o index do maior ano para u
 maior_mes = maior_tempo.month
 index_mes = meses.tolist().index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
 
-dados_agua_df['ANO'] = dados_agua_df['ANO'].astype('int')
+
 dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'HIDROMETRO'})
 
 
@@ -593,8 +594,8 @@ with st.sidebar:
     #st.sidebar.image('link_logoUFSC')
     st.sidebar.title("Coordenadoria de Gestão Ambiental UFSC v. 03/2025")
     st.sidebar.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal por hidrômetro no mapa")
-    ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos )
-    mes_selecionado = st.sidebar.selectbox('Selecione o mes', meses)
+    ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos , index = index_ano)
+    mes_selecionado = st.sidebar.selectbox('Selecione o mes', meses, index = index_mes)
     # Filter the dataframe based on the selected year
     dados_agua_df_ano_mes_selecionado = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado) & (dados_agua_df_sHU['MES_N'] == mes_selecionado)].iloc[:,[2,3,4,5,7,10,18,26,19]]
     dados_agua_df_ano_mes_selecionado = dados_agua_df_ano_mes_selecionado.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
