@@ -1,5 +1,0 @@
-Estac,VOLUME_FATURADO
-Inv,"Mann_Kendall_Test(trend='decreasing', h=True, p=0.001652787718636528, z=-3.1464265445104544, Tau=-0.3682539682539683, s=-232.0, var_s=5390.0, slope=-463.7746, intercept=38983.995500000005)"
-Out,"Mann_Kendall_Test(trend='decreasing', h=True, p=0.004052978473572333, z=-2.8740086618688565, Tau=-0.33650793650793653, s=-212.0, var_s=5390.0, slope=-421.5357200811359, intercept=40074.87510141988)"
-Pri,"Mann_Kendall_Test(trend='decreasing', h=True, p=7.780085950059856e-05, z=-3.9510752357511416, Tau=-0.48484848484848486, s=-256.0, var_s=4165.333333333333, slope=-528.547619047619, intercept=40335.76190476191)"
-Ver,"Mann_Kendall_Test(trend='decreasing', h=True, p=0.0013699425719619907, z=-3.200910121038774, Tau=-0.3746031746031746, s=-236.0, var_s=5390.0, slope=-412.741486013986, intercept=34517.97600524475)"
