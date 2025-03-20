@@ -61,16 +61,18 @@ def pasta_figuras_func(pasta_projeto):
 dados_agua_df = main_abrir_csv_unico_func()
 dados_agua_df['ANO'] = dados_agua_df['ANO'].astype('int')
 
-anos = dados_agua_df['ANO'].unique()
-meses = dados_agua_df['MES_N'].unique()
+anos = dados_agua_df['ANO'].unique().tolist()
+anos.sort(reverse=True)
+meses = dados_agua_df['MES_N'].unique().tolist()
+meses.sort(reverse=True)
 
 dados_agua_df['Dtime'] = pd.to_datetime(dados_agua_df['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
 maior_tempo = dados_agua_df['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
 
 maior_ano = maior_tempo.year
-index_ano = anos.tolist().index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
+index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
 maior_mes = maior_tempo.month
-index_mes = meses.tolist().index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
+index_mes = meses.index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
 
 
 dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'HIDROMETRO'})
@@ -463,11 +465,7 @@ def adicionar_camadas_de_fundo_func(map):
         name='Google Satellite'
     ).add_to(map)
     
-    folium.TileLayer(
-        tiles='OpenStreetMap',
-        attr='OpenStreetMap',
-        name='Open Street Map'
-    ).add_to(map)
+  
   
 
     # Adicionar LayerControl para permitir a seleção de camadas
@@ -512,7 +510,6 @@ def lineplot_volume_faturado_por_mes_ano_func(dados_agua_df_sHU):
                   x='MES_N',
                   y='VOLUME_FATURADO',
                   color='ANO',
-                  title="Volume Faturado por Mês e Ano",
                   labels={'MES_N': 'Mês', 'VOLUME_FATURADO': 'Volume Faturado (m³)', 'ANO': 'Ano'})
 
     return fig
@@ -532,7 +529,6 @@ def boxplot_func(dados_agua_df_sHU):
                  x="MES_N",  # Month (column index after pivot)
                  y="VOLUME_FATURADO", # Values
                  color='ANO',
-                 title='Boxplot do volume faturado por mês em cada ano',
                  labels={'MES_N': 'Mês', 'VOLUME_FATURADO': 'Volume Faturado (m³)', 'ANO': 'Ano'},
                  boxmode='group',
                  points='all')
@@ -549,7 +545,6 @@ def lineplot_volume_faturado_por_ano_mes_func(dados_agua_df_sHU):
                     x='MES_N',
                     y='VOLUME_FATURADO',
                     color='ANO',
-                    title="Volume Faturado para cada mês em cada ano",
                     labels={'MES_N': 'Mês', 'VOLUME_FATURADO': 'Volume Faturado (m³)', 'ANO': 'Ano'})
 
     return fig
@@ -558,7 +553,6 @@ def lineplot_volume_faturado_por_ano_mes_func(dados_agua_df_sHU):
 
 def barplot_volume_faturado_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado):
     fig = px.bar(dados_agua_df_ano_mes_selecionado, x='Hidrometro', y='VOLUME_FATURADO',
-                  title=f"Volume faturado por hidrômetro no mês e ano selecionados",
                   labels={'Hidrometro': 'Hidrômetro', 'VOLUME_FATURADO': 'Volume Faturado (m³)'})
 
 
@@ -567,7 +561,7 @@ def barplot_volume_faturado_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_
 
 
 
-
+###_________________________________________________________________________________
 
 #Configurações Streamlit
 
@@ -582,18 +576,33 @@ alt.themes.enable("dark")
 
 # Map Folium Configurações 1 - Iniciais
 
-map = folium.Map(width = 800, height=400, location=[-27.6, -48.52], zoom_start=15.5)
+map = folium.Map(width = 1200, height=600, location=[-27.6, -48.52], zoom_start=15.5)
                     
     #DADOS A SEREM UTILIZADOS NO STREAMLIT
     # Consumo mensal de um mês e ano a serem selecionados no STREAMLIT SIDEBAR
     # Add a selectbox to the sidebar
     
     
-with st.sidebar:    
-    #link_logoUFSC = os.path.join(pasta_projeto,'Auxiliar', 'Logo','brasao_ufsc.png')
-    #st.sidebar.image('link_logoUFSC')
+with st.sidebar:
+    col1, col2, col3, col4 = st.sidebar.columns(4)
+    with col1:     
+        link_logoUFSC = os.path.join(pasta_projeto,'Auxiliar', 'Logos','brasao_ufsc.png')
+        st.image(link_logoUFSC,width=100)
+    with col2:
+        link_logoCGA = os.path.join(pasta_projeto,'Auxiliar', 'Logos','cropped-logo-cga-1.jpg')
+        st.image(link_logoCGA,width=100)
+    with col3:
+        link_logoUS = os.path.join(pasta_projeto,'Auxiliar', 'Logos','Logo-UFSC-Sustentável-colorido-fundo-transp.png')
+        st.image(link_logoUS,width=100)
+    with col4:
+        link_logoGA = os.path.join(pasta_projeto,'Auxiliar', 'Logos','Gestao_das_Aguas_Logo.png')
+        st.image(link_logoGA,width=100)
+            
+            
     st.sidebar.title("Coordenadoria de Gestão Ambiental UFSC v. 03/2025")
     st.sidebar.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal por hidrômetro no mapa")
+    st.sidebar.caption("Por padrão o último mês disponível está apresentado")
+    
     ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos , index = index_ano)
     mes_selecionado = st.sidebar.selectbox('Selecione o mes', meses, index = index_mes)
     # Filter the dataframe based on the selected year
@@ -607,23 +616,24 @@ with st.sidebar:
     camadas_fixas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge)
     adicionar_camadas_de_fundo_func(map)
    
+
 st.title("Dashboard Monitoramento do Consumo de Água da UFSC")
-st.write("Mapa de hidrômetros, redes e subsetores de Água da UFSC")
-st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece. O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios.')
-st.caption('Há três camadas de fundo diferentes que podem ser visualizadas: Google Satélite, Esri Satélite e Open Street Map. Clique no ícone de camadas para alterar.')
 
-folium_static(map, width=800, height=400)
-    
-
-st.write('\n\n\n')
-
-tab1, tab2 = st.tabs(["Volume por UC", "Dataframe"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Mapa", "Volume no mês selecionado por UC", "Dataframe", "Volume acumulado anual", "Volumes mensais acumulados por mês e ano"])
 
 with tab1:
-    fig8 = barplot_volume_faturado_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado)
-    st.plotly_chart(fig8)
+    
+    st.write("Mapa de hidrômetros, redes e subsetores de Água da UFSC")
+    st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece. O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios.')
+    st.caption('Há três camadas de fundo diferentes disponíveis: Google Satélite, Esri Satélite e Open Street Map. Clique no ícone de camadas para alterar.')
+    folium_static(map, width=1200, height=600)
+
 
 with tab2:
+    fig8 = barplot_volume_faturado_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado)
+    st.write(fig8)
+
+with tab3:
 
     st.write("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) \n")
     dataframe = dados_agua_df_ano_mes_selecionado[['Hidrometro','LOCAL','VOLUME_FATURADO', 'VALOR_TOTAL',]]
@@ -635,24 +645,23 @@ with tab2:
                 }
                                  )
     
-    st.dataframe(dataframe, width=800, height=300) # Or any other way you want to display the data
+    st.dataframe(dataframe, width=1200, height=600) # Or any other way you want to display the data
 
-tab3, tab4 = st.tabs(["Volume por ano", "Volume por mês e ano"])
-with tab3:
+with tab4:
 
-    st.write('Volume faturado acumulado por ano de toda UFSC')
+    st.write('Volume acumulado anual de toda UFSC')
     
     #Volume Faturado acumulado por ano
     
     fig1 = lineplot_volume_faturado_por_ano_func(dados_agua_df_sHU)
-    st.plotly_chart(fig1)
+    st.write(fig1)
 
-with tab4:
+with tab5:
 
     st.write('Volume faturado por mês e por ano de toda a UFSC')
     
     fig2 = lineplot_volume_faturado_por_mes_ano_func(dados_agua_df_sHU)
-    st.plotly_chart(fig2)
+    st.write(fig2)
 
    
        
