@@ -5,7 +5,6 @@ import numpy as np
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-
 import folium
 import folium.plugins as plugins
 import base64
