@@ -56,9 +56,22 @@ def pasta_figuras_func(pasta_projeto):
 
 # Passo 1 - gerar df único (dados_agua_df_sHU) com todos os dados de água
 
-
+pasta_projeto = pasta_projeto_func()
 dados_agua_df = main_abrir_csv_unico_func()
 dados_agua_df['ANO'] = dados_agua_df['ANO'].astype('int')
+dados_agua_df = dados_agua_df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
+dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'HIDROMETRO'})
+
+cadastro_hidrometros_link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
+cadastro_hidrometros_df = pd.read_csv(cadastro_hidrometros_link, encoding='latin-1', sep = ';')
+cadastro_hidrometros_df = cadastro_hidrometros_df.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
+cadastro_hidrometros_df = cadastro_hidrometros_df.rename(columns={'Observacao': 'Faturamento'})
+
+dados_agua_df = dados_agua_df.rename(columns={'HIDROMETRO': 'Hidrometro'})
+dados_agua_df = dados_agua_df.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
+
+dados_agua_df_SHU = dados_agua_df[dados_agua_df['Hidrometro']!='H014'] #remove o Hospital Universitário da análise
+
 
 anos = dados_agua_df['ANO'].unique().tolist()
 anos.sort(reverse=True)
@@ -145,8 +158,6 @@ limite_UFSC = dict_shapes['Limite_UFSC']
 
 #passo 7 - carregar hidrometros shape e mesclar com cadastro, para gerar hidrometros_shp_merge (com H014)
 
-cadastro_hidrometros_link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
-cadastro_hidrometros_df = pd.read_csv(cadastro_hidrometros_link, encoding='latin-1', sep = ';')
 hidrometros_shp_merge = hidrometros_shp.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
 
 
@@ -187,8 +198,8 @@ def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, filtered_s
       style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
       tooltip=None,  # Disable tooltip for this layer
       popup=folium.GeoJsonPopup(
-          fields=['Hidrometro', 'Setor', 'SubSetor', 'VOLUME_FATURADO'],
-          aliases=['Hidrometro', 'Setor', 'SubSetor:', 'Volume Faturado (m³):'],
+          fields=['Hidrometro', 'Local','Setor', 'SubSetor', 'Campus','Cidade','VOLUME_FATURADO'],
+          aliases=['Hidrometro', 'Local','Setor', 'SubSetor:', 'Campus','Cidade', 'Volume Faturado (m³):'],
           localize=True,
           style="""
               background-color: #F0EFEF;
@@ -605,7 +616,7 @@ with st.sidebar:
     ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos , index = index_ano)
     mes_selecionado = st.sidebar.selectbox('Selecione o mes', meses, index = index_mes)
     # Filter the dataframe based on the selected year
-    dados_agua_df_ano_mes_selecionado = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado) & (dados_agua_df_sHU['MES_N'] == mes_selecionado)].iloc[:,[2,3,4,5,7,10,18,26,19]]
+    dados_agua_df_ano_mes_selecionado = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado) & (dados_agua_df_sHU['MES_N'] == mes_selecionado)].iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
     dados_agua_df_ano_mes_selecionado = dados_agua_df_ano_mes_selecionado.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
     dados_agua_df_ano_mes_selecionado.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado) + 1)
     
@@ -636,17 +647,16 @@ with tab2:
 
 with tab3:
 
-    st.write("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) \n")
-    dataframe = dados_agua_df_ano_mes_selecionado[['Hidrometro','LOCAL','VOLUME_FATURADO', 'VALOR_TOTAL',]]
+    st.write("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
+    dataframe = dados_agua_df_ano_mes_selecionado
     dataframe = dataframe.rename(
         columns={
         'VOLUME_FATURADO': 'Volume Faturado m³',
         'VALOR_TOTAL': 'Valor Total R$',
-        'LOCAL':'Local'
                 }
                                  )
     
-    st.dataframe(dataframe, width=1200, height=600) # Or any other way you want to display the data
+    st.dataframe(dataframe, width=1200, height=400) # Or any other way you want to display the data
 
 with tab4:
 
