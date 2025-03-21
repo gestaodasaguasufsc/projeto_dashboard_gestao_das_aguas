@@ -597,9 +597,9 @@ with st.sidebar:
         link_logoGA = os.path.join(pasta_projeto,'Auxiliar', 'Logos','Gestao_das_Aguas_Logo.png')
         st.image(link_logoGA,width=100)
             
-            
-    st.sidebar.title("Coordenadoria de Gestão Ambiental UFSC v. 03/2025")
-    st.sidebar.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal por hidrômetro no mapa")
+    st.title("Dashboard Monitoramento do Consumo de Água da UFSC")        
+    
+    st.sidebar.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal por unidade consumidora no mapa")
     st.sidebar.caption("Por padrão o último mês disponível está apresentado")
     
     ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos , index = index_ano)
@@ -615,8 +615,9 @@ with st.sidebar:
     camadas_fixas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge)
     adicionar_camadas_de_fundo_func(map)
    
-
-st.title("Dashboard Monitoramento do Consumo de Água da UFSC")
+    st.sidebar.caption("Coordenadoria de Gestão Ambiental - CGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
+    st.sidebar.caption("Projeto desenvolvido em Python 3.10 - mar/2025")
+    st.sidebar.caption("contato: gestaodasaguas@contato.ufsc.br")
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Mapa", "Volume no mês selecionado por UC", "Dataframe", "Volume acumulado anual", "Volumes mensais acumulados por mês e ano"])
 
