@@ -500,8 +500,7 @@ def volume_faturado_por_ano_func(dados_agua_df_sHU):
                   y='VOLUME_FATURADO',
                   labels={'ANO': 'Ano', 'VOLUME_FATURADO': 'Volume Faturado (m³)'},
                   barmode='group',  # Set barmode to 'group'
-                  width=800,       # Adjust width if necessary
-                  height=600      # Adjust height if necessary
+                        # Adjust height if necessary
                  )
     fig.update_layout(
         xaxis = dict(
@@ -667,7 +666,7 @@ with tab3:
                 }
                                  )
     
-    st.dataframe(dataframe, width=1200, height=400) # Or any other way you want to display the data
+    st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
 
 with tab4:
 
