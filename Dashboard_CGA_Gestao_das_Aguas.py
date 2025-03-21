@@ -625,6 +625,7 @@ with tab1:
     st.write("Mapa de hidrômetros, redes e subsetores de Água da UFSC")
     st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece. O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios.')
     st.caption('Há três camadas de fundo diferentes disponíveis: Google Satélite, Esri Satélite e Open Street Map. Clique no ícone de camadas para alterar.')
+    st.caption('Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações. ')
     folium_static(map, width=1200, height=600)
 
 
