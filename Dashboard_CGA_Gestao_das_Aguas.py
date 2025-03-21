@@ -488,18 +488,27 @@ def adicionar_camadas_de_fundo_func(map):
 # gráfico 1
 # Gerar lineplot para volume faturado por ano
 
-def lineplot_volume_faturado_por_ano_func(dados_agua_df_sHU):
+def volume_faturado_por_ano_func(dados_agua_df_sHU):
 
 
 
     volume_faturado_por_ano = dados_agua_df_sHU.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
 
     # Cria o gráfico de linha interativo usando Plotly Express
-    fig = px.line(volume_faturado_por_ano,
+    fig = px.bar(volume_faturado_por_ano,
                   x='ANO',
                   y='VOLUME_FATURADO',
-                  title="Volume Faturado por Ano",
-                  labels={'ANO': 'Ano', 'VOLUME_FATURADO': 'Volume Faturado (m³)'})
+                  labels={'ANO': 'Ano', 'VOLUME_FATURADO': 'Volume Faturado (m³)'},
+                  barmode='group',  # Set barmode to 'group'
+                  width=800,       # Adjust width if necessary
+                  height=600      # Adjust height if necessary
+                 )
+    fig.update_layout(
+        xaxis = dict(
+            tickmode = 'linear',
+            tick0 = 0,
+            dtick = 1          # Set interval between ticks (and implicitly bars) to 1
+        ))
 
     return fig
 
@@ -511,12 +520,12 @@ def lineplot_volume_faturado_por_ano_func(dados_agua_df_sHU):
 #### Reorganizando totais mensais:
 #### - Agrupando dados por ano e por mês a partir de dados_agua_df_sHU com dados de volume faturado mensal
 
-def lineplot_volume_faturado_por_mes_ano_func(dados_agua_df_sHU):
+def volume_faturado_por_mes_ano_func(dados_agua_df_sHU):
 
     volume_faturado_por_mes_ano = dados_agua_df_sHU.groupby(['ANO', 'MES_N'])['VOLUME_FATURADO'].sum().reset_index()
 
     # Cria o gráfico de linha interativo usando Plotly Express
-    fig = px.line(volume_faturado_por_mes_ano,
+    fig = px.bar(volume_faturado_por_mes_ano,
                   x='MES_N',
                   y='VOLUME_FATURADO',
                   color='ANO',
@@ -549,9 +558,9 @@ def boxplot_func(dados_agua_df_sHU):
 
 # Lineplot - comparação do volume para cada mês ao longo dos anos
 
-def lineplot_volume_faturado_por_ano_mes_func(dados_agua_df_sHU):
+def volume_faturado_por_ano_mes_func(dados_agua_df_sHU):
     volume_faturado_por_mes_ano = dados_agua_df_sHU.groupby(['ANO', 'MES_N'])['VOLUME_FATURADO'].sum().reset_index()
-    fig = px.line(volume_faturado_por_mes_ano,
+    fig = px.bar(volume_faturado_por_mes_ano,
                     x='MES_N',
                     y='VOLUME_FATURADO',
                     color='ANO',
@@ -610,9 +619,8 @@ with st.sidebar:
             
     st.title("Dashboard Monitoramento do Consumo de Água da UFSC")        
     
-    st.sidebar.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal por unidade consumidora no mapa")
-    st.sidebar.caption("Por padrão o último mês disponível está apresentado")
-    
+    st.sidebar.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal por unidade consumidora no mapa. Por padrão o último mês com dados disponíveis está apresentado.")
+        
     ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos , index = index_ano)
     mes_selecionado = st.sidebar.selectbox('Selecione o mes', meses, index = index_mes)
     # Filter the dataframe based on the selected year
@@ -635,9 +643,12 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(["Mapa", "Volume no mês selecionado por 
 with tab1:
     
     st.write("Mapa de hidrômetros, redes e subsetores de Água da UFSC")
-    st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece. O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios.')
-    st.caption('Há três camadas de fundo diferentes disponíveis: Google Satélite, Esri Satélite e Open Street Map. Clique no ícone de camadas para alterar.')
-    st.caption('Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações. ')
+    st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece.' 
+               ' O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. ' 
+               ' Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios. '
+               ' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.'
+               )
+    
     folium_static(map, width=1200, height=600)
 
 
@@ -664,14 +675,14 @@ with tab4:
     
     #Volume Faturado acumulado por ano
     
-    fig1 = lineplot_volume_faturado_por_ano_func(dados_agua_df_sHU)
+    fig1 = volume_faturado_por_ano_func(dados_agua_df_sHU)
     st.write(fig1)
 
 with tab5:
 
     st.write('Volume faturado por mês e por ano de toda a UFSC')
     
-    fig2 = lineplot_volume_faturado_por_mes_ano_func(dados_agua_df_sHU)
+    fig2 = volume_faturado_por_mes_ano_func(dados_agua_df_sHU)
     st.write(fig2)
 
    
