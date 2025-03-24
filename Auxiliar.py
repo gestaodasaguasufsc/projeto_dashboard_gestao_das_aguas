@@ -120,7 +120,22 @@ for i, item in enumerate(dict_agrupamento.values()):
 for item in dict_dataframes.values():
     print('dict_dataframes', item)
 
-print('dataframe 6 :', dict_dataframes[lista_agrupamento[6]])
+# manual - exemplo
+agrupamento_selecionado = 'Campus Florianópolis - excluído Campus Trindade'
+
+df_selecionado = dict_dataframes[agrupamento_selecionado] 
+volume_faturado_por_ano = df_selecionado.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+custo_faturado_por_ano = df_selecionado.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+print(volume_faturado_por_ano)
+df_selecionado_dataframe = pd.concat([volume_faturado_por_ano, custo_faturado_por_ano['VALOR_TOTAL']],axis=1)
+df_selecionado_dataframe['Agrupamento Selecionado'] = agrupamento_selecionado
+df_selecionado_dataframe = df_selecionado_dataframe.rename(columns=
+                                                          {'ANO':'Ano',
+                                                              'VALOR_TOTAL': 'Custo Total (R$)',
+                                                           'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                           })
+df_selecionado_dataframe = df_selecionado_dataframe.iloc[:,[0,3,1,2]]
+
 
 lista_ucs = dados_agua_df_sHU['Hidrometro'].unique().tolist()
 lista_local = dados_agua_df_sHU['Local'].unique().tolist()

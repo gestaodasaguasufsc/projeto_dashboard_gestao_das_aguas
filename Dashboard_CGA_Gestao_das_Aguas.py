@@ -62,6 +62,7 @@ dados_agua_df['ANO'] = dados_agua_df['ANO'].astype('int')
 dados_agua_df = dados_agua_df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
 dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'HIDROMETRO'})
 
+
 cadastro_hidrometros_link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
 cadastro_hidrometros_df = pd.read_csv(cadastro_hidrometros_link, encoding='latin-1', sep = ';')
 cadastro_hidrometros_df = cadastro_hidrometros_df.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
@@ -538,15 +539,9 @@ def barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado):
     return fig1 , fig2
 
 
-def agrupado_por_ano_func(agrupamento_selecionado, dict_dataframes):
+def agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano):
     
-    
-    df_selecionado = dict_dataframes[agrupamento_selecionado] 
-        
-    volume_faturado_por_ano = df_selecionado.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
-    custo_faturado_por_ano = df_selecionado.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
-        
-           
+                 
    # gráfico de volume
     fig1 = px.bar(volume_faturado_por_ano,
                   x='ANO',
@@ -703,7 +698,7 @@ with st.sidebar:
     st.sidebar.caption("Projeto desenvolvido em Python 3.10 - mar/2025")
     st.sidebar.caption("contato: gestaodasaguas@contato.ufsc.br")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Mapa", "Volume no mês selecionado por UC", "Dataframe", "Volume acumulado anual", "Volumes mensais acumulados por mês e ano"])
+tab1, tab2, tab3, tab4 = st.tabs(["Mapa", "Volume no mês selecionado por UC", "Volume acumulado anual", "Volumes mensais acumulados por mês e ano"])
 
 with tab1:
     
@@ -724,9 +719,7 @@ with tab2:
     st.write("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
     fig2 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado)[1]
     st.write(fig2)
-
-with tab3:
-
+    
     st.write("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
     dataframe = dados_agua_df_ano_mes_selecionado
     dataframe = dataframe.rename(
@@ -738,25 +731,49 @@ with tab3:
     
     st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
 
-with tab4:
+ 
+with tab3:
 
     st.write('Acumulados anuais: Volume e Custo')
     
        
     agrupamento_selecionado = st.selectbox('Selecione o  agrupamento dos dados:', lista_agrupamento, index = 0)
     
+    df_selecionado = dict_dataframes[agrupamento_selecionado] 
+    volume_faturado_por_ano = df_selecionado.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+    custo_faturado_por_ano = df_selecionado.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+    
+    df_selecionado_dataframe = pd.concat([volume_faturado_por_ano, custo_faturado_por_ano['VALOR_TOTAL']],axis=1)
+    df_selecionado_dataframe['Agrupamento Selecionado'] = agrupamento_selecionado
+    df_selecionado_dataframe['VALOR_TOTAL'] = df_selecionado_dataframe['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
+    df_selecionado_dataframe['VOLUME_FATURADO'] = df_selecionado_dataframe['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
+    df_selecionado_dataframe = df_selecionado_dataframe.sort_values(by='ANO', ascending=False)
+    df_selecionado_dataframe = df_selecionado_dataframe.rename(columns=
+                                                              {'ANO':'Ano',
+                                                                  'VALOR_TOTAL': 'Custo Total (R$)',
+                                                               'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                               })
+    df_selecionado_dataframe = df_selecionado_dataframe.iloc[:,[0,3,1,2]]
+    
+    
+  
+    
     #Volume Faturado acumulado por ano
     st.caption('Volume acumulado por ano')
     
-    fig3 = agrupado_por_ano_func(agrupamento_selecionado, dict_dataframes)[0]
+    fig3 = agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano)[0]
     st.write(fig3)
     
     st.caption('Custo acumulado por ano')
-    fig4 = agrupado_por_ano_func(agrupamento_selecionado, dict_dataframes)[1]
+    fig4 = agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano)[1]
     st.write(fig4)
     
 
-with tab5:
+    st.write("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
+                    
+    st.dataframe(df_selecionado_dataframe, width=1200, height=600) # Or any other way you want to display the data
+
+with tab4:
 
     st.write('Volume faturado por mês e por ano de toda a UFSC')
     
