@@ -615,19 +615,11 @@ def boxplot_func(dados_agua_df_sHU):
 
     return fig
 
-#gráfico 4
 
-# Lineplot - comparação do volume para cada mês ao longo dos anos
 
-def volume_faturado_por_ano_mes_func(dados_agua_df_sHU):
-    volume_faturado_por_mes_ano = dados_agua_df_sHU.groupby(['ANO', 'MES_N'])['VOLUME_FATURADO'].sum().reset_index()
-    fig = px.bar(volume_faturado_por_mes_ano,
-                    x='MES_N',
-                    y='VOLUME_FATURADO',
-                    color='ANO',
-                    labels={'MES_N': 'Mês', 'VOLUME_FATURADO': 'Volume Faturado (m³)', 'ANO': 'Ano'})
 
-    return fig
+
+
 
 
 
@@ -775,7 +767,7 @@ with tab3:
 
 with tab4:
 
-    st.write('Volume faturado por mês e por ano de toda a UFSC')
+    st.write('Volumes e custos mensais por ano para o agrupamento selecionado:')
     
     fig2 = volume_faturado_por_mes_ano_func(dados_agua_df_sHU)
     st.write(fig2)

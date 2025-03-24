@@ -8,6 +8,8 @@ import os
 import pandas as pd
 from datetime import date
 import numpy as np
+import plotly.express as px
+from plotly.offline import plot
 
 def main_abrir_csv_unico_func():
     dados_agua_df = abrir_csv_unico_func(pasta_produtos_func(pasta_projeto_func()))
@@ -145,3 +147,23 @@ for i,uc in enumerate(lista_ucs):
     lista_uc_local.append(nome_uc_local)
     
 
+def boxplot_func(volume_faturado_melted):
+   
+    fig = px.box(volume_faturado_melted,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VOLUME_FATURADO", # Values
+                 #color='ANO',
+                 labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
+                # boxmode='group',
+                  points='all')
+                 
+    return fig
+
+
+volume_faturado_por_mes_ano = dados_agua_df_sHU.groupby(['ANO', 'MES_N'])['VOLUME_FATURADO'].sum().reset_index()
+volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
+
+
+
+fig = boxplot_func(volume_faturado_por_mes_ano)
+plot(fig)
