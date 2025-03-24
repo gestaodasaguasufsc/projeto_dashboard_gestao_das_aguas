@@ -70,9 +70,6 @@ cadastro_hidrometros_df = cadastro_hidrometros_df.rename(columns={'Observacao': 
 dados_agua_df = dados_agua_df.rename(columns={'HIDROMETRO': 'Hidrometro'})
 dados_agua_df = dados_agua_df.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
 
-dados_agua_df_SHU = dados_agua_df[dados_agua_df['Hidrometro']!='H014'] #remove o Hospital Universitário da análise
-
-
 anos = dados_agua_df['ANO'].unique().tolist()
 anos.sort(reverse=True)
 meses = dados_agua_df['MES_N'].unique().tolist()
@@ -87,13 +84,57 @@ maior_mes = maior_tempo.month
 index_mes = meses.index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
 
 
-dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'HIDROMETRO'})
+dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
 
+# ordenando e filtrando colunas em dados_agua_df
+dados_agua_df = dados_agua_df.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
 
-
-dados_agua_df = dados_agua_df.rename(columns={'HIDROMETRO': 'Hidrometro'})
-
+# Gerando dados_agua_sf_sHU
 dados_agua_df_sHU = dados_agua_df[dados_agua_df['Hidrometro']!='H014'] #remove o Hospital Universitário da análise
+
+
+#Gerando lista_ucs_local
+lista_ucs = dados_agua_df_sHU['Hidrometro'].unique().tolist()
+lista_local = dados_agua_df_sHU['Local'].unique().tolist()
+lista_uc_local = []
+for i,uc in enumerate(lista_ucs):
+    nome_uc_local = lista_ucs[i] + " " + lista_local[i]
+    lista_uc_local.append(nome_uc_local)
+
+#gerando dicionário com dataframes filtrados por agrupamentos de campi
+
+dict_agrupamento = {
+    'UFSC - Total':['UFSC - Total'],
+    'Campus Florianópolis - todos':['Florianópolis - Trindade', 'Florianópolis - Outros'],
+    'UFSC - Total campi excluído Florianópolis':['Araquari', 'Curitibanos', 'Joinville', 'Araranguá', 'Blumenau'],
+    'Campus Florianópolis - excluído Campus Trindade':['Florianópolis - Outros'],
+    'Campus Florianópolis - somente Campus Trindade':['Florianópolis - Trindade'],
+    'Campus Araranguá':['Araranguá'],
+    'Campus Blumenau': ['Blumenau'],
+    'Campus Curitibanos':['Curitibanos'],
+    'Campus Joinville': ['Joinville'],
+    'Unidade Araquari':['Araquari']
+    }
+
+lista_agrupamento = list(dict_agrupamento.keys())
+    
+dict_dataframes = {}
+
+
+for i, item in enumerate(dict_agrupamento.values()):
+   df_concatenado = pd.DataFrame(columns=dados_agua_df_sHU.columns)
+   
+   if item[0] == 'UFSC - Total':
+       dataframe = dados_agua_df_sHU
+       df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
+   else:
+       
+       for subitem in item:
+           
+           dataframe = dados_agua_df_sHU[dados_agua_df_sHU['Cidade']==subitem]
+           df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
+   dict_dataframes[lista_agrupamento[i]] = df_concatenado
+        
 
 # Passo 2 - carregar dicionário de shapes
 
@@ -488,28 +529,54 @@ def adicionar_camadas_de_fundo_func(map):
 # gráfico 1
 # Gerar lineplot para volume faturado por ano
 
-def volume_faturado_por_ano_func(dados_agua_df_sHU):
+def barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado):
+    fig1 = px.bar(dados_agua_df_ano_mes_selecionado, x='Hidrometro', y='VOLUME_FATURADO',
+                  labels={'Hidrometro': 'Hidrômetro', 'VOLUME_FATURADO': 'Volume Faturado (m³)'})
+    fig2 = px.bar(dados_agua_df_ano_mes_selecionado, x='Hidrometro', y='VALOR_TOTAL',
+                  labels={'Hidrometro': 'Hidrômetro', 'VALOR_TOTAL': 'Custo Faturado (R$)'})
+    
+    return fig1 , fig2
 
 
-
-    volume_faturado_por_ano = dados_agua_df_sHU.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
-
-    # Cria o gráfico de linha interativo usando Plotly Express
-    fig = px.bar(volume_faturado_por_ano,
+def agrupado_por_ano_func(agrupamento_selecionado, dict_dataframes):
+    
+    
+    df_selecionado = dict_dataframes[agrupamento_selecionado] 
+        
+    volume_faturado_por_ano = df_selecionado.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+    custo_faturado_por_ano = df_selecionado.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+        
+           
+   # gráfico de volume
+    fig1 = px.bar(volume_faturado_por_ano,
                   x='ANO',
                   y='VOLUME_FATURADO',
                   labels={'ANO': 'Ano', 'VOLUME_FATURADO': 'Volume Faturado (m³)'},
+                  barmode='group'
+                  )
+    fig1.update_layout(
+        xaxis = dict(
+            tickmode = 'linear',
+            tick0 = 0,
+            dtick = 1          # Set interval between ticks (and implicitly bars) to 1
+                    ))
+    
+     # gráfico de custo   
+    fig2 = px.bar(custo_faturado_por_ano,
+                  x='ANO',
+                  y='VALOR_TOTAL',
+                  labels={'ANO': 'Ano', 'VALOR_TOTAL': 'Custo Faturado (m³)'},
                   barmode='group',  # Set barmode to 'group'
                         # Adjust height if necessary
                  )
-    fig.update_layout(
+    fig2.update_layout(
         xaxis = dict(
             tickmode = 'linear',
             tick0 = 0,
             dtick = 1          # Set interval between ticks (and implicitly bars) to 1
         ))
 
-    return fig
+    return fig1, fig2
 
 
 
@@ -569,12 +636,6 @@ def volume_faturado_por_ano_mes_func(dados_agua_df_sHU):
 
 
 
-def barplot_volume_faturado_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado):
-    fig = px.bar(dados_agua_df_ano_mes_selecionado, x='Hidrometro', y='VOLUME_FATURADO',
-                  labels={'Hidrometro': 'Hidrômetro', 'VOLUME_FATURADO': 'Volume Faturado (m³)'})
-
-
-    return fig
 
 
 
@@ -621,13 +682,18 @@ with st.sidebar:
     st.sidebar.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal por unidade consumidora no mapa. Por padrão o último mês com dados disponíveis está apresentado.")
         
     ano_selecionado = st.sidebar.selectbox('Selecione o ano', anos , index = index_ano)
-    mes_selecionado = st.sidebar.selectbox('Selecione o mes', meses, index = index_mes)
+    mes_selecionado = st.sidebar.selectbox('Selecione o mes', meses, index = index_mes)         
+    uc_selecionado = st.sidebar.selectbox('Selecione a unidade consumidora', lista_uc_local)
+    
+    
+    
+    
     # Filter the dataframe based on the selected year
-    dados_agua_df_ano_mes_selecionado = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado) & (dados_agua_df_sHU['MES_N'] == mes_selecionado)].iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
+    dados_agua_df_ano_mes_selecionado = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado) & (dados_agua_df_sHU['MES_N'] == mes_selecionado)]
     dados_agua_df_ano_mes_selecionado = dados_agua_df_ano_mes_selecionado.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
     dados_agua_df_ano_mes_selecionado.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado) + 1)
     
-    
+         
     chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, filtered_subsetores_agua)
     #classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
     camadas_fixas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge)
@@ -652,8 +718,12 @@ with tab1:
 
 
 with tab2:
-    fig8 = barplot_volume_faturado_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado)
-    st.write(fig8)
+    st.write("\n Volume faturado (m³) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
+    fig1 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado)[0]
+    st.write(fig1)
+    st.write("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
+    fig2 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado)[1]
+    st.write(fig2)
 
 with tab3:
 
@@ -670,12 +740,21 @@ with tab3:
 
 with tab4:
 
-    st.write('Volume acumulado anual de toda UFSC')
+    st.write('Acumulados anuais: Volume e Custo')
+    
+       
+    agrupamento_selecionado = st.selectbox('Selecione o  agrupamento dos dados:', lista_agrupamento, index = 0)
     
     #Volume Faturado acumulado por ano
+    st.caption('Volume acumulado por ano')
     
-    fig1 = volume_faturado_por_ano_func(dados_agua_df_sHU)
-    st.write(fig1)
+    fig3 = agrupado_por_ano_func(agrupamento_selecionado, dict_dataframes)[0]
+    st.write(fig3)
+    
+    st.caption('Custo acumulado por ano')
+    fig4 = agrupado_por_ano_func(agrupamento_selecionado, dict_dataframes)[1]
+    st.write(fig4)
+    
 
 with tab5:
 
