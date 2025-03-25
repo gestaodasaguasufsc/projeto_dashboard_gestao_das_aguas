@@ -21,6 +21,7 @@ import plotly.express as px
 import plotly.colors as pc
 
 
+
 # Passo 0 - funções para carregar csv unico com com todos os dados de água de 2023 ao momento presente
 
 #Main def1
@@ -527,9 +528,7 @@ def adicionar_camadas_de_fundo_func(map):
 
     #map.save('map.html')
 
-
-# gráfico 1
-# Gerar lineplot para volume faturado por ano
+###### Gráficos
 
 def barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado):
     fig1 = px.bar(dados_agua_df_ano_mes_selecionado, x='Hidrometro', y='VOLUME_FATURADO',
@@ -587,7 +586,7 @@ def boxplot_func_px(df):
     chart = px.box(df,
                  x="MES_N",  # Month (column index after pivot)
                  y="VOLUME_FATURADO", # Values
-                 color='ANO',
+                 #color='ANO',
                  labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
                  boxmode='group',
                  points='all'
@@ -618,15 +617,52 @@ def scatter_func_px(df):
     
     return chart
 
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip("#")  # Remove "#" se presente
+    r = int(hex_color[0:2], 16)  # Converte os primeiros 2 caracteres para decimal (vermelho)
+    g = int(hex_color[2:4], 16)  # Converte os próximos 2 caracteres para decimal (verde)
+    b = int(hex_color[4:6], 16)  # Converte os últimos 2 caracteres para decimal (azul)
+    return (r, g, b)  # Retorna a tupla RGB
+
+
 def line_func_px(df):
+    
+      
     # Defina as duas cores desejadas
-    cor1 = 'rgb(255, 0, 0)'
-    cor2 = 'rgb(255, 0, 255)'
+    cor1 =  st.color_picker("Escolha a cor 1", '#3100FB')
+    cor2 =  st.color_picker("Escolha a cor 2", '#E411E4')
+    cor3 =  st.color_picker("Escolha a cor 3", '#CEE411')
+    
+    
+    cor1_rgb = hex_to_rgb(cor1)
+    cor2_rgb = hex_to_rgb(cor2)
+    cor3_rgb = hex_to_rgb(cor3)
 
     
     num_colors = len(df['ANO'].unique())
-    color_discrete_sequence_ = pc.n_colors(cor1, cor2, num_colors, colortype='rgb')
     
+    if num_colors == 1:
+        color_discrete_sequence_ = cor1_rgb
+    elif num_colors == 2:
+        color_discrete_sequence_ = cor1_rgb + cor2_rgb
+    else:
+        if num_colors % 2 == 0: #verifica se é par
+            num_colors_seq1 = num_colors/2
+            num_colors_seq2 = num_colors/2
+        else:
+            num_colors_seq1 = num_colors/2-0.5
+            num_colors_seq2 = num_colors/2+0.5
+        sequencia1 = pc.n_colors(cor1_rgb, cor2_rgb, int(num_colors_seq1), colortype='tuple')
+        sequencia2 = pc.n_colors(cor2_rgb, cor3_rgb, int(num_colors_seq2), colortype='tuple')
+        color_discrete_sequence_ = sequencia1 + sequencia2
+    
+    lista_cores = []
+    for item in color_discrete_sequence_:
+        cor = 'rgb'+str(item)
+        lista_cores.append(cor)
+    color_discrete_sequence_ = lista_cores
+    
+        
     chart = px.line(df,
                  x="MES_N",  # Month (column index after pivot)
                  y="VOLUME_FATURADO", # Values

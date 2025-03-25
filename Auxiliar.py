@@ -12,6 +12,8 @@ import plotly.express as px
 from plotly.offline import plot
 import altair as alt
 import streamlit as st
+import plotly.colors as pc
+
 
 def main_abrir_csv_unico_func():
     dados_agua_df = abrir_csv_unico_func(pasta_produtos_func(pasta_projeto_func()))
@@ -86,8 +88,8 @@ dados_agua_df_sHU['ANO_Categ']= dados_agua_df_sHU['ANO']
 dados_agua_df_sHU['ANO_Categ'] = dados_agua_df_sHU['ANO_Categ'].astype('str')
 
 lista_cidade = dados_agua_df_sHU['Cidade'].unique().tolist()
-for i, item in enumerate(lista_cidade):
-    print(i, item)
+#for i, item in enumerate(lista_cidade):
+#    print(i, item)
 
 
 dict_agrupamento = {
@@ -104,27 +106,27 @@ dict_agrupamento = {
     }
 
 lista_agrupamento = list(dict_agrupamento.keys())
-print(lista_agrupamento)
+#print(lista_agrupamento)
     
 dict_dataframes = {}
 
 
 for i, item in enumerate(dict_agrupamento.values()):
    df_concatenado = pd.DataFrame(columns=dados_agua_df_sHU.columns)
-   print(i, item)
+   #print(i, item)
    if item[0] == 'UFSC - Total':
        dataframe = dados_agua_df_sHU
        df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
    else:
        
        for subitem in item:
-           print(subitem)
+           #print(subitem)
            dataframe = dados_agua_df_sHU[dados_agua_df_sHU['Cidade']==subitem]
            df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
    dict_dataframes[lista_agrupamento[i]] = df_concatenado
         
-for item in dict_dataframes.values():
-    print('dict_dataframes', item)
+#for item in dict_dataframes.values():
+ #   print('dict_dataframes', item)
 
 # manual - exemplo
 agrupamento_selecionado = 'Campus Florianópolis - excluído Campus Trindade'
@@ -132,7 +134,7 @@ agrupamento_selecionado = 'Campus Florianópolis - excluído Campus Trindade'
 df_selecionado = dict_dataframes[agrupamento_selecionado] 
 volume_faturado_por_ano = df_selecionado.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
 custo_faturado_por_ano = df_selecionado.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
-print(volume_faturado_por_ano)
+#print(volume_faturado_por_ano)
 df_selecionado_dataframe = pd.concat([volume_faturado_por_ano, custo_faturado_por_ano['VALOR_TOTAL']],axis=1)
 df_selecionado_dataframe['Agrupamento Selecionado'] = agrupamento_selecionado
 df_selecionado_dataframe = df_selecionado_dataframe.rename(columns=
@@ -197,7 +199,7 @@ volume_faturado_por_mes_ano = dados_agua_df_sHU.groupby(['ANO', 'MES_N'])['VOLUM
 #volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
 
 
-dados_agua_df_sHU.info()
+#dados_agua_df_sHU.info()
 
 
 anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico:",
@@ -208,7 +210,7 @@ anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico
 # Filtrar o DataFrame com base nos anos selecionados
 filtered_df_fig1 = volume_faturado_por_mes_ano[volume_faturado_por_mes_ano['ANO'].isin(anos_selecionados_fig1)]
 fig1 = boxplot_func_px(filtered_df_fig1)
-plot(fig1)
+#plot(fig1)
 
 
 anos_selecionados_fig2 = st.multiselect(    "Selecione os anos desejados no gráfico:",
@@ -219,7 +221,7 @@ anos_selecionados_fig2 = st.multiselect(    "Selecione os anos desejados no grá
 # Filtrar o DataFrame com base nos anos selecionados
 filtered_df_fig2 = volume_faturado_por_mes_ano[volume_faturado_por_mes_ano['ANO'].isin(anos_selecionados_fig2)]
 fig2 = scatter_func_px(filtered_df_fig2)
-plot(fig2)
+#plot(fig2)
 
 
 anos_selecionados_fig3 = st.multiselect(    "Selecione os anos desejados no gráfico:",
@@ -231,6 +233,74 @@ anos_selecionados_fig3 = st.multiselect(    "Selecione os anos desejados no grá
 filtered_df_fig3 = volume_faturado_por_mes_ano[volume_faturado_por_mes_ano['ANO'].isin(anos_selecionados_fig3)]
 
 fig3 = line_func_px(filtered_df_fig3)
-plot(fig3)
+#plot(fig3)
 # para o streamlit -> st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
+
+
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip("#")  # Remove "#" se presente
+    r = int(hex_color[0:2], 16)  # Converte os primeiros 2 caracteres para decimal (vermelho)
+    g = int(hex_color[2:4], 16)  # Converte os próximos 2 caracteres para decimal (verde)
+    b = int(hex_color[4:6], 16)  # Converte os últimos 2 caracteres para decimal (azul)
+    return (r, g, b)  # Retorna a tupla RGB
+
+
+def line_func_px(df):
+    
+    
+    
+    # Defina as duas cores desejadas
+    cor1 =  st.color_picker("Escolha a cor 1", '#3100FB')
+    cor2 =  st.color_picker("Escolha a cor 2", '#E411E4')
+    cor3 =  st.color_picker("Escolha a cor 3", '#CEE411')
+    
+    
+    cor1_rgb = hex_to_rgb(cor1)
+    cor2_rgb = hex_to_rgb(cor2)
+    cor3_rgb = hex_to_rgb(cor3)
+
+    
+    num_colors = len(df['ANO'].unique())
+    
+    if num_colors == 1:
+        color_discrete_sequence_ = cor1_rgb
+    elif num_colors == 2:
+        color_discrete_sequence_ = cor1_rgb + cor2_rgb
+    else:
+        if num_colors % 2 == 0: #verifica se é par
+            num_colors_seq1 = num_colors/2
+            num_colors_seq2 = num_colors/2
+        else:
+            num_colors_seq1 = num_colors/2-0.5
+            num_colors_seq2 = num_colors/2+0.5
+        sequencia1 = pc.n_colors(cor1_rgb, cor2_rgb, int(num_colors_seq1), colortype='tuple')
+        sequencia2 = pc.n_colors(cor2_rgb, cor3_rgb, int(num_colors_seq2), colortype='tuple')
+        color_discrete_sequence_ = sequencia1 + sequencia2
+    
+    lista_cores = []
+    for item in color_discrete_sequence_:
+        cor = 'rgb'+str(item)
+        lista_cores.append(cor)
+    color_discrete_sequence_ = lista_cores
+    
+        
+    chart = px.line(df,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VOLUME_FATURADO", # Values
+                 labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
+                 color='ANO',  # Coluna para a cor
+                 color_discrete_sequence=color_discrete_sequence_,
+                 )
+    chart.update_layout(xaxis=dict(dtick=1))
+    # Definir o intervalo da legenda como 1 (se desejar)
+    min_value = int(df['ANO'].min())
+    max_value = int(df['ANO'].max())
+    tickvals = np.arange(min_value, max_value + 1, 1)
+    ticktext = tickvals.astype(str)
+    chart.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))    
+    
+    return chart
+
+fig3 = line_func_px(filtered_df_fig3)
+plot(fig3)
 
