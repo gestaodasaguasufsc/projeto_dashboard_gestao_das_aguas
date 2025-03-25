@@ -18,6 +18,7 @@ import altair as alt
 import plotly.express as px
 from streamlit_folium import folium_static
 import plotly.express as px
+import plotly.colors as pc
 
 
 # Passo 0 - funções para carregar csv unico com com todos os dados de água de 2023 ao momento presente
@@ -581,45 +582,67 @@ def agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano):
 #### Reorganizando totais mensais:
 #### - Agrupando dados por ano e por mês a partir de dados_agua_df_sHU com dados de volume faturado mensal
 
-def volume_faturado_por_mes_ano_func(dados_agua_df_sHU):
-
-    volume_faturado_por_mes_ano = dados_agua_df_sHU.groupby(['ANO', 'MES_N'])['VOLUME_FATURADO'].sum().reset_index()
-
-    # Cria o gráfico de linha interativo usando Plotly Express
-    fig = px.bar(volume_faturado_por_mes_ano,
-                  x='MES_N',
-                  y='VOLUME_FATURADO',
-                  color='ANO',
-                  labels={'MES_N': 'Mês', 'VOLUME_FATURADO': 'Volume Faturado (m³)', 'ANO': 'Ano'})
-
-    return fig
-
-
-#gráfico 3- boxplot
-
-def boxplot_func(dados_agua_df_sHU):
-
-    volume_faturado_por_mes_ano = dados_agua_df_sHU.groupby(['ANO', 'MES_N'])['VOLUME_FATURADO'].sum().reset_index()
-    volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
-
-    volume_faturado_melted = volume_faturado_pivot.melt(ignore_index=False, value_name='VOLUME_FATURADO')
-    volume_faturado_melted = volume_faturado_melted.reset_index()  # To make 'ANO' a column
-
-    fig = px.box(volume_faturado_melted,
+def boxplot_func_px(df):
+   
+    chart = px.box(df,
                  x="MES_N",  # Month (column index after pivot)
                  y="VOLUME_FATURADO", # Values
                  color='ANO',
-                 labels={'MES_N': 'Mês', 'VOLUME_FATURADO': 'Volume Faturado (m³)', 'ANO': 'Ano'},
+                 labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
                  boxmode='group',
-                 points='all')
+                 points='all'
+                 )
+    chart.update_layout(xaxis=dict(dtick=1))    
+    
+    return chart
 
-    return fig
+def scatter_func_px(df):
+   
+    chart = px.scatter(df,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VOLUME_FATURADO", # Values
+                 labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
+                 color='ANO',  # Coluna para a cor
+                 color_continuous_scale='Viridis' 
+                 )
+    chart.update_layout(xaxis=dict(dtick=1))   
+    
+    # Definir o intervalo da legenda como 1
+    min_value = int(df['ANO'].min())
+    max_value = int(df['ANO'].max())
+    tickvals = np.arange(min_value, max_value + 1, 1)  # Cria um array de valores de tick com intervalo de 1
+    ticktext = tickvals.astype(str)  # Converte os valores de tick para strings para exibição na legenda
+    
+    
+    chart.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))
+    
+    return chart
 
+def line_func_px(df):
+    # Defina as duas cores desejadas
+    cor1 = 'rgb(255, 0, 0)'
+    cor2 = 'rgb(255, 0, 255)'
 
-
-
-
-
+    
+    num_colors = len(df['ANO'].unique())
+    color_discrete_sequence_ = pc.n_colors(cor1, cor2, num_colors, colortype='rgb')
+    
+    chart = px.line(df,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VOLUME_FATURADO", # Values
+                 labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
+                 color='ANO',  # Coluna para a cor
+                 color_discrete_sequence=color_discrete_sequence_,
+                 )
+    chart.update_layout(xaxis=dict(dtick=1))
+    # Definir o intervalo da legenda como 1 (se desejar)
+    min_value = int(df['ANO'].min())
+    max_value = int(df['ANO'].max())
+    tickvals = np.arange(min_value, max_value + 1, 1)
+    ticktext = tickvals.astype(str)
+    chart.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))    
+    
+    return chart
 
 
 
@@ -729,7 +752,11 @@ with tab3:
     st.write('Acumulados anuais: Volume e Custo')
     
        
-    agrupamento_selecionado = st.selectbox('Selecione o  agrupamento dos dados:', lista_agrupamento, index = 0)
+    agrupamento_selecionado = st.selectbox('Selecione o  agrupamento dos dados:', 
+                                           lista_agrupamento, 
+                                           index = 0, 
+                                           key='selectbox_agrupamento1'
+                                           )
     
     df_selecionado = dict_dataframes[agrupamento_selecionado] 
     volume_faturado_por_ano = df_selecionado.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
@@ -767,10 +794,59 @@ with tab3:
 
 with tab4:
 
-    st.write('Volumes e custos mensais por ano para o agrupamento selecionado:')
+    st.write('Volumes e custos mensais acumulados por ano para o agrupamento selecionado:')
     
-    fig2 = volume_faturado_por_mes_ano_func(dados_agua_df_sHU)
-    st.write(fig2)
+    
+    agrupamento_selecionado2 = st.selectbox('Selecione o  agrupamento dos dados:', 
+                                           lista_agrupamento, 
+                                           index = 0, 
+                                           key='selectbox_agrupamento2'
+                                           )
+    df_selecionado2 = dict_dataframes[agrupamento_selecionado2] 
+    
+    df_selecionado2 = df_selecionado2.groupby(['ANO', 'MES_N'])['VOLUME_FATURADO'].sum().reset_index()
+    #volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
+
+
+ 
+    anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico:",
+        options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
+        default=df_selecionado2['ANO'].unique(),
+        key='multiselect_anos_fig1'
+        )
+
+    # Filtrar o DataFrame com base nos anos selecionados
+    filtered_df_fig1 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig1)]
+    fig1 = boxplot_func_px(filtered_df_fig1)
+    st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
+
+
+    anos_selecionados_fig2 = st.multiselect(    "Selecione os anos desejados no gráfico:",
+        options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
+        default=df_selecionado2['ANO'].unique(),  # Valores padrão selecionados
+        key='multiselect_anos_fig2'
+        )
+
+    # Filtrar o DataFrame com base nos anos selecionados
+    filtered_df_fig2 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig2)]
+    fig2 = scatter_func_px(filtered_df_fig2)
+    st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
+
+
+    anos_selecionados_fig3 = st.multiselect(    "Selecione os anos desejados no gráfico:",
+        options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
+        default=df_selecionado2['ANO'].unique(),   # Valores padrão selecionados
+        key='multiselect_anos_fig3'
+        )
+
+    # Filtrar o DataFrame com base nos anos selecionados
+    filtered_df_fig3 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig3)]
+
+    fig3 = line_func_px(filtered_df_fig3)
+    st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
+    
+    
+   
 
    
        

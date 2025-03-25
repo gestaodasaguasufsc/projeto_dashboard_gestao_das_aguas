@@ -10,6 +10,8 @@ from datetime import date
 import numpy as np
 import plotly.express as px
 from plotly.offline import plot
+import altair as alt
+import streamlit as st
 
 def main_abrir_csv_unico_func():
     dados_agua_df = abrir_csv_unico_func(pasta_produtos_func(pasta_projeto_func()))
@@ -80,6 +82,8 @@ dados_agua_df = dados_agua_df.rename(columns={'HIDROMETRO': 'Hidrometro'})
 
 dados_agua_df_sHU = dados_agua_df[dados_agua_df['Hidrometro']!='H014'] 
 
+dados_agua_df_sHU['ANO_Categ']= dados_agua_df_sHU['ANO']
+dados_agua_df_sHU['ANO_Categ'] = dados_agua_df_sHU['ANO_Categ'].astype('str')
 
 lista_cidade = dados_agua_df_sHU['Cidade'].unique().tolist()
 for i, item in enumerate(lista_cidade):
@@ -147,23 +151,86 @@ for i,uc in enumerate(lista_ucs):
     lista_uc_local.append(nome_uc_local)
     
 
-def boxplot_func(volume_faturado_melted):
+def boxplot_func_px(volume_faturado_por_mes_ano):
    
-    fig = px.box(volume_faturado_melted,
+    chart = px.box(volume_faturado_por_mes_ano,
                  x="MES_N",  # Month (column index after pivot)
                  y="VOLUME_FATURADO", # Values
-                 #color='ANO',
+                 color='ANO',
                  labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
-                # boxmode='group',
-                  points='all')
-                 
-    return fig
+                 boxmode='group',
+                 points='all'
+                 )
+        
+    
+    return chart
+
+def scatter_func_px(volume_faturado_por_mes_ano):
+   
+    chart = px.scatter(volume_faturado_por_mes_ano,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VOLUME_FATURADO", # Values
+                 labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
+                 color='ANO',  # Coluna para a cor
+                 color_continuous_scale='Viridis', 
+                 )
+        
+    
+    return chart
+
+def line_func_px(volume_faturado_por_mes_ano):
+   
+    chart = px.line(volume_faturado_por_mes_ano,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VOLUME_FATURADO", # Values
+                 labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
+                 color='ANO'  # Coluna para a cor
+                 #color_continuous_scale='Viridis',
+                 )
+        
+    
+    return chart
+
 
 
 volume_faturado_por_mes_ano = dados_agua_df_sHU.groupby(['ANO', 'MES_N'])['VOLUME_FATURADO'].sum().reset_index()
-volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
+#volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
 
 
+dados_agua_df_sHU.info()
 
-fig = boxplot_func(volume_faturado_por_mes_ano)
-plot(fig)
+
+anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico:",
+    options=volume_faturado_por_mes_ano['ANO'].unique(),  # Opções do multi-check
+    default=volume_faturado_por_mes_ano['ANO'].unique()   # Valores padrão selecionados
+    )
+
+# Filtrar o DataFrame com base nos anos selecionados
+filtered_df_fig1 = volume_faturado_por_mes_ano[volume_faturado_por_mes_ano['ANO'].isin(anos_selecionados_fig1)]
+fig1 = boxplot_func_px(filtered_df_fig1)
+plot(fig1)
+
+
+anos_selecionados_fig2 = st.multiselect(    "Selecione os anos desejados no gráfico:",
+    options=volume_faturado_por_mes_ano['ANO'].unique(),  # Opções do multi-check
+    default=volume_faturado_por_mes_ano['ANO'].unique()  # Valores padrão selecionados
+    )
+
+# Filtrar o DataFrame com base nos anos selecionados
+filtered_df_fig2 = volume_faturado_por_mes_ano[volume_faturado_por_mes_ano['ANO'].isin(anos_selecionados_fig2)]
+fig2 = scatter_func_px(filtered_df_fig2)
+plot(fig2)
+
+
+anos_selecionados_fig3 = st.multiselect(    "Selecione os anos desejados no gráfico:",
+    options=volume_faturado_por_mes_ano['ANO'].unique(),  # Opções do multi-check
+    default=volume_faturado_por_mes_ano['ANO'].unique()   # Valores padrão selecionados
+    )
+
+# Filtrar o DataFrame com base nos anos selecionados
+filtered_df_fig3 = volume_faturado_por_mes_ano[volume_faturado_por_mes_ano['ANO'].isin(anos_selecionados_fig3)]
+
+fig3 = line_func_px(filtered_df_fig3)
+plot(fig3)
+# para o streamlit -> st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
+
