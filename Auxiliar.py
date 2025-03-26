@@ -6,6 +6,7 @@ Created on Mon Mar 24 08:45:59 2025
 """
 import os
 import pandas as pd
+import geopandas as gpd
 from datetime import date
 import numpy as np
 import plotly.express as px
@@ -302,5 +303,98 @@ def line_func_px(df):
     return chart
 
 fig3 = line_func_px(filtered_df_fig3)
-plot(fig3)
+#plot(fig3)
+
+
+
+# Passo 2 - carregar dicionário de shapes
+
+#Carregando dados shapefile
+
+#GDB Esri
+#pasta_projeto = ""
+pasta_projeto = pasta_projeto_func()
+shapes_pasta = os.path.join(pasta_projeto, 'Dados','Origem','Shapes')
+print(shapes_pasta)
+
+dict_SAA_UFSC = {
+    'hidrometros':'UFSC_Hidrometros',
+    'Limite_UFSC' :  'CGA_Limite_Campus_UFSC_Trindade_112021_editado',
+    'Rede_Interna_UFSC' : 'Rede_Interna_UFSC',
+    'Rede_CASAN' : 'Rede_Casan_',
+    'Reservatorios' : 'Reservatorios',
+    'SubSetores_Agua' : 'SubSetores_Agua'
+}
+
+dict_shapes = {}
+
+for chave in dict_SAA_UFSC:
+  nome_shp =  f'{dict_SAA_UFSC[chave]}.shp'
+  link = ""  
+  link = os.path.join(shapes_pasta,nome_shp)
+  shape = gpd.read_file(link)
+  shape = shape.to_crs(epsg=4326)
+  dict_shapes[chave] = shape
+
+
+
+#Passo 3 - edição hidrometros_shp
+
+
+#remover colunas 4 e 5 hidrometro_shp
+
+x = 4 #coluna 4 - Xcoord
+y = 5 #coluna 5 - Ycoord
+hidrometros_shp = dict_shapes['hidrometros']
+colunas_a_manter = np.r_[0:x, x+1:y, y+1:hidrometros_shp.shape[1]]
+hidrometros_shp = hidrometros_shp.iloc[:,colunas_a_manter]
+hidrometros_shp.rename(columns={'Nome_hidro': 'Hidrometro'}, inplace=True)
+
+def localiza_hidrometro_func (df_i, valor, shp):
+    df = df_i.iloc[:,[1,11]]
+    df['nome_uc_local'] = df['Hidrometro'] +" " + df['Local']
+    selecao = df.loc[df['nome_uc_local']==valor, 'Hidrometro'].iloc[0]
+    lat = shp.loc[shp['Hidrometro']==selecao,'Latitude'].iloc[0]
+    long = shp.loc[shp['Hidrometro']==selecao,'Longitude'].iloc[0]
+    lista_keys = ['hid_sel', 'lat', 'long']
+    saida = [selecao, lat, long]
+    dict_saida = {}
+    for i, item in enumerate(lista_keys):
+        dict_saida[item] = saida[i]
+    return dict_saida
+
+
+
+selecao_uc_mapa = 	"H001 Almoxarifado e Transportes (PU 11 e 06)"
+
+
+def localiza_hidrometro_1_func (df_i, valor):
+    df = df_i.iloc[:,[1,11]]
+    df['nome_uc_local'] = df['Hidrometro'] +" " + df['Local']
+    selecao = df.loc[df['nome_uc_local']==valor, 'Hidrometro'].iloc[0]
+    return selecao
+
+#selecao = localiza_hidrometro_1_func (cadastro_hidrometros_df, selecao_uc_mapa)
+
+#print(  'SELECAO: ',selecao)
+
+
+#lat = hidrometros_shp.loc[hidrometros_shp['Hidrometro']=='H001','Latitude']
+#print(lat)
+
+#long = hidrometros_shp.loc[hidrometros_shp['Hidrometro']==selecao,'Longitude']
+
+#with col1:
+    #selecao_uc_mapa = st.selectbox('Selecione a unidade consumidora', lista_uc_local, key='selectbox_mapa_uc')        
+
+dict_saida = localiza_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, hidrometros_shp)
+print(dict_saida)
+
+#saida =  [selecao, lat, long]
+
+
+
+    
+    
+#map = folium.Map(width = 950, height=750, location=[lat, long], zoom_start=5)
 
