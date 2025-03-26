@@ -388,13 +388,91 @@ def localiza_hidrometro_1_func (df_i, valor):
     #selecao_uc_mapa = st.selectbox('Selecione a unidade consumidora', lista_uc_local, key='selectbox_mapa_uc')        
 
 dict_saida = localiza_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, hidrometros_shp)
-print(dict_saida)
+#print(dict_saida)
 
 #saida =  [selecao, lat, long]
 
+hidrometros_shp_merge = hidrometros_shp.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
+
+uc_selecionada = 'H001'
+
+#for index, row in hidrometros_shp_merge.iterrows():
+ #   if row.geometry is not None and row.geometry.is_valid:
+                                    
+  #        if row['Hidrometro'] == uc_selecionada:
+              #print("SIM", row['Hidrometro'])
+              
+              
+#Gerando lista_ucs_local
 
 
+lista_ucs = dados_agua_df_sHU['Hidrometro'].unique().tolist()
+lista_local = dados_agua_df_sHU['Local'].unique().tolist()
+lista_uc_local = []
+
+for i,uc in enumerate(lista_ucs):
+    nome_uc_local = lista_ucs[i] + " " + lista_local[i]
+    lista_uc_local.append(nome_uc_local)
+
+lista_uc_local.sort()
+lista_uc_local.append("UFSC - visão geral")
+index_visao_geral =lista_uc_local.index("UFSC - visão geral")
     
-    
-#map = folium.Map(width = 950, height=750, location=[lat, long], zoom_start=5)
 
+#gerando dicionário com dataframes filtrados por agrupamentos de campi
+
+dict_agrupamento = {
+    'UFSC - Total':['UFSC - Total'],
+    'Campus Florianópolis - todos':['Florianópolis - Trindade', 'Florianópolis - Outros'],
+    'UFSC - Total campi excluído Florianópolis':['Araquari', 'Curitibanos', 'Joinville', 'Araranguá', 'Blumenau'],
+    'Campus Florianópolis - excluído Campus Trindade':['Florianópolis - Outros'],
+    'Campus Florianópolis - somente Campus Trindade':['Florianópolis - Trindade'],
+    'Campus Araranguá':['Araranguá'],
+    'Campus Blumenau': ['Blumenau'],
+    'Campus Curitibanos':['Curitibanos'],
+    'Campus Joinville': ['Joinville'],
+    'Unidade Araquari':['Araquari']
+    }
+
+
+#def cria_listas_campi_func (df_i):
+ #   lista_cidades = df_i['Cidade'].unique()
+  #  lista_nomes = ['Trindade','Outros','Araquari','Curitibanos','Joinville','Ararangua','Blumenau']
+   # df = df_i.iloc[:,[4,33,31]]
+    #df['nome_uc_local'] = df['Hidrometro'] + " " + df['Local']
+    #dict_df = {}
+    #for i,item in enumerate(lista_nomes):
+     #   nome = f'df_cidades_{item}'
+        #dict_cidades[nome] = lista_cidades[i]
+
+        
+df_i = cadastro_hidrometros_df
+
+lista_cidades = df_i['Cidade'].unique()
+n = 6
+
+selecao_cidade = lista_cidades[n]
+    
+def gerador_lista_uc_local_por_campi_func (df_i, selecao_cidade):
+    df_i = df_i[df_i['Cidade']!= 'Florianópolis  HU']
+    df = df_i.iloc[:,[1,11,9]]
+    df['nome_uc_local'] = df['Hidrometro'] + " " + df['Local']
+    df_filtrada = df[df['Cidade'] == selecao_cidade]
+    lista = df_filtrada['nome_uc_local'].tolist()
+    return lista
+
+df = df_i.iloc[:,[1,11,9]]
+df['nome_uc_local'] = df['Hidrometro'] + " " + df['Local']
+df_filtrada = df[df['Cidade'] == selecao_cidade]
+lista_uc_local_2 = df_filtrada['nome_uc_local'].tolist()
+
+
+
+#lista_uc_local_2 = gerador_lista_uc_local_por_campi_func (df_i,selecao_cidade)
+
+#for item in lista_uc_local_2:
+ #   print(item)
+                       
+                       
+                       
+                       

@@ -96,65 +96,7 @@ dados_agua_df = dados_agua_df.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18
 dados_agua_df_sHU = dados_agua_df[dados_agua_df['Hidrometro']!='H014'] #remove o Hospital Universitário da análise
 
 
-#Gerando lista_ucs_local
 
-
-lista_ucs = dados_agua_df_sHU['Hidrometro'].unique().tolist()
-lista_local = dados_agua_df_sHU['Local'].unique().tolist()
-lista_uc_local = []
-
-for i,uc in enumerate(lista_ucs):
-    nome_uc_local = lista_ucs[i] + " " + lista_local[i]
-    lista_uc_local.append(nome_uc_local)
-  
-#Localiza hidrômetro, entrada com cadastro_hidrometros_df, valor selecionado)  
-def localiza_lat_long_hidrometro_func (df_i, valor, shp):
-    df = df_i.iloc[:,[1,11]]
-    df['nome_uc_local'] = df['Hidrometro'] +" " + df['Local']
-    selecao = df.loc[df['nome_uc_local']==valor, 'Hidrometro'].iloc[0]
-    lat = shp.loc[shp['Hidrometro']==selecao,'Latitude'].iloc[0]
-    long = shp.loc[shp['Hidrometro']==selecao,'Longitude'].iloc[0]
-    lista_keys = ['hid_sel', 'lat', 'long']
-    saida = [selecao, lat, long]
-    dict_saida = {}
-    for i, item in enumerate(lista_keys):
-        dict_saida[item] = saida[i]
-    return dict_saida
-    
-
-#gerando dicionário com dataframes filtrados por agrupamentos de campi
-
-dict_agrupamento = {
-    'UFSC - Total':['UFSC - Total'],
-    'Campus Florianópolis - todos':['Florianópolis - Trindade', 'Florianópolis - Outros'],
-    'UFSC - Total campi excluído Florianópolis':['Araquari', 'Curitibanos', 'Joinville', 'Araranguá', 'Blumenau'],
-    'Campus Florianópolis - excluído Campus Trindade':['Florianópolis - Outros'],
-    'Campus Florianópolis - somente Campus Trindade':['Florianópolis - Trindade'],
-    'Campus Araranguá':['Araranguá'],
-    'Campus Blumenau': ['Blumenau'],
-    'Campus Curitibanos':['Curitibanos'],
-    'Campus Joinville': ['Joinville'],
-    'Unidade Araquari':['Araquari']
-    }
-
-lista_agrupamento = list(dict_agrupamento.keys())
-    
-dict_dataframes = {}
-
-
-for i, item in enumerate(dict_agrupamento.values()):
-   df_concatenado = pd.DataFrame(columns=dados_agua_df_sHU.columns)
-   
-   if item[0] == 'UFSC - Total':
-       dataframe = dados_agua_df_sHU
-       df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
-   else:
-       
-       for subitem in item:
-           
-           dataframe = dados_agua_df_sHU[dados_agua_df_sHU['Cidade']==subitem]
-           df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
-   dict_dataframes[lista_agrupamento[i]] = df_concatenado
         
 
 # Passo 2 - carregar dicionário de shapes
@@ -277,13 +219,14 @@ def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, filtered_s
 
 
 #### ____________________________________________________________________________________________________________________________
-#### Parte xx - Inclusão de shapes fixos (não variam no tempo)
-
-# Camadas fixas - não alteram no tempo
+#### Parte xx - Inclusão de outros shapes 
 
 
+# demais camadas
 
-def camadas_fixas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge):
+
+
+def camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada):
 
     # Camada 1. Reservatórios
 
@@ -393,54 +336,72 @@ def camadas_fixas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, lim
 
     for index, row in hidrometros_shp_merge.iterrows():
         if row.geometry is not None and row.geometry.is_valid:
-          texto = (
-          'Hidrometro: '+row['Hidrometro']+
-          '<br>'+'Local: '+row['Local']+
-          '<br>'+'Campus: '+row['Campus']+
-          '<br>'+'Cidade: '+row['Cidade']+
-          '<br>'+'Setor: '+row['Setor de Abastecimento CGA']+
-          '<br>'+'SubSetor: '+row['Setor de Abastecimento CGA.1']
-          )
-
-          texto = texto if pd.isna(row['Matricula']) else texto + '<br>'+'Matrícula: '+str(int(row['Matricula']))
-          pasta_figuras = os.path.join(pasta_projeto, 'Auxiliar', 'Info_Hidrometros')
-          figura_nome = row['Hidrometro']+'.jpg'
-          figura_url = os.path.join(pasta_figuras, figura_nome)
-          if os.path.isfile(figura_url)==True:
-            with open(figura_url, "rb") as image_file:
-              encoded_string = base64.b64encode(image_file.read()).decode()
-          else:
-            pass
-          figura_src = f"<img src='data:image/jpeg;base64,{encoded_string}' width='400'>" if os.path.isfile(figura_url) else ""
-          popup_content = (
-              f"{texto}<br>{figura_src}"
+              texto = (
+              'Hidrometro: '+row['Hidrometro']+
+              '<br>'+'Local: '+row['Local']+
+              '<br>'+'Campus: '+row['Campus']+
+              '<br>'+'Cidade: '+row['Cidade']+
+              '<br>'+'Setor: '+row['Setor de Abastecimento CGA']+
+              '<br>'+'SubSetor: '+row['Setor de Abastecimento CGA.1']
               )
-
-          lista_cores = ('blue', 'red', 'green')
-          background_color = ('yellow', 'black', 'black')
-
-          if row['Categoria'] == 'Medidor faturado pela UFSC':
-              i = 0
-          elif row['Categoria'] == 'Medidor não faturado pela UFSC':
-              i = 1
-          elif row['Categoria'] == 'Medidor Interno':
-              i = 2
-          else:
-              pass
-
-          folium.Marker(
-              location=[row.geometry.y, row.geometry.x],
-              popup=folium.Popup(popup_content, max_width=300),
-              icon=plugins.BeautifyIcon(
-                  icon="circle",
-                  icon_shape="circle-dot",
-                  border_color=lista_cores[i],
-                  text_color="#007799",
-                  background_color=background_color[i],
-                  icon_size=icon_size)
-              ).add_to(hidrometros_group)
+    
+              texto = texto if pd.isna(row['Matricula']) else texto + '<br>'+'Matrícula: '+str(int(row['Matricula']))
+              pasta_figuras = os.path.join(pasta_projeto, 'Auxiliar', 'Info_Hidrometros')
+              figura_nome = row['Hidrometro']+'.jpg'
+              figura_url = os.path.join(pasta_figuras, figura_nome)
+              if os.path.isfile(figura_url)==True:
+                with open(figura_url, "rb") as image_file:
+                  encoded_string = base64.b64encode(image_file.read()).decode()
+              else:
+                pass
+              figura_src = f"<img src='data:image/jpeg;base64,{encoded_string}' width='400'>" if os.path.isfile(figura_url) else ""
+              popup_content = (
+                  f"{texto}<br>{figura_src}"
+                  )
+    
+              lista_cores = ('blue', 'red', 'green')
+              background_color = ('yellow', 'black', 'black')
+    
+              if row['Categoria'] == 'Medidor faturado pela UFSC':
+                  i = 0
+              elif row['Categoria'] == 'Medidor não faturado pela UFSC':
+                  i = 1
+              elif row['Categoria'] == 'Medidor Interno':
+                  i = 2
+              else:
+                  pass
+              
+                           
+              if row['Hidrometro'] == uc_selecionada:
+                # Modificar cor, tamanho e adicionar ao grupo para o ponto específico
+                    folium.Marker(
+                        location=[row.geometry.y, row.geometry.x],
+                        popup=folium.Popup(popup_content, max_width=300),
+                        icon=plugins.BeautifyIcon(
+                            icon="circle",
+                            icon_shape="circle-dot",
+                            border_color='red',  # Mudar cor para vermelho
+                            text_color="#007799",
+                            background_color='red',  # Mudar cor de fundo para vermelho
+                            icon_size=(20, 20)  # Mudar tamanho para 15x15 pixels
+                                                )
+                                ).add_to(hidrometros_group)
+              else:
+                    # Criar marcador com as configurações originais para outros pontos
+                    folium.Marker(
+                        location=[row.geometry.y, row.geometry.x],
+                        popup=folium.Popup(popup_content, max_width=300),
+                        icon=plugins.BeautifyIcon(
+                            icon="circle",
+                            icon_shape="circle-dot",
+                            border_color=lista_cores[i],
+                            text_color="#007799",
+                            background_color=background_color[i],
+                            icon_size=icon_size
+                        )
+                        ).add_to(hidrometros_group)
         else:
-          pass
+            pass
 
     hidrometros_group.add_to(map)
 
@@ -706,8 +667,77 @@ def line_func_px(df):
 
 
 
+#### Defs streamlit
+
+#Localiza hidrômetro, entrada com cadastro_hidrometros_df, valor selecionado)  
+def localiza_lat_long_hidrometro_func (df_i, valor, shp):
+    df = df_i.iloc[:,[1,11]]
+    df['nome_uc_local'] = df['Hidrometro'] +" " + df['Local']
+    selecao = df.loc[df['nome_uc_local']==valor, 'Hidrometro'].iloc[0]
+    lat = shp.loc[shp['Hidrometro']==selecao,'Latitude'].iloc[0]
+    long = shp.loc[shp['Hidrometro']==selecao,'Longitude'].iloc[0]
+    lista_keys = ['hid_sel', 'lat', 'long']
+    saida = [selecao, lat, long]
+    dict_saida = {}
+    for i, item in enumerate(lista_keys):
+        dict_saida[item] = saida[i]
+    return dict_saida
+
+def gerador_lista_uc_local_por_campi_func (df, selecao_cidade):
+    df = df[df['Cidade']!= 'Florianópolis  HU']
+    df = df.iloc[:,[1,11,9]]
+    df['nome_uc_local'] = df['Hidrometro'] + " " + df['Local']
+    df_filtrada = df[df['Cidade'] == selecao_cidade]
+    lista = df_filtrada['nome_uc_local'].tolist()
+    lista.sort()
+    lista.append("UFSC - visão geral")
+    index_ = lista.index("UFSC - visão geral")
+    return lista, index_
+
+def lista_cidades_index_func(df):
+        df = df[df['Cidade']!= 'Florianópolis  HU']
+        lista = df['Cidade'].unique().tolist()
+        index_ = lista.index('Florianópolis - Trindade')
+        return lista, index_
+   
+
+#gerando dicionário com dataframes filtrados por agrupamentos de campi
+
+dict_agrupamento = {
+    'UFSC - Total':['UFSC - Total'],
+    'Campus Florianópolis - todos':['Florianópolis - Trindade', 'Florianópolis - Outros'],
+    'UFSC - Total campi excluído Florianópolis':['Araquari', 'Curitibanos', 'Joinville', 'Araranguá', 'Blumenau'],
+    'Campus Florianópolis - excluído Campus Trindade':['Florianópolis - Outros'],
+    'Campus Florianópolis - somente Campus Trindade':['Florianópolis - Trindade'],
+    'Campus Araranguá':['Araranguá'],
+    'Campus Blumenau': ['Blumenau'],
+    'Campus Curitibanos':['Curitibanos'],
+    'Campus Joinville': ['Joinville'],
+    'Unidade Araquari':['Araquari']
+    }
 
 
+
+
+lista_agrupamento = list(dict_agrupamento.keys())
+
+    
+dict_dataframes = {}
+
+
+for i, item in enumerate(dict_agrupamento.values()):
+   df_concatenado = pd.DataFrame(columns=dados_agua_df_sHU.columns)
+   
+   if item[0] == 'UFSC - Total':
+       dataframe = dados_agua_df_sHU
+       df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
+   else:
+       
+       for subitem in item:
+           
+           dataframe = dados_agua_df_sHU[dados_agua_df_sHU['Cidade']==subitem]
+           df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
+   dict_dataframes[lista_agrupamento[i]] = df_concatenado
 
 
 ###_________________________________________________________________________________
@@ -763,8 +793,10 @@ with tab1:
     st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece.' 
                ' O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. ' 
                ' Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios. '
-               ' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.'
+               
                )
+    st.caption(' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.')
+    st.caption(' Clique nos pontos de localização dos hidrômetros para visualizar imagem do local')
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:     
@@ -773,25 +805,52 @@ with tab1:
         mes_selecionado_mapa = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_mapa_mes')
     
     col1, col2 = st.columns(2)
+    
     with col1:
-        selecao_uc_mapa = st.selectbox('Selecione a unidade consumidora', lista_uc_local, key='selectbox_mapa_uc')        
         
-        dict_saida = localiza_lat_long_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, hidrometros_shp)
-        lat = dict_saida['lat']
-        long = dict_saida['long']
-        map = folium.Map(width = 950, height=750, location=[lat, long], zoom_start=30)
+        funcao = lista_cidades_index_func(cadastro_hidrometros_df)
+        lista_cidades = funcao[0]
+        index_cidades = funcao[1]
+        selecao_cidade = st.selectbox('Selecione o campi/unidade', lista_cidades, index = index_cidades , key='selectbox_mapa_cidades')        
         
-       
+            
+        
+    with col2: 
+        
+        funcao = gerador_lista_uc_local_por_campi_func (cadastro_hidrometros_df , selecao_cidade)
+        lista_uc_local = funcao[0]
+        index_visao_geral = funcao[1]
+    
+        selecao_uc_mapa = st.selectbox('Selecione a unidade consumidora', lista_uc_local, index = index_visao_geral , key='selectbox_mapa_uc')        
+        
+        
+        
+        if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+            map = folium.Map(width = 950, height=750, location=[-27.6, -48.52], zoom_start=15.5)
+            uc_selecionada = selecao_uc_mapa
+        else: 
+            dict_saida = localiza_lat_long_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, hidrometros_shp)
+            lat = dict_saida['lat']
+            long = dict_saida['long']
+            uc_selecionada = dict_saida['hid_sel']
+            map = folium.Map(width = 950, height=750, location=[lat, long], zoom_start=18)
+        
+    
     
     dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
     dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
     dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
              
     chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
-    #classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
-    camadas_fixas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge)
-    adicionar_camadas_de_fundo_func(map)
+    #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
     
+    
+    camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
+    
+    
+    
+    adicionar_camadas_de_fundo_func(map)
+        
     folium_static(map, width=1000, height=800)
     
     
