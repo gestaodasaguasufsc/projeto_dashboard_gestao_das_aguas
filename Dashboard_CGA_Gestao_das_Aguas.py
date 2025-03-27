@@ -574,7 +574,7 @@ def boxplot_func_px(df):
     
     return chart
 
-def scatter_func_px(df):
+def scatter_func_px_vol(df):
    
     chart = px.scatter(df,
                  x="MES_N",  # Month (column index after pivot)
@@ -591,6 +591,26 @@ def scatter_func_px(df):
     tickvals = np.arange(min_value, max_value + 1, 1)  # Cria um array de valores de tick com intervalo de 1
     ticktext = tickvals.astype(str)  # Converte os valores de tick para strings para exibição na legenda
     
+    chart.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))
+    
+    return chart
+
+def scatter_func_px_cus(df):
+   
+    chart = px.scatter(df,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VALOR_TOTAL", # Values
+                 labels={'ANO': 'Ano','VALOR_TOTAL': 'Valor Total (R$)' },
+                 color='ANO',  # Coluna para a cor
+                 color_continuous_scale='Viridis' 
+                 )
+    chart.update_layout(xaxis=dict(dtick=1))   
+    
+    # Definir o intervalo da legenda como 1
+    min_value = int(df['ANO'].min())
+    max_value = int(df['ANO'].max())
+    tickvals = np.arange(min_value, max_value + 1, 1)  # Cria um array de valores de tick com intervalo de 1
+    ticktext = tickvals.astype(str)  # Converte os valores de tick para strings para exibição na legenda
     
     chart.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))
     
@@ -700,6 +720,17 @@ def lista_cidades_index_func(df):
         index_ = lista.index('Florianópolis - Trindade')
         return lista, index_
    
+    
+def funcao_graf_uc_ano_func(df, selecao_uc_mapa):
+    df = df[df['Hidrometro']==selecao_uc_mapa]
+    vol_uc = df.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+    cus_uc = df.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+    graf_uc = agrupado_por_ano_func(vol_uc, cus_uc)
+    return graf_uc[0], graf_uc[1]
+
+def funcao_graf_uc_mes_func(df, selecao_uc_mapa):
+    df = df[df['Hidrometro']==selecao_uc_mapa]
+    return scatter_func_px_vol(df), scatter_func_px_cus(df)
 
 #gerando dicionário com dataframes filtrados por agrupamentos de campi
 
@@ -750,7 +781,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded")
 
-alt.themes.enable("dark")
+#alt.themes.enable("dark")
 
 
 # Map Folium Configurações 1 - Iniciais
@@ -784,25 +815,23 @@ with st.sidebar:
     st.sidebar.caption("Projeto desenvolvido em Python 3.10 - mar/2025")
     st.sidebar.caption("contato: gestaodasaguas@contato.ufsc.br")
 
-tab1, tab2, tab3, tab4 = st.tabs(["Mapa Cadastral e informações por UC", 
-                                  "Dados mensais por UC", "Dados agrupados anuais", "Dados agrupados mensais"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa Cadastral e informações por UC", 
+                                  "Dados gerais de UCs por ano e mês selecionado", "Dados agrupados anuais", "Dados agrupados mensais"])
 
 with tab1:
     
-    st.write("Mapa de hidrômetros, redes e subsetores de Água da UFSC")
-    st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece.' 
-               ' O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. ' 
-               ' Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios. '
-               
-               )
-    st.caption(' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.')
-    st.caption(' Clique nos pontos de localização dos hidrômetros para visualizar imagem do local')
+
+with tab2:
     
+        
     col1, col2, col3, col4 = st.columns(4)
     with col1:     
         ano_selecionado_mapa = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_mapa_ano')
     with col2:
         mes_selecionado_mapa = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_mapa_mes')
+    
+    with col3:
+        st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
     
     col1, col2 = st.columns(2)
     
@@ -821,7 +850,11 @@ with tab1:
         lista_uc_local = funcao[0]
         index_visao_geral = funcao[1]
     
-        selecao_uc_mapa = st.selectbox('Selecione a unidade consumidora', lista_uc_local, index = index_visao_geral , key='selectbox_mapa_uc')        
+        selecao_uc_mapa = st.selectbox('Selecione a unidade consumidora', 
+                                       lista_uc_local, 
+                                       index = index_visao_geral , 
+                                       key='selectbox_mapa_uc'
+                                       )        
         
         
         
@@ -836,35 +869,85 @@ with tab1:
             map = folium.Map(width = 950, height=750, location=[lat, long], zoom_start=18)
         
     
+    tab2_1, tab2_2, tab2_3 = st.tabs(["Mapa", 
+                          'Dados agrupados anuais da UC selecionada',
+                          'Dados mensais da UC selecionada',
+                                     ])
     
-    dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
-    dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
-    dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
-             
-    chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
-    #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
-    
-    
-    camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
-    
-    
-    
-    adicionar_camadas_de_fundo_func(map)
+    with tab2_1:
+        st.write("Mapa de hidrômetros, redes e subsetores de Água da UFSC")
+        st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece.' 
+                   ' O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. ' 
+                   ' Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios. '
+                   
+                   )
+        st.caption(' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.')
+        st.caption(' Clique nos pontos de localização dos hidrômetros para visualizar imagem do local')
         
-    folium_static(map, width=1000, height=800)
+        dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
+        dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
+        dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
+                 
+        chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
+        #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
+               
+        camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
+                        
+        adicionar_camadas_de_fundo_func(map)
+            
+        folium_static(map, width=1000, height=800)
     
+    with tab2_2:
+        tab2_2_1, tab2_2_2 = st.tabs(['Volume',
+                              'Custo'
+                              ])  
+        funcao_graf_uc_ano = funcao_graf_uc_ano_func(dados_agua_df_sHU, uc_selecionada)
+        
+        with tab2_2_1:
+            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+                st.caption('Selecione uma unidade consumidora para mostrar gráfico.')   
+            else:
+                st.caption(f'Volume da UC {selecao_uc_mapa} agrupado por ano.')   
+                st.write(funcao_graf_uc_ano[0])
+                                        
+        with tab2_2_2:
+            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+                st.caption('Selecione uma unidade consumidora para mostrar gráfico.')
+            else:        
+                st.caption(f'Custo da UC {selecao_uc_mapa} agrupado por ano.')   
+                st.write(funcao_graf_uc_ano[1])
     
-    
-    
-    
-    
+    with tab2_3:
+        tab2_3_1, tab2_3_2, tab2_3_3 = st.tabs(['Volume',
+                              'Custo', 'Fatura no mês e ano selecionados'
+                              ])  
+        
+               
+        with tab2_3_1:
+            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+                st.caption('Selecione uma unidade consumidora para mostrar gráfico.')   
+            else:
+                st.caption(f'Volume da UC {selecao_uc_mapa} distribuído por mês.')   
+                funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df_sHU, uc_selecionada)
+                st.write(funcao_graf_uc_mes[0])
+                                        
+        with tab2_3_2:
+            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+                st.caption('Selecione uma unidade consumidora para mostrar gráfico.')
+            else:        
+                st.caption(f'Custo da UC {selecao_uc_mapa} distribuído por mês.')   
+                funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df_sHU, uc_selecionada)
+                st.write(funcao_graf_uc_mes[1])
 
-with tab2:
+        with tab2_3_3:
+            st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')   
+            st.caption('Indisponível o momento')
+            
+with tab3:
     
-    st.write("Informações mensais por unidade consumidora:")
     st.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal. Por padrão o último mês com dados disponíveis está filtrado.")
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:     
         ano_selecionado_dados_mensais = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_dados_mensais_ano')
     with col2:
@@ -879,14 +962,14 @@ with tab2:
     
     
     
-    st.write("\n Volume faturado (m³) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
+    st.caption("\n Volume faturado (m³) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
     fig1 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado_dados_mensais)[0]
     st.write(fig1)
-    st.write("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
+    st.caption("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
     fig2 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado_dados_mensais)[1]
     st.write(fig2)
     
-    st.write("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
+    st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
     dataframe = dados_agua_df_ano_mes_selecionado_dados_mensais
     dataframe = dataframe.rename(
         columns={
@@ -898,7 +981,7 @@ with tab2:
     st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
 
  
-with tab3:
+with tab4:
 
     st.write('Acumulados anuais: Volume e Custo')
     
@@ -943,7 +1026,7 @@ with tab3:
                     
     st.dataframe(df_selecionado_dataframe, width=1200, height=600) # Or any other way you want to display the data
 
-with tab4:
+with tab5:
 
     st.write('Volumes e custos mensais acumulados por ano para o agrupamento selecionado:')
     
@@ -986,7 +1069,8 @@ with tab4:
     
         # Filtrar o DataFrame com base nos anos selecionados
     filtered_df_fig2 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig2)]
-    fig2 = scatter_func_px(filtered_df_fig2)
+    
+    fig2 = scatter_func_px_vol(filtered_df_fig2)
     st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
 
     filtered_df_fig2 = filtered_df_fig2.rename(columns=

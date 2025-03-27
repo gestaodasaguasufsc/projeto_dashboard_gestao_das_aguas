@@ -473,6 +473,53 @@ lista_uc_local_2 = df_filtrada['nome_uc_local'].tolist()
 #for item in lista_uc_local_2:
  #   print(item)
                        
-                       
-                       
-                       
+def agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano):
+    
+                 
+   # gráfico de volume
+    fig1 = px.bar(volume_faturado_por_ano,
+                  x='ANO',
+                  y='VOLUME_FATURADO',
+                  labels={'ANO': 'Ano', 'VOLUME_FATURADO': 'Volume Faturado (m³)'},
+                  barmode='group'
+                  )
+    fig1.update_layout(
+        xaxis = dict(
+            tickmode = 'linear',
+            tick0 = 0,
+            dtick = 1          # Set interval between ticks (and implicitly bars) to 1
+                    ))
+    
+     # gráfico de custo   
+    fig2 = px.bar(custo_faturado_por_ano,
+                  x='ANO',
+                  y='VALOR_TOTAL',
+                  labels={'ANO': 'Ano', 'VALOR_TOTAL': 'Custo Faturado (m³)'},
+                  barmode='group',  # Set barmode to 'group'
+                        # Adjust height if necessary
+                 )
+    fig2.update_layout(
+        xaxis = dict(
+            tickmode = 'linear',
+            tick0 = 0,
+            dtick = 1          # Set interval between ticks (and implicitly bars) to 1
+        ))
+
+    return fig1, fig2
+
+def funcao_graf_uc_func(df, selecao_uc_mapa):
+    df = df[df['Hidrometro']==selecao_uc_mapa]
+    vol_uc = df.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+    cus_uc = df.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+    graf_uc = agrupado_por_ano_func(vol_uc, cus_uc)
+    return graf_uc[0], graf_uc[1]
+
+df = dados_agua_df_sHU
+selecao_uc_mapa = 'H001'
+    
+
+funcao_graf_uc = funcao_graf_uc_func(dados_agua_df_sHU, selecao_uc_mapa)
+fig1 = funcao_graf_uc[0]              
+plot(fig1)                   
+fig2 = funcao_graf_uc[1]              
+plot(fig2)                 
