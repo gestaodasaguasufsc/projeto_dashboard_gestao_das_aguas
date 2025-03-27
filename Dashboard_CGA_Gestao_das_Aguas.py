@@ -874,14 +874,12 @@ with tab2:
                                      ])
     
     with tab2_1:
-        st.write("Mapa de hidrômetros, redes e subsetores de Água da UFSC")
+        st.caption("Mapa de hidrômetros, redes e subsetores de Água da UFSC")
         st.caption('Os subsetores correspondem a área estimada que cada hidrômetro abastece.' 
-                   ' O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. ' 
+                   'O mapa apresenta os subsetores com o consumo do mês selecionado ao lado.'
                    ' Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios. '
-                   
-                   )
-        st.caption(' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.')
-        st.caption(' Clique nos pontos de localização dos hidrômetros para visualizar imagem do local')
+                   ' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.'
+                    ' Clique nos pontos de localização dos hidrômetros para visualizar imagem do local')
         
         dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
         dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
@@ -952,7 +950,9 @@ with tab3:
     with col2:
         mes_selecionado_dados_mensais = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_dados_mensais_mes')         
     
-      
+    tab3_1, tab3_2, tab3_3 = st.tabs(['Volume',
+                          'Custo', 'Tabela'
+                          ])    
     dados_agua_df_ano_mes_selecionado_dados_mensais = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_dados_mensais) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_dados_mensais)]
     dados_agua_df_ano_mes_selecionado_dados_mensais = dados_agua_df_ano_mes_selecionado_dados_mensais.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
     dados_agua_df_ano_mes_selecionado_dados_mensais.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_dados_mensais) + 1)
@@ -960,29 +960,31 @@ with tab3:
         # Filter the dataframe based on the selected year
     
     
-    
-    st.caption("\n Volume faturado (m³) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
-    fig1 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado_dados_mensais)[0]
-    st.write(fig1)
-    st.caption("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
-    fig2 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado_dados_mensais)[1]
-    st.write(fig2)
-    
-    st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
-    dataframe = dados_agua_df_ano_mes_selecionado_dados_mensais
-    dataframe = dataframe.rename(
-        columns={
-        'VOLUME_FATURADO': 'Volume Faturado m³',
-        'VALOR_TOTAL': 'Valor Total R$',
-                }
-                                 )
-    
-    st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
+    with tab3_1:
+        st.caption("\n Volume faturado (m³) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
+        fig1 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado_dados_mensais)[0]
+        st.write(fig1)
+    with tab3_2:
+        st.caption("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
+        fig2 = barplot_para_mes_ano_selecionado_func(dados_agua_df_ano_mes_selecionado_dados_mensais)[1]
+        st.write(fig2)
+    with tab3_3:
+        
+        st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
+        dataframe = dados_agua_df_ano_mes_selecionado_dados_mensais
+        dataframe = dataframe.rename(
+            columns={
+            'VOLUME_FATURADO': 'Volume Faturado m³',
+            'VALOR_TOTAL': 'Valor Total R$',
+                    }
+                                     )
+        
+        st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
 
  
 with tab4:
 
-    st.write('Acumulados anuais: Volume e Custo')
+    st.caption('Acumulados anuais: Volume e Custo')
     
        
     agrupamento_selecionado = st.selectbox('Selecione o  agrupamento dos dados:', 
@@ -990,6 +992,7 @@ with tab4:
                                            index = 0, 
                                            key='selectbox_agrupamento1'
                                            )
+   
     
     df_selecionado = dict_dataframes[agrupamento_selecionado] 
     volume_faturado_por_ano = df_selecionado.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
@@ -1009,95 +1012,111 @@ with tab4:
     
     
     
-    
+    tab4_1, tab4_2, tab4_3 = st.tabs(['Volume',
+                          'Custo', 'Tabela'
+                          ])    
+    with tab4_1:
     #Volume Faturado acumulado por ano
-    st.caption('Volume acumulado por ano')
+        st.caption('Volume acumulado por ano')
+        
+        fig3 = agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano)[0]
+        st.write(fig3)
     
-    fig3 = agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano)[0]
-    st.write(fig3)
     
-    st.caption('Custo acumulado por ano')
-    fig4 = agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano)[1]
-    st.write(fig4)
+    with tab4_2:
+        
+        st.caption('Custo acumulado por ano')
+        fig4 = agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano)[1]
+        st.write(fig4)
     
-
-    st.write("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
-                    
-    st.dataframe(df_selecionado_dataframe, width=1200, height=600) # Or any other way you want to display the data
+    
+    with tab4_3:
+        st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
+                        
+        st.dataframe(df_selecionado_dataframe, width=1200, height=600) # Or any other way you want to display the data
 
 with tab5:
 
-    st.write('Volumes e custos mensais acumulados por ano para o agrupamento selecionado:')
-    
+    st.caption('Gráficos de volumes acumulados por ano para o agrupamento selecionado:')
     
     agrupamento_selecionado2 = st.selectbox('Selecione o  agrupamento dos dados:', 
                                            lista_agrupamento, 
                                            index = 0, 
                                            key='selectbox_agrupamento2'
                                            )
-    df_selecionado2 = dict_dataframes[agrupamento_selecionado2] 
     
-    df_selecionado2 = df_selecionado2.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
-    #volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
-
+    tab5_1, tab5_2, tab5_3 = st.tabs(['BoxPlot','ScatterPlot', 'LinePlot'])
+                           
+    with tab5_1:
+        
+        df_selecionado2 = dict_dataframes[agrupamento_selecionado2] 
+        
+        df_selecionado2 = df_selecionado2.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
+        #volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
     
- 
-    anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico:",
-        options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
-        default=df_selecionado2['ANO'].unique(),
-        key='multiselect_anos_fig1'
-        )
-
-    # Filtrar o DataFrame com base nos anos selecionados
-    filtered_df_fig1 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig1)]
-    fig1 = boxplot_func_px(filtered_df_fig1)
-    st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
-    
-    filtered_df_fig1 = filtered_df_fig1.rename(columns=
-                                              {'ANO':'Ano',
-                                              'VALOR_TOTAL': 'Custo Total (R$)',
-                                              'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                              }                                              )
-    st.dataframe(filtered_df_fig1, width=600, height=300)    
-
-    anos_selecionados_fig2 = st.multiselect(    "Selecione os anos desejados no gráfico:",
-        options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
-        default=df_selecionado2['ANO'].unique(),  # Valores padrão selecionados
-        key='multiselect_anos_fig2'
-        )
+        
+     
+        anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico:",
+            options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
+            default=df_selecionado2['ANO'].unique(),
+            key='multiselect_anos_fig1'
+            )
     
         # Filtrar o DataFrame com base nos anos selecionados
-    filtered_df_fig2 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig2)]
+        filtered_df_fig1 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig1)]
+        fig1 = boxplot_func_px(filtered_df_fig1)
+        st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
+        
+        filtered_df_fig1 = filtered_df_fig1.rename(columns=
+                                                  {'ANO':'Ano',
+                                                  'VALOR_TOTAL': 'Custo Total (R$)',
+                                                  'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                  }                                              )
+        st.dataframe(filtered_df_fig1, width=600, height=300)    
     
-    fig2 = scatter_func_px_vol(filtered_df_fig2)
-    st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
-
-    filtered_df_fig2 = filtered_df_fig2.rename(columns=
-                                               {'ANO':'Ano',
-                                               'VALOR_TOTAL': 'Custo Total (R$)',
-                                               'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                               }                                              )
-    st.dataframe(filtered_df_fig2, width=600, height=300)  
-
-    anos_selecionados_fig3 = st.multiselect(    "Selecione os anos desejados no gráfico:",
-        options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
-        default=df_selecionado2['ANO'].unique(),   # Valores padrão selecionados
-        key='multiselect_anos_fig3'
-        )
-
-    # Filtrar o DataFrame com base nos anos selecionados
-    filtered_df_fig3 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig3)]
-
-    fig3 = line_func_px(filtered_df_fig3)
-    st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
+    with tab5_2:
     
-    filtered_df_fig3 = filtered_df_fig3.rename(columns=
-                                               {'ANO':'Ano',
-                                               'VALOR_TOTAL': 'Custo Total (R$)',
-                                               'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                               }                                              )
-    st.dataframe(filtered_df_fig3, width=600, height=300)      
-   
+    
+        anos_selecionados_fig2 = st.multiselect(    "Selecione os anos desejados no gráfico:",
+            options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
+            default=df_selecionado2['ANO'].unique(),  # Valores padrão selecionados
+            key='multiselect_anos_fig2'
+            )
+        
+            # Filtrar o DataFrame com base nos anos selecionados
+        filtered_df_fig2 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig2)]
+        
+        fig2 = scatter_func_px_vol(filtered_df_fig2)
+        st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
+    
+        filtered_df_fig2 = filtered_df_fig2.rename(columns=
+                                                   {'ANO':'Ano',
+                                                   'VALOR_TOTAL': 'Custo Total (R$)',
+                                                   'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                   }                                              )
+        st.dataframe(filtered_df_fig2, width=600, height=300)  
+
+    with tab5_3:
+        
+        anos_selecionados_fig3 = st.multiselect(    "Selecione os anos desejados no gráfico:",
+            options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
+            default=df_selecionado2['ANO'].unique(),   # Valores padrão selecionados
+            key='multiselect_anos_fig3'
+            )
+    
+        # Filtrar o DataFrame com base nos anos selecionados
+        filtered_df_fig3 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig3)]
+    
+        fig3 = line_func_px(filtered_df_fig3)
+        st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
+        
+        filtered_df_fig3 = filtered_df_fig3.rename(columns=
+                                                   {'ANO':'Ano',
+                                                   'VALOR_TOTAL': 'Custo Total (R$)',
+                                                   'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                   }                                              )
+        st.dataframe(filtered_df_fig3, width=600, height=300)      
+       
 
    
        
