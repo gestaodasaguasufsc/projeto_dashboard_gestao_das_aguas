@@ -819,11 +819,10 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa Cadastral e informa
                                   "Dados gerais de UCs por ano e mês selecionado", "Dados agrupados anuais", "Dados agrupados mensais"])
 
 with tab1:
-    
+    st.caption('Indicadores: Em desenvolvimento')
 
 with tab2:
-    
-        
+            
     col1, col2, col3, col4 = st.columns(4)
     with col1:     
         ano_selecionado_mapa = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_mapa_ano')
@@ -941,7 +940,7 @@ with tab2:
 
         with tab2_3_3:
             st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')   
-            st.caption('Indisponível o momento')
+            st.caption('Indisponível no momento')
             
 with tab3:
     
