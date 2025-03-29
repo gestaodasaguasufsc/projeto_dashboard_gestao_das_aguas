@@ -58,46 +58,61 @@ def pasta_figuras_func(pasta_projeto):
 
 # Passo 1 - gerar df único (dados_agua_df_sHU) com todos os dados de água
 
+def tratamento_de_dados_func(pasta):
+    
+    
+    link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
+    df_cad = pd.read_csv(link, encoding='latin-1', sep = ';')
+    df_cad = df_cad.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
+    df_cad = df_cad.rename(columns={'Observacao': 'Faturamento'})
+    
+    df = main_abrir_csv_unico_func()
+    df['ANO'] = df['ANO'].astype('int')
+    df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
+    df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
+    df = df.merge(df_cad, on='Hidrometro', how='left')
+    
+          
+    df_sHU = df[df['Hidrometro']!='H014']
+    
+    anos = df['ANO'].unique().tolist()
+    anos.sort(reverse=True)
+    meses = df['MES_N'].unique().tolist()
+    meses.sort(reverse=True)
+    
+    df_sHU['Dtime'] = pd.to_datetime(df_sHU['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
+    maior_tempo = df_sHU['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
+    maior_ano = maior_tempo.year
+    index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
+    maior_mes = maior_tempo.month
+    index_mes = meses.index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
+    
+    lista_cidades = df_sHU['Cidade'].unique().tolist()
+    
+    # ordenando e filtrando colunas em dados_agua_df
+    df_sHU = df_sHU.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
+    
+    saida = [df_cad, df, df_sHU, anos, meses, maior_ano, index_ano, maior_mes, index_mes, lista_cidades]
+    return saida
+
 pasta_projeto = pasta_projeto_func()
-dados_agua_df = main_abrir_csv_unico_func()
-dados_agua_df['ANO'] = dados_agua_df['ANO'].astype('int')
-dados_agua_df = dados_agua_df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
-dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'HIDROMETRO'})
 
+trat_func = tratamento_de_dados_func(pasta_projeto)
 
-cadastro_hidrometros_link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
-cadastro_hidrometros_df = pd.read_csv(cadastro_hidrometros_link, encoding='latin-1', sep = ';')
-cadastro_hidrometros_df = cadastro_hidrometros_df.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
-cadastro_hidrometros_df = cadastro_hidrometros_df.rename(columns={'Observacao': 'Faturamento'})
-
-dados_agua_df = dados_agua_df.rename(columns={'HIDROMETRO': 'Hidrometro'})
-dados_agua_df = dados_agua_df.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
-
-anos = dados_agua_df['ANO'].unique().tolist()
-anos.sort(reverse=True)
-meses = dados_agua_df['MES_N'].unique().tolist()
-meses.sort(reverse=True)
-
-dados_agua_df['Dtime'] = pd.to_datetime(dados_agua_df['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
-maior_tempo = dados_agua_df['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
-
-maior_ano = maior_tempo.year
-index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
-maior_mes = maior_tempo.month
-index_mes = meses.index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
-
-
-dados_agua_df = dados_agua_df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
-
-# ordenando e filtrando colunas em dados_agua_df
-dados_agua_df = dados_agua_df.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
-
-# Gerando dados_agua_sf_sHU
-dados_agua_df_sHU = dados_agua_df[dados_agua_df['Hidrometro']!='H014'] #remove o Hospital Universitário da análise
+cadastro_hidrometros_df =   trat_func[0]
+dados_agua_df =             trat_func[1]
+dados_agua_df_sHU =         trat_func[2]
+anos =                      trat_func[3]
+meses =                     trat_func[4]
+maior_ano =                 trat_func[5]
+index_ano =                 trat_func[6]
+maior_mes =                 trat_func[7]
+index_mes =                 trat_func[8]
+lista_cidades =             trat_func[9]
 
 
 
-        
+       
 
 # Passo 2 - carregar dicionário de shapes
 
@@ -732,7 +747,10 @@ def funcao_graf_uc_mes_func(df, selecao_uc_mapa):
     df = df[df['Hidrometro']==selecao_uc_mapa]
     return scatter_func_px_vol(df), scatter_func_px_cus(df)
 
+
 #gerando dicionário com dataframes filtrados por agrupamentos de campi
+
+
 
 dict_agrupamento = {
     'UFSC - Total':['UFSC - Total'],
@@ -750,26 +768,109 @@ dict_agrupamento = {
 
 
 
-lista_agrupamento = list(dict_agrupamento.keys())
-
+def dict_dataframes_func(dct, df):
     
-dict_dataframes = {}
-
-
-for i, item in enumerate(dict_agrupamento.values()):
-   df_concatenado = pd.DataFrame(columns=dados_agua_df_sHU.columns)
+    list_agr = list(dct.keys())
+    dict_dataframes = {}
    
-   if item[0] == 'UFSC - Total':
-       dataframe = dados_agua_df_sHU
-       df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
-   else:
+    for i, item in enumerate(dct.values()):
+        df_zero = pd.DataFrame(columns=df.columns)
        
-       for subitem in item:
-           
-           dataframe = dados_agua_df_sHU[dados_agua_df_sHU['Cidade']==subitem]
-           df_concatenado = pd.concat([df_concatenado, dataframe], axis=0)
-   dict_dataframes[lista_agrupamento[i]] = df_concatenado
+        if item[0] == 'UFSC - Total':
+            df_concatenado = pd.concat([df_zero, df], axis=0)
+        
+        else:
+            df_concatenado = df_zero
+            for subitem in item:
+               df_subitem = df[df['Cidade']==subitem]
+               df_concatenado = pd.concat([df_concatenado, df_subitem], axis=0)
+        dict_dataframes[list_agr[i]] = df_concatenado
+    
+    return list_agr, dict_dataframes
 
+
+
+def trat_acumulado_por_ano_func (dct, agr_sel):
+
+    df_sel = dct[agr_sel] 
+    vol_ano = df_sel.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+    cus_ano = df_sel.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+    
+    df = pd.concat([vol_ano, cus_ano['VALOR_TOTAL']],axis=1)
+    df['Agrupamento Selecionado'] = agr_sel
+    df['VALOR_TOTAL'] = df['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
+    df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
+    df = df.sort_values(by='ANO', ascending=False)
+    df = df.rename(columns=
+                                                              {'ANO':'Ano',
+                                                                  'VALOR_TOTAL': 'Custo Total (R$)',
+                                                               'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                               })
+    df = df.iloc[:,[0,3,1,2]]
+
+    return vol_ano, cus_ano, df
+
+funcao_dict_dfs = dict_dataframes_func(dict_agrupamento, dados_agua_df_sHU)
+lista_agrupamento = funcao_dict_dfs[0]
+dict_dataframes = funcao_dict_dfs[1]
+
+def indicadores_vol_cus_func(
+        agrupamento_selecionado_ind,
+        ano_selecionado_ind,
+        mes_selecionado_ind,
+        dict_dataframes):
+
+
+    df_selecionado_ind = dict_dataframes[agrupamento_selecionado_ind] 
+
+
+    df_selecionado_ind = df_selecionado_ind.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
+    
+    df_selecionado_ind['VOLUME_FATURADO'] = df_selecionado_ind['VOLUME_FATURADO'].astype(int)
+    #gerando a coluna de médias
+
+    lm = []
+
+
+    df_selecionado_ind['VOL_MED_U6M'] = 0
+    df_selecionado_ind['VOL_VAR_ABS'] = 0 #VOLUME NO MÊS - MEDIA
+    df_selecionado_ind['VOL_VAR_PER'] = 0
+    df_selecionado_ind['CUS_MED_U6M'] = 0
+    df_selecionado_ind['CUS_VAR_ABS'] = 0 #VOLUME NO MÊS - MEDIA
+    df_selecionado_ind['CUS_VAR_PER'] = 0
+
+
+    for i, item in enumerate(df_selecionado_ind['VOLUME_FATURADO']):
+        if i<=5:
+            lm.append(item)
+        
+        else:
+            lm.append(item)
+            media = ((lm[i-1] + lm[i-2] +lm[i-3] + lm[i-4] +lm[i-5] +lm[i-6])/6)
+            media = int("{:.0f}".format(media))
+            variacao_abs = float("{:.2f}".format(item - media))
+            variacao_per = float("{:.2f}".format(variacao_abs/item))
+            df_selecionado_ind['VOL_MED_U6M'][i] = media
+            df_selecionado_ind['VOL_VAR_ABS'][i] = variacao_abs
+            df_selecionado_ind['VOL_VAR_PER'][i] = variacao_per
+
+    lm = []
+    for i, item in enumerate(df_selecionado_ind['VALOR_TOTAL']):
+        if i<=5:
+            lm.append(item)
+        
+        else:
+            lm.append(item)
+            media = ((lm[i-1] + lm[i-2] +lm[i-3] + lm[i-4] +lm[i-5] +lm[i-6])/6)
+            media = float("{:.2f}".format(media))
+            variacao_abs = float("{:.2f}".format(item - media))
+            variacao_per = float("{:.2f}".format(variacao_abs/item))
+            df_selecionado_ind['CUS_MED_U6M'][i] = media
+            df_selecionado_ind['CUS_VAR_ABS'][i] = variacao_abs
+            df_selecionado_ind['CUS_VAR_PER'][i] = variacao_per
+
+
+    return df_selecionado_ind
 
 ###_________________________________________________________________________________
 
@@ -818,8 +919,89 @@ with st.sidebar:
 tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa Cadastral e informações por UC", 
                                   "Dados gerais de UCs por ano e mês selecionado", "Dados agrupados anuais", "Dados agrupados mensais"])
 
-with tab1:
-    st.caption('Indicadores: Em desenvolvimento')
+
+#INDICADORES--------------------------------------------
+
+with tab1: 
+    
+     
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:     
+        ano_selecionado_ind = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_indicadores_ano')
+    with col2:
+        mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
+    with col3:
+            st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        agrupamento_selecionado_ind = st.selectbox('Selecione o  agrupamento dos dados:', 
+                                           lista_agrupamento, 
+                                           index = 0, 
+                                           key='selectbox_agrupamento_ind'
+                                           )
+    
+    
+        df_selecionado_ind = indicadores_vol_cus_func(
+                agrupamento_selecionado_ind,
+                ano_selecionado_ind,
+                mes_selecionado_ind,
+                dict_dataframes)
+        
+        
+
+        linha_mes_ano = df_selecionado_ind[(df_selecionado_ind['ANO']== ano_selecionado_ind) & (df_selecionado_ind['MES_N'] == mes_selecionado_ind)]
+        index_ind = linha_mes_ano.index[0]
+        volume_mes = linha_mes_ano['VOLUME_FATURADO'].iloc[0]
+        volume_media = linha_mes_ano['VOL_MED_U6M'].iloc[0]
+        volume_variacao_abs = linha_mes_ano['VOL_VAR_ABS'].iloc[0]
+        volume_variacao_per = linha_mes_ano['VOL_VAR_PER'].iloc[0]
+        custo_mes = linha_mes_ano['VALOR_TOTAL'].iloc[0]
+        custo_media = linha_mes_ano['CUS_MED_U6M'].iloc[0]
+        custo_variacao_abs = linha_mes_ano['CUS_VAR_ABS'].iloc[0]
+        custo_variacao_per = linha_mes_ano['CUS_VAR_PER'].iloc[0]
+    
+                      
+    
+    
+    col1, col2, col3, col4 = st.columns(4)
+         
+            
+    with col1:      
+            texto = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+            texto1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+            st.metric("Volume no mês/ano selecionados", 
+                      texto, texto1, 
+                      border=True, delta_color="inverse")
+    
+    with col2:
+            texto = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+            texto1 = (f'R$ {custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+            st.metric("Custo no mês/ano selecionados",
+                      texto, texto1, 
+                      border=True, delta_color="inverse")
+  
+    with col3:      
+            texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+            st.metric("Volume médio dos últimos 6 meses", texto , border=True)
+    
+    with col4:
+            texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+            st.metric("Custo médio dos últimos 6 meses", texto, border=True)
+    
+    
+     
+        
+        
+        
+    #trat_acum_func = trat_acumulado_por_ano_func (dict_dataframes, agrupamento_selecionado)
+        
+    #volume_faturado_por_ano = trat_acum_func[0]
+    #custo_faturado_por_ano = trat_acum_func[1]
+    #df_selecionado_dataframe = trat_acum_func[2]
+    
+#MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
 
 with tab2:
             
@@ -831,7 +1013,8 @@ with tab2:
     
     with col3:
         st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
-    
+        
+            
     col1, col2 = st.columns(2)
     
     with col1:
@@ -840,8 +1023,6 @@ with tab2:
         lista_cidades = funcao[0]
         index_cidades = funcao[1]
         selecao_cidade = st.selectbox('Selecione o campi/unidade', lista_cidades, index = index_cidades , key='selectbox_mapa_cidades')        
-        
-            
         
     with col2: 
         
@@ -854,7 +1035,6 @@ with tab2:
                                        index = index_visao_geral , 
                                        key='selectbox_mapa_uc'
                                        )        
-        
         
         
         if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
@@ -986,32 +1166,21 @@ with tab4:
 
     st.caption('Acumulados anuais: Volume e Custo')
     
+    
        
     agrupamento_selecionado = st.selectbox('Selecione o  agrupamento dos dados:', 
                                            lista_agrupamento, 
                                            index = 0, 
                                            key='selectbox_agrupamento1'
                                            )
-   
-    
-    df_selecionado = dict_dataframes[agrupamento_selecionado] 
-    volume_faturado_por_ano = df_selecionado.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
-    custo_faturado_por_ano = df_selecionado.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
-    
-    df_selecionado_dataframe = pd.concat([volume_faturado_por_ano, custo_faturado_por_ano['VALOR_TOTAL']],axis=1)
-    df_selecionado_dataframe['Agrupamento Selecionado'] = agrupamento_selecionado
-    df_selecionado_dataframe['VALOR_TOTAL'] = df_selecionado_dataframe['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
-    df_selecionado_dataframe['VOLUME_FATURADO'] = df_selecionado_dataframe['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
-    df_selecionado_dataframe = df_selecionado_dataframe.sort_values(by='ANO', ascending=False)
-    df_selecionado_dataframe = df_selecionado_dataframe.rename(columns=
-                                                              {'ANO':'Ano',
-                                                                  'VALOR_TOTAL': 'Custo Total (R$)',
-                                                               'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                               })
-    df_selecionado_dataframe = df_selecionado_dataframe.iloc[:,[0,3,1,2]]
-    
-    
-    
+     
+    trat_acum_func = trat_acumulado_por_ano_func (dict_dataframes, agrupamento_selecionado)
+        
+    volume_faturado_por_ano = trat_acum_func[0]
+    custo_faturado_por_ano = trat_acum_func[1]
+    df_selecionado_dataframe = trat_acum_func[2]
+        
+        
     tab4_1, tab4_2, tab4_3 = st.tabs(['Volume',
                           'Custo', 'Tabela'
                           ])    
