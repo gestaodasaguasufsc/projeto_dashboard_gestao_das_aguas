@@ -82,17 +82,21 @@ def tratamento_de_dados_func(pasta):
     
     df_sHU['Dtime'] = pd.to_datetime(df_sHU['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
     maior_tempo = df_sHU['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
+    menor_tempo = df_sHU['Dtime'].min()
     maior_ano = maior_tempo.year
     index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
     maior_mes = maior_tempo.month
     index_mes = meses.index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
+    menor_ano = menor_tempo.year
+    menor_mes = menor_tempo.month
+    
     
     lista_cidades = df_sHU['Cidade'].unique().tolist()
     
     # ordenando e filtrando colunas em dados_agua_df
     df_sHU = df_sHU.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
     
-    saida = [df_cad, df, df_sHU, anos, meses, maior_ano, index_ano, maior_mes, index_mes, lista_cidades]
+    saida = [df_cad, df, df_sHU, anos, meses, maior_ano, index_ano, maior_mes, index_mes, lista_cidades, menor_ano, menor_mes]
     return saida
 
 pasta_projeto = pasta_projeto_func()
@@ -109,7 +113,8 @@ index_ano =                 trat_func[6]
 maior_mes =                 trat_func[7]
 index_mes =                 trat_func[8]
 lista_cidades =             trat_func[9]
-
+menor_ano =                 trat_func[10]
+menor_mes =                 trat_func[11]
 
 
        
@@ -1075,6 +1080,7 @@ with tab2:
     
     with col3:
         st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
+        st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')
         
             
     col1, col2 = st.columns(2)
