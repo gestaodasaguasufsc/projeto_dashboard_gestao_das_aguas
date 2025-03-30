@@ -709,8 +709,12 @@ def localiza_lat_long_hidrometro_func (df_i, valor, shp):
     df = df_i.iloc[:,[1,11]]
     df['nome_uc_local'] = df['Hidrometro'] +" " + df['Local']
     selecao = df.loc[df['nome_uc_local']==valor, 'Hidrometro'].iloc[0]
-    lat = shp.loc[shp['Hidrometro']==selecao,'Latitude'].iloc[0]
-    long = shp.loc[shp['Hidrometro']==selecao,'Longitude'].iloc[0]
+    try:
+        lat = shp.loc[shp['Hidrometro']==selecao,'Latitude'].iloc[0]
+        long = shp.loc[shp['Hidrometro']==selecao,'Longitude'].iloc[0]
+    except:
+        lat = ""
+        long = ""
     lista_keys = ['hid_sel', 'lat', 'long']
     saida = [selecao, lat, long]
     dict_saida = {}
@@ -849,7 +853,12 @@ def indicadores_vol_cus_func(
             media = ((lm[i-1] + lm[i-2] +lm[i-3] + lm[i-4] +lm[i-5] +lm[i-6])/6)
             media = int("{:.0f}".format(media))
             variacao_abs = float("{:.2f}".format(item - media))
-            variacao_per = float("{:.2f}".format(variacao_abs/item))
+            if item is None == True:
+                variacao_per = "Dados insuficientes"
+            elif item == 0:
+                variacao_per = "Divisão por zero" 
+            else: 
+                variacao_per = float("{:.2f}".format(variacao_abs/item))
             df_selecionado_ind['VOL_MED_U6M'][i] = media
             df_selecionado_ind['VOL_VAR_ABS'][i] = variacao_abs
             df_selecionado_ind['VOL_VAR_PER'][i] = variacao_per
@@ -864,7 +873,13 @@ def indicadores_vol_cus_func(
             media = ((lm[i-1] + lm[i-2] +lm[i-3] + lm[i-4] +lm[i-5] +lm[i-6])/6)
             media = float("{:.2f}".format(media))
             variacao_abs = float("{:.2f}".format(item - media))
-            variacao_per = float("{:.2f}".format(variacao_abs/item))
+            if item is None == True:
+                variacao_per = "Dados insuficientes"
+            elif item == 0:
+                variacao_per = "Divisão por zero" 
+            else: 
+                variacao_per = float("{:.2f}".format(variacao_abs/item))
+            
             df_selecionado_ind['CUS_MED_U6M'][i] = media
             df_selecionado_ind['CUS_VAR_ABS'][i] = variacao_abs
             df_selecionado_ind['CUS_VAR_PER'][i] = variacao_per
@@ -933,7 +948,7 @@ with tab1:
     with col3:
             st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
     
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2  = st.columns(2)
     
     with col1:
         agrupamento_selecionado_ind = st.selectbox('Selecione o  agrupamento dos dados:', 
@@ -941,57 +956,104 @@ with tab1:
                                            index = 0, 
                                            key='selectbox_agrupamento_ind'
                                            )
-    
-    
-        df_selecionado_ind = indicadores_vol_cus_func(
-                agrupamento_selecionado_ind,
-                ano_selecionado_ind,
-                mes_selecionado_ind,
-                dict_dataframes)
+        sem_dados = False
         
-        
-
-        linha_mes_ano = df_selecionado_ind[(df_selecionado_ind['ANO']== ano_selecionado_ind) & (df_selecionado_ind['MES_N'] == mes_selecionado_ind)]
-        index_ind = linha_mes_ano.index[0]
-        volume_mes = linha_mes_ano['VOLUME_FATURADO'].iloc[0]
-        volume_media = linha_mes_ano['VOL_MED_U6M'].iloc[0]
-        volume_variacao_abs = linha_mes_ano['VOL_VAR_ABS'].iloc[0]
-        volume_variacao_per = linha_mes_ano['VOL_VAR_PER'].iloc[0]
-        custo_mes = linha_mes_ano['VALOR_TOTAL'].iloc[0]
-        custo_media = linha_mes_ano['CUS_MED_U6M'].iloc[0]
-        custo_variacao_abs = linha_mes_ano['CUS_VAR_ABS'].iloc[0]
-        custo_variacao_per = linha_mes_ano['CUS_VAR_PER'].iloc[0]
-    
-                      
-    
-    
-    col1, col2, col3, col4 = st.columns(4)
-         
+        try:
+            df_selecionado_ind = indicadores_vol_cus_func(
+                    agrupamento_selecionado_ind,
+                    ano_selecionado_ind,
+                    mes_selecionado_ind,
+                    dict_dataframes)
+          
+            linha_mes_ano = df_selecionado_ind[(df_selecionado_ind['ANO']== ano_selecionado_ind) & (df_selecionado_ind['MES_N'] == mes_selecionado_ind)]
+            index_ind = linha_mes_ano.index[0]
+            volume_mes = linha_mes_ano['VOLUME_FATURADO'].iloc[0]
+            volume_media = linha_mes_ano['VOL_MED_U6M'].iloc[0]
+            volume_variacao_abs = linha_mes_ano['VOL_VAR_ABS'].iloc[0]
+            volume_variacao_per = linha_mes_ano['VOL_VAR_PER'].iloc[0]
+            custo_mes = linha_mes_ano['VALOR_TOTAL'].iloc[0]
+            custo_media = linha_mes_ano['CUS_MED_U6M'].iloc[0]
+            custo_variacao_abs = linha_mes_ano['CUS_VAR_ABS'].iloc[0]
+            custo_variacao_per = linha_mes_ano['CUS_VAR_PER'].iloc[0]
             
-    with col1:      
-            texto = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-            texto1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-            st.metric("Volume no mês/ano selecionados", 
-                      texto, texto1, 
-                      border=True, delta_color="inverse")
+        except:
+            st.caption('Dados inexistentes para o local/ano/mês selecionado')
+            sem_dados = True
+        
+        
+            
     
-    with col2:
-            texto = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-            texto1 = (f'R$ {custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-            st.metric("Custo no mês/ano selecionados",
-                      texto, texto1, 
-                      border=True, delta_color="inverse")
-  
-    with col3:      
-            texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-            st.metric("Volume médio dos últimos 6 meses", texto , border=True)
-    
-    with col4:
-            texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-            st.metric("Custo médio dos últimos 6 meses", texto, border=True)
+                     
     
     
-     
+    
+         
+    if sem_dados == True:
+        pass
+    else:
+        col1, col2, col3, col4 = st.columns(4)
+        
+        st.markdown(
+                    """
+                <style>
+                [data-testid="stMetricValue"] {
+                    font-size: 30px;
+                }
+                </style>
+                """,
+                    unsafe_allow_html=True,
+                )
+        
+        with col1:      
+                textov0 = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                textov1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                textov2 = (f'{volume_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
+                
+                #if volume_variacao_abs>0: 
+                  #  delta_color_t1 = 'inverse'
+                #else:
+                 #   delta_color_t1 = 'normal'
+                
+                
+                st.metric("Volume no mês/ano selecionados", 
+                          textov0, 
+                          border=True)
+        
+        with col2:
+                textoc0 = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                textoc1 = (f'{custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                textoc2 = (f'{custo_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
+                st.metric("Custo no mês/ano selecionados",
+                          textoc0,  
+                          border=True, delta_color="inverse")
+      
+        with col3:      
+                texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                st.metric("Volume médio dos últimos 6 meses", texto , border=True)
+        
+        with col4:
+                texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                st.metric("Custo médio dos últimos 6 meses", texto, border=True)
+    
+        st.caption('Variações de volume e custo em relação à média dos últimos 6 meses')
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+                st.metric("Volume variação absoluta", 
+                          "", textov1, 
+                          border=True, delta_color="inverse")
+                st.metric("Volume variação percentual", 
+                          "", textov2, 
+                          border=True, delta_color="inverse")
+                
+        with col2:
+                st.metric("Custo variação absoluta", 
+                          "", textoc1, 
+                          border=True, delta_color="inverse")
+                st.metric("Custo variação percentual", 
+                          "", textoc2, 
+                          border=True, delta_color="inverse")
+        
         
         
         
@@ -1041,12 +1103,17 @@ with tab2:
             map = folium.Map(width = 950, height=750, location=[-27.6, -48.52], zoom_start=15.5)
             uc_selecionada = selecao_uc_mapa
         else: 
-            dict_saida = localiza_lat_long_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, hidrometros_shp)
-            lat = dict_saida['lat']
-            long = dict_saida['long']
-            uc_selecionada = dict_saida['hid_sel']
-            map = folium.Map(width = 950, height=750, location=[lat, long], zoom_start=18)
-        
+            
+            try:
+                dict_saida = localiza_lat_long_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, hidrometros_shp)
+                lat = dict_saida['lat']
+                long = dict_saida['long']
+                uc_selecionada = dict_saida['hid_sel']
+                map = folium.Map(width = 950, height=750, location=[lat, long], zoom_start=18)
+                verificador_mapa  = True
+            except:
+                verificador_mapa  = False
+                pass
     
     tab2_1, tab2_2, tab2_3 = st.tabs(["Mapa", 
                           'Dados agrupados anuais da UC selecionada',
@@ -1061,19 +1128,28 @@ with tab2:
                    ' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.'
                     ' Clique nos pontos de localização dos hidrômetros para visualizar imagem do local')
         
-        dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
-        dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
-        dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
-                 
-        chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
-        #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
-               
-        camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
-                        
-        adicionar_camadas_de_fundo_func(map)
+        try:
+            dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
+            dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
+            dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
+                     
+            chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
+            #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
+                   
+            camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
+                            
+            adicionar_camadas_de_fundo_func(map)
+                
+            folium_static(map, width=1000, height=800)
+            verificador_dados = True
+        except:
+            verificador_dados = False
+            st.caption('UC sem dados georreferenciados')
             
-        folium_static(map, width=1000, height=800)
     
+    
+        
+        
     with tab2_2:
         tab2_2_1, tab2_2_2 = st.tabs(['Volume',
                               'Custo'
@@ -1093,32 +1169,37 @@ with tab2:
             else:        
                 st.caption(f'Custo da UC {selecao_uc_mapa} agrupado por ano.')   
                 st.write(funcao_graf_uc_ano[1])
-    
-    with tab2_3:
-        tab2_3_1, tab2_3_2, tab2_3_3 = st.tabs(['Volume',
-                              'Custo', 'Fatura no mês e ano selecionados'
-                              ])  
+                
+    if verificador_dados == False:
+        st.caption('UC sem dados disponíveis no mês e ano')
+        pass
+    else:
         
-               
-        with tab2_3_1:
-            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
-                st.caption('Selecione uma unidade consumidora para mostrar gráfico.')   
-            else:
-                st.caption(f'Volume da UC {selecao_uc_mapa} distribuído por mês.')   
-                funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df_sHU, uc_selecionada)
-                st.write(funcao_graf_uc_mes[0])
-                                        
-        with tab2_3_2:
-            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
-                st.caption('Selecione uma unidade consumidora para mostrar gráfico.')
-            else:        
-                st.caption(f'Custo da UC {selecao_uc_mapa} distribuído por mês.')   
-                funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df_sHU, uc_selecionada)
-                st.write(funcao_graf_uc_mes[1])
-
-        with tab2_3_3:
-            st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')   
-            st.caption('Indisponível no momento')
+        with tab2_3:
+            tab2_3_1, tab2_3_2, tab2_3_3 = st.tabs(['Volume',
+                                  'Custo', 'Fatura no mês e ano selecionados'
+                                  ])  
+            
+                   
+            with tab2_3_1:
+                if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+                    st.caption('Selecione uma unidade consumidora para mostrar gráfico.')   
+                else:
+                    st.caption(f'Volume da UC {selecao_uc_mapa} distribuído por mês.')   
+                    funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df_sHU, uc_selecionada)
+                    st.write(funcao_graf_uc_mes[0])
+                                            
+            with tab2_3_2:
+                if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+                    st.caption('Selecione uma unidade consumidora para mostrar gráfico.')
+                else:        
+                    st.caption(f'Custo da UC {selecao_uc_mapa} distribuído por mês.')   
+                    funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df_sHU, uc_selecionada)
+                    st.write(funcao_graf_uc_mes[1])
+    
+            with tab2_3_3:
+                st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')   
+                st.caption('Indisponível no momento')
             
 with tab3:
     
