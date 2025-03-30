@@ -952,6 +952,7 @@ with tab1:
         mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
     with col3:
             st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
+            st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')
     
     col1, col2  = st.columns(2)
     
@@ -1002,7 +1003,7 @@ with tab1:
                     """
                 <style>
                 [data-testid="stMetricValue"] {
-                    font-size: 30px;
+                    font-size: 25px;
                 }
                 </style>
                 """,
