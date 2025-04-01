@@ -1219,7 +1219,9 @@ with tab3:
             'VALOR_TOTAL': 'Valor Total R$',
                     }
                                      )
-        
+        st.caption('Estatística:')
+        st.dataframe(dataframe.describe(), width=1200, height=400)
+        st.caption('Dados:')
         st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
 
  
@@ -1263,6 +1265,9 @@ with tab4:
     with tab4_3:
         st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
                         
+        st.caption('Estatística:')
+        st.dataframe(df_selecionado_dataframe.describe(), width=1200, height=320)
+        st.caption('Dados:')
         st.dataframe(df_selecionado_dataframe, width=1200, height=600) # Or any other way you want to display the data
 
 with tab5:
@@ -1275,7 +1280,7 @@ with tab5:
                                            key='selectbox_agrupamento2'
                                            )
     
-    tab5_1, tab5_2, tab5_3 = st.tabs(['BoxPlot','ScatterPlot', 'LinePlot'])
+    tab5_1, tab5_2, tab5_3 = st.tabs(['ScatterPlot','BoxPlot','LinePlot'])
                            
     with tab5_1:
         
@@ -1304,7 +1309,10 @@ with tab5:
                                                    'VALOR_TOTAL': 'Custo Total (R$)',
                                                    'VOLUME_FATURADO': 'Volume Faturado (m³)'
                                                    }                                              )
-        st.dataframe(filtered_df_fig2, width=600, height=300)  
+        st.caption('Estatística:')
+        st.dataframe(filtered_df_fig2.describe(), width=600, height=320)
+        st.caption('Dados:')
+        st.dataframe(filtered_df_fig2.sort_values(by='Ano',ascending=False), width=600, height=400)  
      
             
     
@@ -1326,7 +1334,10 @@ with tab5:
                                                   'VALOR_TOTAL': 'Custo Total (R$)',
                                                   'VOLUME_FATURADO': 'Volume Faturado (m³)'
                                                   }                                              )
-        st.dataframe(filtered_df_fig1, width=600, height=300)
+        st.caption('Estatística:')
+        st.dataframe(filtered_df_fig1.describe(), width=600, height=320)
+        st.caption('Dados:')
+        st.dataframe(filtered_df_fig1.sort_values(by='Ano',ascending=False), width=600, height=400)
         
 
     with tab5_3:
@@ -1348,8 +1359,11 @@ with tab5:
                                                    'VALOR_TOTAL': 'Custo Total (R$)',
                                                    'VOLUME_FATURADO': 'Volume Faturado (m³)'
                                                    }                                              )
-        st.dataframe(filtered_df_fig3, width=600, height=300)      
-       
+        st.caption('Estatística:')
+        st.dataframe(filtered_df_fig3.describe(), width=600, height=320)
+        st.caption('Dados:')
+        
+        st.dataframe(filtered_df_fig3.sort_values(by='Ano',ascending=False), width=600, height=400)           
 
    
        
