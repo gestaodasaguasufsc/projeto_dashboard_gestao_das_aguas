@@ -1360,7 +1360,7 @@ with tab5:
                                                    'VOLUME_FATURADO': 'Volume Faturado (m³)'
                                                    }                                              )
         st.caption('Estatística:')
-        st.dataframe(filtered_df_fig3.describe(), width=600, height=320)
+        st.dataframe(filtered_df_fig3.describe(), width=600, height=325)
         st.caption('Dados:')
         
         st.dataframe(filtered_df_fig3.sort_values(by='Ano',ascending=False), width=600, height=400)           
