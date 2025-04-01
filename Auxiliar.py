@@ -71,7 +71,7 @@ def tratamento_de_dados_func(pasta):
     meses = df['MES_N'].unique().tolist()
     meses.sort(reverse=True)
     
-    df['Dtime'] = pd.to_datetime(df['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
+    #df['Dtime'] = pd.to_datetime(df['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
     maior_tempo = df['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
     maior_ano = maior_tempo.year
     index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
@@ -713,3 +713,13 @@ print(texto)
 #print(custo_mes)
 #print(linha_mes_ano)
 #print(linha_mes_ano_m1)
+
+caminho_colunas_csv = os.path.join(pasta_projeto,'Dados' , 'Origem', 'colunas_df.csv')
+dados_agua_df_vazio= pd.read_csv(caminho_colunas_csv)
+
+dados_agua_df_atualizado = pd.read_csv(os.path.join(pasta_projeto,'Dados' , 'Origem', 'atualizacao_dfs','dados_agua_df_para_atualizar.csv'))
+dados_agua_df_original = pd.read_csv(os.path.join(pasta_projeto,'Dados' , 'Produtos', 'dados_agua_df.csv'))
+
+
+
+

@@ -22,43 +22,14 @@ import plotly.colors as pc
 
 
 
-# Passo 0 - funções para carregar csv unico com com todos os dados de água de 2023 ao momento presente
-
-#Main def1
-def main_abrir_csv_unico_func():
-    dados_agua_df = abrir_csv_unico_func(pasta_produtos_func(pasta_projeto_func()))
-    return dados_agua_df   
-
-    #sub-def 1: -------------------------------------
-def pasta_projeto_func():
-    pasta_projeto = os.path.dirname(os.path.abspath('__file__'))
-    return pasta_projeto
 
 
-    #sub-def 2: -------------------------------------
-def pasta_produtos_func(pasta_projeto):
-    pasta_produtos = os.path.join(pasta_projeto,'Dados', 'Produtos')
-    return pasta_produtos
-
-    #sub-def 3: -------------------------------------
-def abrir_csv_unico_func(pasta_produtos):
-
-    caminho_dados_agua_csv = os.path.join(pasta_produtos, 'dados_agua_df.csv')
-    dados_agua_df = pd.read_csv(caminho_dados_agua_csv)
-    return dados_agua_df
-
-    #sub-def 4: ------------------------------------
-def pasta_figuras_func(pasta_projeto):
-    # mudando para pasta de figuras
-    pasta_figuras = os.path.join(pasta_projeto,'Figuras')
-    print('Pasta figuras: ', pasta_figuras)
-    return pasta_figuras   
 
 ############## Parte 2 - código geração de mapas e dados tabulares de consumo de água de 2013 ao momento presente
 
-# Passo 1 - gerar df único (dados_agua_df_sHU) com todos os dados de água
 
-def tratamento_de_dados_func(pasta):
+
+def tratamento_de_dados_func(pasta_projeto):
     
     
     link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
@@ -66,7 +37,7 @@ def tratamento_de_dados_func(pasta):
     df_cad = df_cad.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
     df_cad = df_cad.rename(columns={'Observacao': 'Faturamento'})
     
-    df = main_abrir_csv_unico_func()
+    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' , 'dados_agua_df_2.csv'))
     df['ANO'] = df['ANO'].astype('int')
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
@@ -79,8 +50,7 @@ def tratamento_de_dados_func(pasta):
     anos.sort(reverse=True)
     meses = df['MES_N'].unique().tolist()
     meses.sort(reverse=True)
-    
-    df_sHU['Dtime'] = pd.to_datetime(df_sHU['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
+    df_sHU['Dtime'] = pd.to_datetime(df_sHU['Dtime'])
     maior_tempo = df_sHU['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
     menor_tempo = df_sHU['Dtime'].min()
     maior_ano = maior_tempo.year
@@ -99,7 +69,12 @@ def tratamento_de_dados_func(pasta):
     saida = [df_cad, df, df_sHU, anos, meses, maior_ano, index_ano, maior_mes, index_mes, lista_cidades, menor_ano, menor_mes]
     return saida
 
-pasta_projeto = pasta_projeto_func()
+
+# Passo 0 - funções para carregar csv unico com com todos os dados de água de 2023 ao momento presente
+
+pasta_projeto = os.path.dirname(os.path.abspath('__file__'))
+
+# Passo 1 - gerar df único (dados_agua_df_sHU) com todos os dados de água e variáveis iniciais
 
 trat_func = tratamento_de_dados_func(pasta_projeto)
 
@@ -116,7 +91,6 @@ lista_cidades =             trat_func[9]
 menor_ano =                 trat_func[10]
 menor_mes =                 trat_func[11]
 
-
        
 
 # Passo 2 - carregar dicionário de shapes
@@ -125,7 +99,7 @@ menor_mes =                 trat_func[11]
 
 #GDB Esri
 #pasta_projeto = ""
-pasta_projeto = pasta_projeto_func()
+
 shapes_pasta = os.path.join(pasta_projeto, 'Dados','Origem','Shapes')
 print(shapes_pasta)
 
@@ -162,9 +136,8 @@ colunas_a_manter = np.r_[0:x, x+1:y, y+1:hidrometros_shp.shape[1]]
 hidrometros_shp = hidrometros_shp.iloc[:,colunas_a_manter]
 hidrometros_shp.rename(columns={'Nome_hidro': 'Hidrometro'}, inplace=True)
 
-#Passo 4
+#Passo 4 - retirar o consumo do hospital universitario, valor muito alto em relação aos demais pontos
 
-#retirar o consumo do hospital universitario, valor muito alto em relação aos demais pontos
 hidrometros_shp_filtered = hidrometros_shp[hidrometros_shp['Hidrometro'] != 'H014']
 
 #Passo 5 - Correções no arquivo subsetores_agua
