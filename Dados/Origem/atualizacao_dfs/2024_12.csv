@@ -36,7 +36,6 @@ H041 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,2296810.0,Trindade
 H042 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,2296802.0,Trindade,C11C001909,H042,CASAN,Florianópolis - Trindade,CCE 2  R. Eng. Andrey C. Ferreira,1.0,0.0,0.0,0.0,1.0,4904.0,5560.0,656.0,656.0,MÉDIO,VIDRO DO HIDROMETRO SUADO,11663.95,11663.95,-2204.49,0.0,0.0,21123.41,21123.410000000003,0.0
 H043 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,6816860.0,Trindade,A94S171408,H043,CASAN,Florianópolis - Trindade,Casa de Veg.  Depto. de Microbiologia,1.0,0.0,0.0,0.0,1.0,111.0,112.0,1.0,1.0,LIDO,Sem ocorrência,49.68,49.68,-9.39,0.0,0.0,89.97,89.97,0.0
 H044 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,2296896.0,Trindade,C11C001908,H044,CASAN,Florianópolis - Trindade,CFM Oceanografia e entorno,1.0,0.0,0.0,0.0,1.0,1382.0,1452.0,70.0,70.0,LIDO,Sem ocorrência,1180.41,1180.41,-223.1,0.0,0.0,2137.72,2137.7200000000003,0.0
-H045 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,2296772.0,Trindade,,H045,CASAN,Florianópolis - Trindade,"Museologia e MArquE (MU01, MU10 e CFH09)",1.0,0.0,0.0,0.0,1.0,5756.0,5778.0,22.0,22.0,LIDO/REVISÃO,CONFIRMACAO LEITURA,321.69,321.69,-60.79,0.0,0.0,582.59,582.59,0.0
 H046 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,2296780.0,Trindade,B10C017966,H046,CASAN,Florianópolis - Trindade,CCB Botânica,1.0,0.0,0.0,0.0,1.0,2833.0,2911.0,78.0,78.0,LIDO,Sem ocorrência,1323.53,1323.53,-250.15,0.0,0.0,2396.91,2396.91,0.0
 H047 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,2296837.0,Trindade,C11C009598,H047,CASAN,Florianópolis - Trindade,NDI e MArquE,1.0,0.0,0.0,0.0,1.0,18580.0,18921.0,341.0,341.0,LIDO/REVISÃO,Alto Consumo,6028.6,6028.6,-1139.41,0.0,0.0,10917.79,10917.79,0.0
 H048 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,2296764.0,Trindade,C11C001910,H048,CASAN,Florianópolis - Trindade,Centro de Filosofia e Humanas 1,1.0,0.0,0.0,0.0,1.0,43089.0,43820.0,731.0,731.0,LIDO,Sem ocorrência,13005.7,13005.7,-2458.07,0.0,0.0,23553.33,23553.33,0.0
@@ -73,24 +72,8 @@ H108 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,0.0,Joinville - Pe
 H109 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,0.0,Joinville - Perini B. P.,F17B900021,H109,Condomínio Perini,Joinville,Bloco O - O1,0.0,0.0,1.0,0.0,1.0,2072.673,2137.315,64.64200000000028,64.642,LIDO,Sem ocorrência,769.24,615.39,0.0,0.0,0.0,1384.63,1384.63,0.0
 H110 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,0.0,Joinville - Perini B. P.,F17B900028,H110,Condomínio Perini,Joinville,Bloco U - RU,0.0,0.0,1.0,0.0,1.0,6392.93,6552.35,159.42000000000007,159.42,LIDO,Sem ocorrência,1897.1,1517.68,0.0,0.0,0.0,3414.7799999999997,3414.7799999999997,0.0
 H111 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,0.0,Joinville - Perini B. P.,C16UB020205,H111,Condomínio Perini,Joinville,Bloco U - U,0.0,0.0,1.0,0.0,1.0,5890.462,6170.452,279.9899999999998,279.99,LIDO,Sem ocorrência,3331.88,2665.5,0.0,0.0,0.0,5997.38,5997.38,0.0
-H112 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,0.0,Joinville - Perini B. P.,,H112,Condomínio Perini,Joinville,Tunel de Vento - LAB 01,0.0,0.0,1.0,0.0,1.0,512.214,522.931,10.716999999999985,10.717,LIDO,Sem ocorrência,127.53,102.03,0.0,0.0,0.0,229.56,229.56,0.0
-H113 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,0.0,Joinville - Perini B. P.,,H113,Condomínio Perini,Joinville,Bloco U - U LAB,0.0,0.0,1.0,0.0,1.0,0.0,6414.275,6414.275,243.823,LIDO,Sem ocorrência,2901.49,2321.19,0.0,0.0,0.0,5222.68,5222.68,0.0
-H130 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,0.0,Sapiens Park,,H130,Condomínio Sapiens Park,Florianópolis - Outros,Sapiens Park - INPETRO,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-H131 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,0.0,Sapiens Park,,H131,Condomínio Sapiens Park,Florianópolis - Outros,Sapiens Park - Fotovoltaica,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 H200 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,15431797.0,Centro,B17C003784,H200,CASAN,Curitibanos,Curitibanos CEDUP,1.0,0.0,0.0,0.0,1.0,3352.0,3449.0,97.0,97.0,LIDO,Sem ocorrência,1663.44,0.0,-157.19,0.0,0.0,1506.25,1506.25,0.0
-H201 2024 Dezembro,Medidor não instalado,2024.0,Dezembro,0.0,Área Sede,,H201,Interno,Curitibanos,Curitibanos SEDE - Água Subterrânea,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-H202 2024 Dezembro,Medidor não instalado,2024.0,Dezembro,0.0,Área Sede,,H202,Interno,Curitibanos,Curitibanos SEDE - ETE,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 H300 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,196916.0,Araranguá,A15L279126,H300,SAMAE ARARANGUÁ,Araranguá,SAMAE Araranguá  Mato Alto,1.0,0.0,0.0,0.0,1.0,4289.0,4342.0,53.0,53.0,LIDO,Sem ocorrência,729.27,0.0,0.0,0.0,0.0,729.27,729.27,0.0
 H302 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,107568.0,Araranguá,A22LN0055338,H302,SAMAE ARARANGUÁ,Araranguá,SAMAE Araranguá  R. Pedro M. Pacheco (Medicina),1.0,0.0,0.0,0.0,1.0,187.0,194.0,7.0,10.0,LIDO,Mínimo,96.81,71.06,0.0,0.0,0.0,167.87,167.87,0.0
 H401 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,38988.0,Blumenau,A12S141289,H401,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2750",1.0,0.0,0.0,0.0,1.0,3694.0,3774.0,80.0,80.0,LIDO,Sem ocorrência,607.5,704.83,-66.61,0.0,0.0,1245.72,1245.72,0.0
 H402 2024 Dezembro,Medidor faturado pela UFSC,2024.0,Dezembro,55308.0,Blumenau,Y17AA00025980,H402,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2514",1.0,0.0,0.0,0.0,1.0,2206.0,2206.0,0.0,1.0,LIDO,Sem ocorrência,63.5,73.45,-6.94,0.0,0.0,130.01,130.01,0.0
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,UFSC + HU,131.0,30.0,27.0,3.0,191.0,,,,24749.182,,,434641.5199999999,382546.31,-75409.79999999999,-290.99,0.0,741487.04,741487.04,0.0
-,,,,,,,,,,UFSC,80.0,30.0,18.0,2.0,130.0,,,,,,,,,,,,,,

@@ -36,7 +36,6 @@ H041 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,2296810.0,Trindade,C
 H042 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,2296802.0,Trindade,C11C001909,H042,CASAN,Florianópolis - Trindade,CCE 2  R. Eng. Andrey C. Ferreira,1.0,0.0,0.0,0.0,1.0,3355,4188.0,833.0,833.0,LIDO/REVISÃO,Alto Consumo,14830.48,14830.48,-2869.4,0.0,703.04,27494.6,27494.6,0.0
 H043 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,6816860.0,Trindade,A94S171408,H043,CASAN,Florianópolis - Trindade,Casa de Veg.  Depto. de Microbiologia,1.0,0.0,0.0,0.0,1.0,109,111.0,2.0,2.0,LIDO,Sem ocorrência,56.05,56.05,-10.87,0.0,2.95,104.18,104.17999999999999,0.0
 H044 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,2296896.0,Trindade,C11C001908,H044,CASAN,Florianópolis - Trindade,CFM Oceanografia e entorno,1.0,0.0,0.0,0.0,1.0,1089,1209.0,120.0,120.0,LIDO,Alto Consumo,2074.91,2074.91,-394.25,0.0,22.02,3777.59,3777.5899999999997,0.0
-H045 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,2296772.0,Trindade,,H045,CASAN,Florianópolis - Trindade,"Museologia e MArquE (MU01, MU10 e CFH09)",1.0,0.0,0.0,0.0,1.0,5456,5693.0,237.0,237.0,LIDO,Sem ocorrência,4168.04,4168.04,-801.77,0.0,148.37,7682.68,7682.679999999999,0.0
 H046 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,2296780.0,Trindade,B10C017966,H046,CASAN,Florianópolis - Trindade,CCB Botânica,1.0,0.0,0.0,0.0,1.0,2631,2729.0,98.0,98.0,LIDO,Sem ocorrência,1681.33,1681.33,-329.27,0.0,121.81,3155.2,3155.2,0.0
 H047 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,2296837.0,Trindade,C11C009598,H047,CASAN,Florianópolis - Trindade,NDI e MArquE,1.0,0.0,0.0,0.0,1.0,17567,18050.0,483.0,483.0,LIDO/REVISÃO,Alto Consumo,8568.98,8568.98,-1625.48,0.0,62.84,15575.32,15575.32,0.0
 H048 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,2296764.0,Trindade,C11C001910,H048,CASAN,Florianópolis - Trindade,Centro de Filosofia e Humanas 1,1.0,0.0,0.0,0.0,1.0,41095,42083.0,988.0,988.0,LIDO/REVISÃO,Alto Consumo,17603.43,17603.43,-3363.85,0.0,389.42,32232.43,32232.43,0.0
@@ -73,24 +72,8 @@ H108 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,0.0,Joinville - Peri
 H109 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,0.0,Joinville - Perini B. P.,F17B900021,H109,Condomínio Perini,Joinville,Bloco O - O1,0.0,0.0,1.0,0.0,1.0,"1990,531",2030.984,40.452999999999975,40.453,0,0,481.39,385.11,0.0,0.0,0.0,866.5,866.5,0.0
 H110 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,0.0,Joinville - Perini B. P.,F17B900028,H110,Condomínio Perini,Joinville,Bloco U - RU,0.0,0.0,1.0,0.0,1.0,"6151,72",6247.37,95.64999999999964,95.65,0,0,1138.24,910.59,0.0,0.0,0.0,2048.83,2048.83,0.0
 H111 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,0.0,Joinville - Perini B. P.,C16UB020205,H111,Condomínio Perini,Joinville,Bloco U - U,0.0,0.0,1.0,0.0,1.0,"5241,143",5468.168,227.02499999999964,227.025,0,0,2701.6,2161.28,0.0,0.0,0.0,4862.88,4862.88,0.0
-H112 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,0.0,Joinville - Perini B. P.,,H112,Condomínio Perini,Joinville,Tunel de Vento - LAB 01,0.0,0.0,1.0,0.0,1.0,"497,157",499.073,1.9159999999999968,1.916,0,0,119.0,95.2,0.0,0.0,0.0,214.2,214.2,0.0
-H113 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,0.0,Joinville - Perini B. P.,,H113,Condomínio Perini,Joinville,Bloco U - U LAB,0.0,0.0,1.0,0.0,1.0,0,6414.275,6414.275,243.823,LIDO,Sem ocorrência,2901.49,2321.19,0.0,0.0,0.0,5222.68,5222.68,0.0
-H130 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,0.0,Sapiens Park,,H130,Condomínio Sapiens Park,Florianópolis - Outros,Sapiens Park - INPETRO,1.0,0.0,0.0,0.0,1.0,0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-H131 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,0.0,Sapiens Park,,H131,Condomínio Sapiens Park,Florianópolis - Outros,Sapiens Park - Fotovoltaica,1.0,0.0,0.0,0.0,1.0,0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 H200 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,15431797.0,Centro,B17C003784,H200,CASAN,Curitibanos,Curitibanos CEDUP,1.0,0.0,0.0,0.0,1.0,3142,3252.0,110.0,110.0,0,0,1896.01,0.0,-182.01000000000002,0.0,30.13,1744.13,1744.13,0.0
-H201 2024 Outubro,Medidor não instalado,2024.0,Outubro,0.0,Área Sede,,H201,Interno,Curitibanos,Curitibanos SEDE - Água Subterrânea,1.0,0.0,0.0,0.0,1.0,0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-H202 2024 Outubro,Medidor não instalado,2024.0,Outubro,0.0,Área Sede,,H202,Interno,Curitibanos,Curitibanos SEDE - ETE,0.0,0.0,0.0,0.0,0.0,0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 H300 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,196916.0,Araranguá,A15L279126,H300,SAMAE ARARANGUÁ,Araranguá,SAMAE Araranguá  Mato Alto,1.0,0.0,0.0,0.0,1.0,4236,4261.0,25.0,25.0,0,0,291.11,0.0,0.0,0.0,0.0,291.11,291.11,0.0
 H302 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,107568.0,Araranguá,A22LN0055338,H302,SAMAE ARARANGUÁ,Araranguá,SAMAE Araranguá  R. Pedro M. Pacheco (Medicina),1.0,0.0,0.0,0.0,1.0,179,181.0,2.0,10.0,0,0,96.81,71.06,0.0,0.0,0.0,167.87,167.87,0.0
 H401 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,38988.0,Blumenau,A12S141289,H401,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2750",1.0,0.0,0.0,0.0,1.0,3494,3581.0,87.0,87.0,0,0,664.06,770.48,-72.81,0.0,0.0,1361.73,1361.73,0.0
 H402 2024 Outubro,Medidor faturado pela UFSC,2024.0,Outubro,55308.0,Blumenau,Y17AA00025980,H402,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2514",1.0,0.0,0.0,0.0,1.0,2203,0.0,-2203.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,UFSC + HU,131.0,30.0,27.0,3.0,191.0,,,,27067.237000000005,,,478241.4200000001,394797.3400000001,-82058.79999999997,-89.97,10297.060000000001,801187.0499999998,801187.0499999999,0.0
-,,,,,,,,,,UFSC,80.0,30.0,18.0,2.0,130.0,,,,,,,,,,,,,,

@@ -50,6 +50,7 @@ for item in lista_ano_mes:
     for sheet_name in xls_file.sheet_names:   
         if item == sheet_name:
             df = pd.read_excel(xls_file, sheet_name)
+            df = df.dropna()
             df.columns = dados_agua_df_vazio.columns
             df.to_csv(os.path.join(pasta_atualizacao_df,f'{sheet_name}.csv'), index=False)
     else:
@@ -62,9 +63,15 @@ else:
 dict_dfs = {}
 
 for csv in os.listdir(pasta_atualizacao_df):
-    nome = (f'{csv[:-4]}_df')
-    df_csv = pd.read_csv(os.path.join(pasta_atualizacao_df, csv))
-    dict_dfs[nome] = df_csv
+    
+    if csv == 'dados_agua_df_para_atualizar.csv':
+        pass
+    else:
+        print(csv)
+        nome = (f'{csv[:-4]}_df')
+        df_csv = pd.read_csv(os.path.join(pasta_atualizacao_df, csv))
+        df_csv = df_csv.dropna() 
+        dict_dfs[nome] = df_csv
     
 
 ### - percorrer cada csv, converter em dataframe e adicionar a um dicionário:
@@ -151,7 +158,6 @@ def exportar_pd_unico_to_csv(dados_agua_df):
 
 exportar_pd_unico_to_csv(dados_agua_df)
 
-dados_agua_df.info()   
 
 #
 concatenar = 'SIM'
@@ -170,6 +176,7 @@ else:
     pass
 #----------------------------------------------------------------
 
-
+dados_agua_df_antigo.info()
 dados_agua_df.info()
+
 

@@ -36,7 +36,6 @@ H041 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,2296810.0,Trinda
 H042 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,2296802.0,Trindade,C11C001909,H042,CASAN,Florianópolis - Trindade,CCE 2  R. Eng. Andrey C. Ferreira,1.0,0.0,0.0,0.0,1.0,5285.0,5465.0,180.0,180.0,LIDO/REVISÃO,CONFIRMACAO LEITURA,3148.31,3148.31,-595.04,0.0,0.0,5701.58,5701.58,0.0
 H043 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,6816860.0,Trindade,A94S171408,H043,CASAN,Florianópolis - Trindade,Casa de Veg.  Depto. de Microbiologia,1.0,0.0,0.0,0.0,1.0,111.0,111.0,0.0,0.0,LIDO,HIDRÔMETRO PARADO.,43.31,43.31,-8.19,0.0,0.0,78.43,78.43,0.0
 H044 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,2296896.0,Trindade,C11C001908,H044,CASAN,Florianópolis - Trindade,CFM Oceanografia e entorno,1.0,0.0,0.0,0.0,1.0,1568.0,1619.0,51.0,51.0,LIDO,Sem ocorrência,840.5,840.5,-158.86,0.0,0.0,1522.14,1522.1399999999999,0.0
-H045 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,2296772.0,Trindade,,H045,CASAN,Florianópolis - Trindade,"Museologia e MArquE (MU01, MU10 e CFH09)",1.0,0.0,0.0,0.0,1.0,5780.0,5781.0,1.0,1.0,LIDO/REVISÃO,CONFIRMACAO LEITURA,49.68,49.68,-9.39,0.0,0.0,89.97,89.97,0.0
 H046 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,2296780.0,Trindade,B10C017966,H046,CASAN,Florianópolis - Trindade,CCB Botânica,1.0,0.0,0.0,0.0,1.0,2971.0,3036.0,65.0,65.0,LIDO,Sem ocorrência,1090.96,1090.96,-206.19,0.0,0.0,1975.73,1975.73,0.0
 H047 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,2296837.0,Trindade,C11C009598,H047,CASAN,Florianópolis - Trindade,NDI e MArquE,1.0,0.0,0.0,0.0,1.0,19192.0,19374.0,182.0,182.0,LIDO,Sem ocorrência,3184.09,3184.09,-601.79,0.0,0.0,5766.39,5766.39,0.0
 H048 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,2296764.0,Trindade,C11C001910,H048,CASAN,Florianópolis - Trindade,Centro de Filosofia e Humanas 1,1.0,0.0,0.0,0.0,1.0,44566.0,45320.0,754.0,754.0,LIDO,Sem ocorrência,13417.17,13417.17,-2535.84,0.0,0.0,24298.5,24298.5,0.0
@@ -73,24 +72,9 @@ H108 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,0.0,Joinville - 
 H109 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,0.0,Joinville - Perini B. P.,F17B900021,H109,Condomínio Perini,Joinville,Bloco O - O1,0.0,0.0,1.0,0.0,1.0,534.521,536.709,2.187999999999988,2.188,0,0,119.0,95.2,0.0,0.0,0.0,214.2,214.2,0.0
 H110 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,0.0,Joinville - Perini B. P.,F17B900028,H110,Condomínio Perini,Joinville,Bloco U - RU,0.0,0.0,1.0,0.0,1.0,39.465,50.165,10.699999999999996,10.7,0,0,127.33,101.86,0.0,0.0,0.0,229.19,229.19,0.0
 H111 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,0.0,Joinville - Perini B. P.,C16UB020205,H111,Condomínio Perini,Joinville,Bloco U - U,0.0,0.0,1.0,0.0,1.0,4698.51,4729.06,30.550000000000182,30.55,0,0,363.55,290.84,0.0,0.0,0.0,654.39,654.39,0.0
-H112 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,0.0,Joinville - Perini B. P.,,H112,Condomínio Perini,Joinville,Tunel de Vento - LAB 01,0.0,0.0,1.0,0.0,1.0,6689.47,6773.16,83.6899999999996,83.69,0,0,995.91,796.73,0.0,0.0,0.0,1792.6399999999999,1792.6399999999999,0.0
-H113 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,0.0,Joinville - Perini B. P.,,H113,Condomínio Perini,Joinville,Bloco U - U LAB,0.0,0.0,1.0,0.0,1.0,6414.275,6545.452,131.1770000000006,131.177,0,0,1561.01,1248.81,0.0,0.0,0.0,2809.8199999999997,2809.8199999999997,0.0
-H130 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,0.0,Sapiens Park,,H130,Condomínio Sapiens Park,Florianópolis - Outros,Sapiens Park - INPETRO,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-H131 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,0.0,Sapiens Park,,H131,Condomínio Sapiens Park,Florianópolis - Outros,Sapiens Park - Fotovoltaica,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 H200 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,15431797.0,Centro,B17C003784,H200,CASAN,Curitibanos,Curitibanos CEDUP,1.0,0.0,0.0,0.0,1.0,3470.0,3511.0,41.0,41.0,0,0,661.5999999999999,0.0,-62.529999999999994,0.0,0.0,599.07,599.0699999999999,0.0
-H201 2025 Fevereiro,Medidor não instalado,2025.0,Fevereiro,0.0,Área Sede,,H201,Interno,Curitibanos,Curitibanos SEDE - Água Subterrânea,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-H202 2025 Fevereiro,Medidor não instalado,2025.0,Fevereiro,0.0,Área Sede,,H202,Interno,Curitibanos,Curitibanos SEDE - ETE,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 H300 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,196916.0,Araranguá,A15L279126,H300,SAMAE ARARANGUÁ,Araranguá,SAMAE Araranguá  Mato Alto,1.0,0.0,0.0,0.0,1.0,4643.0,209.0,-4434.0,10.0,0,0,96.81,71.06,0.0,0.0,0.0,167.87,167.87,0.0
 H302 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,107568.0,Araranguá,A22LN0055338,H302,SAMAE ARARANGUÁ,Araranguá,SAMAE Araranguá  R. Pedro M. Pacheco (Medicina),1.0,0.0,0.0,0.0,1.0,201.0,4701.0,4500.0,58.0,0,0,812.87,0.0,0.0,0.0,0.0,812.87,812.87,0.0
 H401 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,38988.0,Blumenau,A12S141289,H401,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2750",0.0,0.0,0.0,0.0,0.0,3787.0,0.0,-3787.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 H402 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,55308.0,Blumenau,Y17AA00025980,H402,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2514",0.0,0.0,0.0,0.0,0.0,2209.0,0.0,-2209.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 H403 2025 Fevereiro,Medidor faturado pela UFSC,2025.0,Fevereiro,13390.0,Blumenau,0,H403,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau   Rua Marechal Rondon, 880",1.0,0.0,0.0,0.0,1.0,27210.0,27348.0,138.0,138.0,0,0,1140.08,0.0,0.0,0.0,1.55,1141.63,1141.6299999999999,0.0
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,UFSC + HU,129.0,30.0,27.0,3.0,189.0,,,,21339.823999999997,,,375360.99000000005,344764.9900000001,-67259.11000000002,-323.4,1.55,652545.02,652545.02,0.0
-,,,,,,,,,,UFSC,78.0,30.0,18.0,2.0,128.0,,,,,,,,,,,,,,

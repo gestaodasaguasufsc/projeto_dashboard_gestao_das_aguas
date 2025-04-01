@@ -71,7 +71,7 @@ def tratamento_de_dados_func(pasta):
     meses = df['MES_N'].unique().tolist()
     meses.sort(reverse=True)
     
-    #df['Dtime'] = pd.to_datetime(df['Dtime'],format='%Y-%m-%d') #formata a coluna Dtime para datetime
+    df['Dtime'] = pd.to_datetime(df['Dtime']) #formata a coluna Dtime para datetime
     maior_tempo = df['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
     maior_ano = maior_tempo.year
     index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
@@ -415,6 +415,7 @@ dict_saida = localiza_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, 
 #saida =  [selecao, lat, long]
 
 hidrometros_shp_merge = hidrometros_shp.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
+hidrometros_shp_merge.to_csv(os.path.join(pasta_projeto,'Dados','Produtos','hidrometros_shp_merge.csv'))
 
 uc_selecionada = 'H001'
 
@@ -623,7 +624,7 @@ for i, item in enumerate(df_selecionado_ind['VALOR_TOTAL']):
         df_selecionado_ind['CUS_VAR_ABS'][i] = variacao_abs
         df_selecionado_ind['CUS_VAR_PER'][i] = variacao_per
 
-print(lm)
+
   
     
 def indicadores_vol_cus_func(
@@ -694,11 +695,11 @@ custo_media = linha_mes_ano['CUS_MED_U6M'].iloc[0]
 custo_variacao_abs = linha_mes_ano['CUS_VAR_ABS'].iloc[0]
 custo_variacao_per = linha_mes_ano['CUS_VAR_PER'].iloc[0]
 
-print(volume_mes)
+
 
 texto = (f'{volume_media:,.2f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
 #texto = str(f'{volume_media:,.2f} m³'.replace("", ".")
-print(texto)
+
 #depois que tiver a coluna média feita
 
 #print(index_ind)
@@ -720,6 +721,18 @@ dados_agua_df_vazio= pd.read_csv(caminho_colunas_csv)
 dados_agua_df_atualizado = pd.read_csv(os.path.join(pasta_projeto,'Dados' , 'Origem', 'atualizacao_dfs','dados_agua_df_para_atualizar.csv'))
 dados_agua_df_original = pd.read_csv(os.path.join(pasta_projeto,'Dados' , 'Produtos', 'dados_agua_df.csv'))
 
+pasta_projeto = os.path.dirname(os.path.abspath('__file__')) 
+pasta_atualizacao_df = os.path.join(pasta_projeto,'Dados','Origem','atualizacao_dfs')
 
+dict_dfs = {}
+
+for csv in os.listdir(pasta_atualizacao_df):
+    nome = (f'{csv[:-4]}_df')
+    if 'dados' in csv == True:
+        pass
+    else:
+        df_csv = pd.read_csv(os.path.join(pasta_atualizacao_df, csv))
+        df_csv = df_csv.dropna() 
+        dict_dfs[nome] = df_csv
 
 
