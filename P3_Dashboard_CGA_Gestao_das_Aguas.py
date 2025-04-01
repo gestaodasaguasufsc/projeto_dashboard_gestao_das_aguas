@@ -1279,33 +1279,13 @@ with tab5:
                            
     with tab5_1:
         
+       
+        
+       
         df_selecionado2 = dict_dataframes[agrupamento_selecionado2] 
         
         df_selecionado2 = df_selecionado2.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
         #volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
-    
-        
-     
-        anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico:",
-            options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
-            default=df_selecionado2['ANO'].unique(),
-            key='multiselect_anos_fig1'
-            )
-    
-        # Filtrar o DataFrame com base nos anos selecionados
-        filtered_df_fig1 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig1)]
-        fig1 = boxplot_func_px(filtered_df_fig1)
-        st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
-        
-        filtered_df_fig1 = filtered_df_fig1.rename(columns=
-                                                  {'ANO':'Ano',
-                                                  'VALOR_TOTAL': 'Custo Total (R$)',
-                                                  'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                  }                                              )
-        st.dataframe(filtered_df_fig1, width=600, height=300)    
-    
-    with tab5_2:
-    
     
         anos_selecionados_fig2 = st.multiselect(    "Selecione os anos desejados no gráfico:",
             options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
@@ -1325,6 +1305,29 @@ with tab5:
                                                    'VOLUME_FATURADO': 'Volume Faturado (m³)'
                                                    }                                              )
         st.dataframe(filtered_df_fig2, width=600, height=300)  
+     
+            
+    
+    with tab5_2:
+    
+        anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico:",
+            options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
+            default=df_selecionado2['ANO'].unique(),
+            key='multiselect_anos_fig1'
+            )
+    
+        # Filtrar o DataFrame com base nos anos selecionados
+        filtered_df_fig1 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig1)]
+        fig1 = boxplot_func_px(filtered_df_fig1)
+        st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
+        
+        filtered_df_fig1 = filtered_df_fig1.rename(columns=
+                                                  {'ANO':'Ano',
+                                                  'VALOR_TOTAL': 'Custo Total (R$)',
+                                                  'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                  }                                              )
+        st.dataframe(filtered_df_fig1, width=600, height=300)
+        
 
     with tab5_3:
         
