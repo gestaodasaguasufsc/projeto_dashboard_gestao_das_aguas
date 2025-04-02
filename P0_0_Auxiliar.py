@@ -34,7 +34,7 @@ def pasta_produtos_func(pasta_projeto):
     #sub-def 3: -------------------------------------
 def abrir_csv_unico_func(pasta_produtos):
 
-    caminho_dados_agua_csv = os.path.join(pasta_produtos, 'dados_agua_df.csv')
+    caminho_dados_agua_csv = os.path.join(pasta_produtos, 'dados_agua_df_2.csv')
     dados_agua_df = pd.read_csv(caminho_dados_agua_csv)
     return dados_agua_df
 
@@ -172,9 +172,12 @@ lista_ucs = dados_agua_df_sHU['Hidrometro'].unique().tolist()
 lista_local = dados_agua_df_sHU['Local'].unique().tolist()
 lista_uc_local = []
 for i,uc in enumerate(lista_ucs):
-    nome_uc_local = lista_ucs[i] + " " + lista_local[i]
-    lista_uc_local.append(nome_uc_local)
-    
+    print(i, uc, lista_local[i] )
+    try:
+        nome_uc_local = lista_ucs[i] + " " + lista_local[i]
+        lista_uc_local.append(nome_uc_local)
+    except:
+        pass
 
 def boxplot_func_px(volume_faturado_por_mes_ano):
    
@@ -433,9 +436,16 @@ lista_ucs = dados_agua_df_sHU['Hidrometro'].unique().tolist()
 lista_local = dados_agua_df_sHU['Local'].unique().tolist()
 lista_uc_local = []
 
+lista_ucs = dados_agua_df_sHU['Hidrometro'].unique().tolist()
+lista_local = dados_agua_df_sHU['Local'].unique().tolist()
+lista_uc_local = []
 for i,uc in enumerate(lista_ucs):
-    nome_uc_local = lista_ucs[i] + " " + lista_local[i]
-    lista_uc_local.append(nome_uc_local)
+    print(i, uc, lista_local[i] )
+    try:
+        nome_uc_local = lista_ucs[i] + " " + lista_local[i]
+        lista_uc_local.append(nome_uc_local)
+    except:
+        pass
 
 lista_uc_local.sort()
 lista_uc_local.append("UFSC - visão geral")
@@ -736,3 +746,47 @@ for csv in os.listdir(pasta_atualizacao_df):
         dict_dfs[nome] = df_csv
 
 
+def trat_acumulado_por_ano_func (dct, agr_sel):
+
+    df_sel = dct[agr_sel] 
+    vol_ano = df_sel.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+    cus_ano = df_sel.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+    
+    df = pd.concat([vol_ano, cus_ano],axis=1).reset_index()
+    df['Agrupamento Selecionado'] = agr_sel
+    df['VALOR_TOTAL'] = df['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
+    df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
+    df = df.sort_values(by='ANO', ascending=False)
+    df = df.rename(columns=
+                                                              {'ANO':'Ano',
+                                                                  'VALOR_TOTAL': 'Custo Total (R$)',
+                                                               'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                               })
+    df = df.iloc[:,[0,3,1,2]]
+
+    return vol_ano, cus_ano, df
+
+dct = dict_dataframes
+agr_sel = lista_agrupamento[0]
+
+df_sel = dct[agr_sel] 
+vol_ano = df_sel.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+cus_ano = df_sel.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+
+
+df = pd.concat([vol_ano, cus_ano.iloc[:,1]],axis=1).reset_index()
+df['Agrupamento Selecionado'] = agr_sel
+#df['VALOR_TOTAL'] = df['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
+#df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
+#df = df.sort_values(by='ANO', ascending=False)
+df = df[['ANO','VOLUME_FATURADO','VALOR_TOTAL','Agrupamento Selecionado']]
+
+df = df.rename(columns=
+                                                          {'ANO':'Ano',
+                                                              'VALOR_TOTAL': 'Custo Total (R$)',
+                                                           'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                           })
+    
+print(df)
+
+print(df.describe())

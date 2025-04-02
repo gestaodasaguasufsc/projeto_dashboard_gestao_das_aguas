@@ -778,17 +778,17 @@ def trat_acumulado_por_ano_func (dct, agr_sel):
     vol_ano = df_sel.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
     cus_ano = df_sel.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
     
-    df = pd.concat([vol_ano, cus_ano['VALOR_TOTAL']],axis=1)
+    df = pd.concat([vol_ano, cus_ano['VALOR_TOTAL']],axis=1).reset_index()
     df['Agrupamento Selecionado'] = agr_sel
-    df['VALOR_TOTAL'] = df['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
-    df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
+    #df['VALOR_TOTAL'] = df['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
+    #df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
     df = df.sort_values(by='ANO', ascending=False)
     df = df.rename(columns=
                                                               {'ANO':'Ano',
                                                                   'VALOR_TOTAL': 'Custo Total (R$)',
                                                                'VOLUME_FATURADO': 'Volume Faturado (m³)'
                                                                })
-    df = df.iloc[:,[0,3,1,2]]
+    df = df.iloc[:,[1,2,3]]
 
     return vol_ano, cus_ano, df
 
@@ -1266,9 +1266,9 @@ with tab4:
         st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
                         
         st.caption('Estatística:')
-        st.dataframe(df_selecionado_dataframe.describe(), width=1200, height=320)
+        st.dataframe(df_selecionado_dataframe.describe(), width=800, height=320)
         st.caption('Dados:')
-        st.dataframe(df_selecionado_dataframe, width=1200, height=600) # Or any other way you want to display the data
+        st.dataframe(df_selecionado_dataframe, width=800, height=600) # Or any other way you want to display the data
 
 with tab5:
 
