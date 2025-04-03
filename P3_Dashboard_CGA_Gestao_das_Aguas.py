@@ -1210,9 +1210,16 @@ with tab2:
                 if pdf == 0:
                     st.caption('Fatura não disponível')
                 else:
-                    
+                    st.download_button(
+                        label="Download PDF",
+                        data=pdf,
+                        file_name= f'{ano_selecionado_mapa}_{mes_selecionado_mapa}_{selecao_uc_mapa}.pdf',
+                        mime="text/pdf",
+                        icon=":material/download:",
+                                        )
                     pdf_viewer(pdf, width=1200, height=2400)
                 
+               
                 
                 
             
