@@ -1242,8 +1242,8 @@ with tab3:
     with col2:
         mes_selecionado_dados_mensais = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_dados_mensais_mes')         
     
-    tab3_1, tab3_2, tab3_3 = st.tabs(['Volume',
-                          'Custo', 'Tabela'
+    tab3_1, tab3_2, tab3_3, tab3_4 = st.tabs(['Volume',
+                          'Custo', 'Dados selecionados', 'Estatísticas'
                           ])    
     dados_agua_df_ano_mes_selecionado_dados_mensais = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_dados_mensais) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_dados_mensais)]
     dados_agua_df_ano_mes_selecionado_dados_mensais = dados_agua_df_ano_mes_selecionado_dados_mensais.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
@@ -1262,19 +1262,23 @@ with tab3:
         st.write(fig2)
     with tab3_3:
         
-        st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
+ 
         dataframe = dados_agua_df_ano_mes_selecionado_dados_mensais
         dataframe = dataframe.rename(
             columns={
             'VOLUME_FATURADO': 'Volume Faturado m³',
             'VALOR_TOTAL': 'Valor Total R$',
                     }
-                                     )
-        st.caption('Estatística:')
-        st.dataframe(dataframe.describe(), width=1200, height=400)
-        st.caption('Dados:')
+                                  )
+        
+        st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
+        st.caption("Dados:")
         st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
-
+    
+    with tab3_4:
+        st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
+        st.caption('Estatísticas:')
+        st.dataframe(dataframe.describe(), width=1200, height=400)
  
 with tab4:
 
@@ -1295,9 +1299,8 @@ with tab4:
     df_selecionado_dataframe = trat_acum_func[2]
         
         
-    tab4_1, tab4_2, tab4_3 = st.tabs(['Volume',
-                          'Custo', 'Tabela'
-                          ])    
+    tab4_1, tab4_2, tab4_3 , tab4_4 = st.tabs(['Volume',
+                          'Custo', 'Dados selecionados', 'Estatísticas'                          ])    
     with tab4_1:
     #Volume Faturado acumulado por ano
         st.caption('Volume acumulado por ano')
@@ -1314,12 +1317,15 @@ with tab4:
     
     
     with tab4_3:
+        
         st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
-                        
-        st.caption('Estatística:')
-        st.dataframe(df_selecionado_dataframe.describe(), width=800, height=320)
         st.caption('Dados:')
         st.dataframe(df_selecionado_dataframe, width=800, height=600) # Or any other way you want to display the data
+
+    with tab4_4:
+        st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
+        st.caption('Estatísticas:')
+        st.dataframe(df_selecionado_dataframe.describe(), width=800, height=320)
 
 with tab5:
 
@@ -1352,20 +1358,29 @@ with tab5:
             # Filtrar o DataFrame com base nos anos selecionados
         filtered_df_fig2 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig2)]
         
-        fig2 = scatter_func_px_vol(filtered_df_fig2)
-        st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
-    
-        filtered_df_fig2 = filtered_df_fig2.rename(columns=
-                                                   {'ANO':'Ano',
-                                                   'VALOR_TOTAL': 'Custo Total (R$)',
-                                                   'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                   }                                              )
-        st.caption('Estatística:')
-        st.dataframe(filtered_df_fig2.describe(), width=600, height=320)
-        st.caption('Dados:')
-        st.dataframe(filtered_df_fig2.sort_values(by='Ano',ascending=False), width=600, height=400)  
-     
+        tab5_1_1, tab5_1_2, tab5_1_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
+        
+        with tab5_1_1:
+        
+            fig2 = scatter_func_px_vol(filtered_df_fig2)
             
+            st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
+        
+            filtered_df_fig2 = filtered_df_fig2.rename(columns=
+                                                       {'ANO':'Ano',
+                                                       'VALOR_TOTAL': 'Custo Total (R$)',
+                                                       'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                       }                                              )
+        
+        
+        with tab5_1_2:
+            
+            st.caption('Dados selecionados:')
+            st.dataframe(filtered_df_fig2.sort_values(by='Ano',ascending=False), width=600, height=400)  
+     
+        with tab5_1_3:  
+            st.caption('Estatísticas:')
+            st.dataframe(filtered_df_fig2.describe(), width=600, height=320)
     
     with tab5_2:
     
@@ -1378,17 +1393,29 @@ with tab5:
         # Filtrar o DataFrame com base nos anos selecionados
         filtered_df_fig1 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig1)]
         fig1 = boxplot_func_px(filtered_df_fig1)
-        st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
         
-        filtered_df_fig1 = filtered_df_fig1.rename(columns=
-                                                  {'ANO':'Ano',
-                                                  'VALOR_TOTAL': 'Custo Total (R$)',
-                                                  'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                  }                                              )
-        st.caption('Estatística:')
-        st.dataframe(filtered_df_fig1.describe(), width=600, height=320)
-        st.caption('Dados:')
-        st.dataframe(filtered_df_fig1.sort_values(by='Ano',ascending=False), width=600, height=400)
+        tab5_2_1, tab5_2_2, tab5_2_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
+        
+        with tab5_2_1:
+        
+            st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
+            
+            filtered_df_fig1 = filtered_df_fig1.rename(columns=
+                                                      {'ANO':'Ano',
+                                                      'VALOR_TOTAL': 'Custo Total (R$)',
+                                                      'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                      }                                              )
+        
+        with tab5_2_2:
+            st.caption('Dados:')
+            st.dataframe(filtered_df_fig1.sort_values(by='Ano',ascending=False), width=600, height=400)
+        
+        with tab5_2_3:
+            st.caption('Estatísticas:')
+            st.dataframe(filtered_df_fig1.describe(), width=600, height=320)
+        
+        
+        
         
 
     with tab5_3:
@@ -1403,19 +1430,28 @@ with tab5:
         filtered_df_fig3 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig3)]
     
         fig3 = line_func_px(filtered_df_fig3)
-        st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
         
-        filtered_df_fig3 = filtered_df_fig3.rename(columns=
-                                                   {'ANO':'Ano',
-                                                   'VALOR_TOTAL': 'Custo Total (R$)',
-                                                   'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                   }                                              )
-        st.caption('Estatística:')
-        st.dataframe(filtered_df_fig3.describe(), width=600, height=325)
-        st.caption('Dados:')
+        tab5_3_1, tab5_3_2, tab5_3_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
         
-        st.dataframe(filtered_df_fig3.sort_values(by='Ano',ascending=False), width=600, height=400)           
+        with tab5_3_1:
+        
+            st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
+            
+            filtered_df_fig3 = filtered_df_fig3.rename(columns=
+                                                       {'ANO':'Ano',
+                                                       'VALOR_TOTAL': 'Custo Total (R$)',
+                                                       'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                       }                                              )
+               
+        with tab5_3_2:
+        
+            st.caption('Dados:')
+            st.dataframe(filtered_df_fig3.sort_values(by='Ano',ascending=False), width=600, height=400)           
 
+        with tab5_3_3:
+            
+            st.caption('Estatísticas:')
+            st.dataframe(filtered_df_fig3.describe(), width=600, height=325)
    
        
 
