@@ -14,6 +14,7 @@ import matplotlib.colors as colors
 import matplotlib.ticker as ticker
 import mapclassify as mc
 import streamlit as st
+from streamlit_pdf_viewer import pdf_viewer
 import altair as alt
 import plotly.express as px
 from streamlit_folium import folium_static
@@ -865,6 +866,32 @@ def indicadores_vol_cus_func(
 
     return df_selecionado_ind
 
+
+def abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura):
+    meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+
+    if mes_fatura <= 9:
+        mes_fatura_str = '0' + str(mes_fatura)
+    else: 
+        mes_fatura_str = str(mes_fatura)
+
+    mes_fatura_texto = mes_fatura_str  + ' - ' + meses[mes_fatura-1].upper()  
+    pasta_faturas = os.path.join(pasta_projeto, 'Dados', 'Origem', 'CGA - Faturas', str(ano_fatura), mes_fatura_texto)
+    pdf = 0
+    try:
+        for item in os.listdir(pasta_faturas):
+            
+            if item[:4] == uc_selecionada:
+                
+                pdf = os.path.join(pasta_faturas, item)
+                                            
+            else:
+                pass 
+    except:
+        pass
+    return pdf  
+
+
 ###_________________________________________________________________________________
 
 #Configurações Streamlit
@@ -1179,7 +1206,15 @@ with tab2:
     
             with tab2_3_3:
                 st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')   
-                st.caption('Indisponível no momento')
+                pdf = abrir_fatura_pdf(uc_selecionada, ano_selecionado_mapa, mes_selecionado_mapa)
+                if pdf == 0:
+                    st.caption('Fatura não disponível')
+                else:
+                    
+                    pdf_viewer(pdf, width=1200, height=2400)
+                
+                
+                
             
 with tab3:
     

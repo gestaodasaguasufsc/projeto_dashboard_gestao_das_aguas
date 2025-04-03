@@ -1,0 +1,150 @@
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="pt">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="_csrf" content=""/>
+		<meta name="_csrf_header" content=""/>
+		
+				
+		<title>Entrar no eCasan</title>
+							
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Acesse a segunda via de suas faturas; Saiba sobre interrupções no abastecimento de água na sua residência; Controle seu consumo diariamente; Emita certidões; Verifique o histórico de volume fornecido.">
+		<meta name="author" content="CASAN/GIN/DIDS - Companhia Catarinense de Águas e Saneamento">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		
+		<!-- styles -->
+		<link href="/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/resources/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">			
+		
+		<link href="/resources/ecasan/css/login.css" rel="stylesheet">
+					
+		<!--[if gte IE 9]>
+		  <style type="text/css">
+		    .gradient {
+		       filter: none;
+		    }
+		  </style>
+		<![endif]-->				
+		
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+		  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		
+		<!-- fav icon -->
+		<link rel="shortcut icon" href="/resources/ecasan/images/fav.png">
+	</head>
+
+	<body>
+		<div id="loading"><span id="loading_text"></span></div>
+	    <div class="topbar"></div>
+	    <div class="content">
+
+<script type="text/javascript">
+	
+	var verifyCallback = function(response) {
+		$('input[name="j_captcha"]:hidden').val(response);
+	};
+
+	var onloadCallback = function() {
+		grecaptcha.render('recaptcha_sec', {
+			'sitekey' : '6LdFmgETAAAAAAP3suZ9YDlcsuiMJ3IDVnc0RgOI',
+			'callback' : verifyCallback,
+			'hl' : 'pt-BR',
+			'theme' : 'light'
+		});
+	};
+</script>
+
+<div class="container">
+	
+		<form name='f_login_index' class="form-signin"
+			action="j_spring_security_check" method='POST'>
+			<a href="/">
+				<div class="form-signin-logo"></div>
+			</a>
+			<!--[if lte IE 9]>
+						<label for="j_username">CPF ou CNPJ</label>
+					<![endif]-->
+			<input type="text" id="j_username" name="j_username"
+				class="input-block-level" placeholder="CPF ou CNPJ">
+			<!--[if lte IE 9]>						
+						<label for="j_password">Matrícula</label>					
+					<![endif]-->
+			<input type="text" id="j_password" name="j_password"
+				class="input-block-level" placeholder="Matrícula">
+			
+			<div class="button-content">
+			<input type="hidden" name=""   value="" />
+				<button class="btn btn-large btn btn-primary" type="submit">Acessar</button>
+			</div>
+		</form>
+		
+	
+
+	
+</div>
+
+
+		<input id="_path" type="hidden" value="/"/>
+	</div> <!-- /content -->
+	
+	
+
+    <!-- javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/resources/jquery/jquery-1.10.2.min.js"></script>
+    <script src="/resources/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/resources/ecasan/js/general.js"></script>
+    
+    <script type="text/javascript">
+    	$(document).ajaxStart(function(){
+			$('#loading').show();
+			$('#loading_text').html("Carregando...");
+    	});
+    	$(document).ajaxStop(function(){
+    		$('#loading').hide();
+    		$('#loading_text').html("");
+    	});
+		$(document).ajaxError(function(){
+			if($('#loading').is(":visible")){
+				$('#loading').hide();
+				$('#loading_text').html("");
+			}
+		});  
+    </script>
+                   
+    
+   	<script type="text/javascript">	
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-35607686-2']);
+	  _gaq.push(['_setDomainName', 'casan.com.br']);
+	  _gaq.push(['_trackPageview']);	
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();	
+	</script>
+    
+  </body>
+</html>
+<script
+	src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+	async defer></script>
+<script>
+	$(document).ready(function() {
+		$("#j_username").focus();
+	});
+</script>

@@ -774,11 +774,11 @@ vol_ano = df_sel.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
 cus_ano = df_sel.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
 
 
-df = pd.concat([vol_ano, cus_ano.iloc[:,1]],axis=1).reset_index()
+df = pd.concat([vol_ano, cus_ano['VALOR_TOTAL']],axis=1).reset_index()
 df['Agrupamento Selecionado'] = agr_sel
 #df['VALOR_TOTAL'] = df['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
 #df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
-#df = df.sort_values(by='ANO', ascending=False)
+df = df.sort_values(by='ANO', ascending=False)
 df = df[['ANO','VOLUME_FATURADO','VALOR_TOTAL','Agrupamento Selecionado']]
 
 df = df.rename(columns=
@@ -786,7 +786,57 @@ df = df.rename(columns=
                                                               'VALOR_TOTAL': 'Custo Total (R$)',
                                                            'VOLUME_FATURADO': 'Volume Faturado (m³)'
                                                            })
-    
-print(df)
 
-print(df.describe())
+import webbrowser #para o spyder apenas
+
+from streamlit_pdf_viewer import pdf_viewer
+
+# Display a PDF file
+
+meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+
+uc_selecionada = 'H002'
+ano_fatura = 2023
+mes_fatura = 1
+if mes_fatura <= 9:
+    mes_fatura_str = '0' + str(mes_fatura)
+else: 
+    mes_fatura_str = str(mes_fatura)
+
+mes_fatura_texto = mes_fatura_str  + ' - ' + meses[mes_fatura-1].upper()  
+pasta_faturas = os.path.join(pasta_projeto, 'Dados', 'Origem', 'CGA - Faturas', str(ano_fatura), mes_fatura_texto)
+for item in os.listdir(pasta_faturas):
+    if item[:4] == uc_selecionada:
+        pdf = pdf_viewer(os.path.join(pasta_faturas, item), width=700, height=1000)
+        #pdf = os.path.join(pasta_faturas, item)                            
+    else:
+        pass                           
+
+def abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura):
+    meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+
+    uc_selecionada = 'H002'
+    ano_fatura = 2023
+    mes_fatura = 1
+    if mes_fatura <= 9:
+        mes_fatura_str = '0' + str(mes_fatura)
+    else: 
+        mes_fatura_str = str(mes_fatura)
+
+    mes_fatura_texto = mes_fatura_str  + ' - ' + meses[mes_fatura-1].upper()  
+    pasta_faturas = os.path.join(pasta_projeto, 'Dados', 'Origem', 'CGA - Faturas', str(ano_fatura), mes_fatura_texto)
+    for item in os.listdir(pasta_faturas):
+        if item[:4] == uc_selecionada:
+            pdf = pdf_viewer(os.path.join(pasta_faturas, item), width=700, height=1000)
+            
+            #pdf = os.path.join(pasta_faturas, item)                            
+        else:
+            pass 
+    return pdf         
+    
+pdf = abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura)
+st.write(pdf, width=750, height=1100)
+
+# open an HTML file on my own (Windows) computer
+url = pdf
+webbrowser.open(url,new=2)                                     
