@@ -11,7 +11,7 @@ import glob
 
 
 pasta_projeto = os.path.dirname(os.path.abspath('__file__')) 
-pasta_atualizacao_df = os.path.join(pasta_projeto,'Dados','Origem','atualizacao_dfs')
+pasta_atualizacao_df = os.path.join(pasta_projeto,'Dados','Produtos','atualizacao_dfs')
 
 try:
     os.mkdir(os.path.join(pasta_atualizacao_df))
@@ -150,13 +150,13 @@ dados_agua_df = dados_agua_df.drop('DIA', axis=1)
  
 ## - exportar o arquivo para um csv unico:
 
-def exportar_pd_unico_to_csv(dados_agua_df):
-    pasta_atualizacao_df = os.path.join(pasta_projeto,'Dados','Origem','atualizacao_dfs')
+def exportar_pd_unico_to_csv(dados_agua_df, pasta_atualizacao_df):
+    
     caminho_dados_agua_csv = os.path.join(pasta_atualizacao_df, 'dados_agua_df_para_atualizar.csv')
     dados_agua_df.to_csv(caminho_dados_agua_csv, index=False)
     
 
-exportar_pd_unico_to_csv(dados_agua_df)
+exportar_pd_unico_to_csv(dados_agua_df, pasta_atualizacao_df)
 
 
 #
@@ -170,7 +170,7 @@ if concatenar == 'SIM':
     
     dados_agua_df = pd.concat([dados_agua_df_antigo, dados_agua_df], ignore_index=True)
     #neste caso, origem e saida são o mesmo arquivo, irá sobreescrever
-    caminho_dados_agua_df_saida = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df_2.csv')
+    caminho_dados_agua_df_saida = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df_3.csv')
     dados_agua_df.to_csv(caminho_dados_agua_df_saida, index=False)
 else:
     pass

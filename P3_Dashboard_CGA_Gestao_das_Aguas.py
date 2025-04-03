@@ -936,7 +936,7 @@ with st.sidebar:
     st.sidebar.caption("Projeto desenvolvido em Python 3.10 - mar/2025")
     st.sidebar.caption("contato: gestaodasaguas@contato.ufsc.br")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa Cadastral e informações por UC", 
+tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa cadastral e dados mensais individualizados por UC", 
                                   "Dados gerais de UCs por ano e mês selecionado", "Dados agrupados anuais", "Dados agrupados mensais"])
 
 
@@ -951,8 +951,9 @@ with tab1:
     with col2:
         mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
     with col3:
-            st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
-            st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')
+        st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')    
+        st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
+            
     
     col1, col2  = st.columns(2)
     
@@ -1080,8 +1081,9 @@ with tab2:
         mes_selecionado_mapa = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_mapa_mes')
     
     with col3:
-        st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
         st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')
+        st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
+        
         
             
     col1, col2 = st.columns(2)
@@ -1122,9 +1124,10 @@ with tab2:
                 verificador_mapa  = False
                 pass
     
-    tab2_1, tab2_2, tab2_3 = st.tabs(["Mapa", 
+    tab2_1, tab2_2, tab2_3 , tab2_4 = st.tabs(["Mapa", 
                           'Dados agrupados anuais da UC selecionada',
                           'Dados mensais da UC selecionada',
+                          'Fatura no mês e ano selecionados'
                                      ])
     
     with tab2_1:
@@ -1183,8 +1186,8 @@ with tab2:
     else:
         
         with tab2_3:
-            tab2_3_1, tab2_3_2, tab2_3_3 = st.tabs(['Volume',
-                                  'Custo', 'Fatura no mês e ano selecionados'
+            tab2_3_1, tab2_3_2 = st.tabs(['Volume',
+                                  'Custo'
                                   ])  
             
                    
@@ -1204,20 +1207,26 @@ with tab2:
                     funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df_sHU, uc_selecionada)
                     st.write(funcao_graf_uc_mes[1])
     
-            with tab2_3_3:
-                st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')   
-                pdf = abrir_fatura_pdf(uc_selecionada, ano_selecionado_mapa, mes_selecionado_mapa)
-                if pdf == 0:
-                    st.caption('Fatura não disponível')
-                else:
-                    st.download_button(
-                        label="Download PDF",
-                        data=pdf,
-                        file_name= f'{ano_selecionado_mapa}_{mes_selecionado_mapa}_{selecao_uc_mapa}.pdf',
-                        mime="text/pdf",
-                        icon=":material/download:",
-                                        )
-                    pdf_viewer(pdf, width=1200, height=2400)
+        with tab2_4:
+             
+            pdf = abrir_fatura_pdf(uc_selecionada, ano_selecionado_mapa, mes_selecionado_mapa)
+            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+                st.caption('Selecione uma unidade consumidora para mostrar fatura.')
+            elif pdf == 0:
+                st.caption('Fatura não disponível para o ano e mês da unidade selecionada.')
+                st.caption('Faturas em pdf disponíveis a partir de 2018.')
+                st.caption('As faturas CASAN podem ser acessadas diretamente em https:ecasan.com.br.')
+            
+            else:
+                st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')  
+                st.download_button(
+                    label="Download PDF",
+                    data=pdf,
+                    file_name= f'{ano_selecionado_mapa}_{mes_selecionado_mapa}_{selecao_uc_mapa}.pdf',
+                    mime="text/pdf",
+                    icon=":material/download:",
+                                    )
+                pdf_viewer(pdf, width=1200, height=2400)   
                 
                
                 

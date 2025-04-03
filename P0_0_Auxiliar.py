@@ -829,7 +829,7 @@ def abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura):
         if item[:4] == uc_selecionada:
             pdf = pdf_viewer(os.path.join(pasta_faturas, item), width=700, height=1000)
             
-            #pdf = os.path.join(pasta_faturas, item)                            
+        #pdf = os.path.join(pasta_faturas, item)                            
         else:
             pass 
     return pdf         
