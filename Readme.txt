@@ -25,6 +25,7 @@ Arquivos principais:
 Arquivo main = Dashboard_CGA_Gestao_das_Aguas.py
 Arquivo auxiliar = Run_Streamlit.py para rodar em localhost o arquivo main.
 requirements.txt requerido pelo streamlit cloud para importar bibliotecas quando do deploy.
+Obs: No requirements.txt é necessário retirar os módulos de windows pywin32 para rodar no streamlit.
 
 Obs: Projeto iniciado em 09/2024, na disciplina de Pós-Graduação em Engenharia Ambiental PPGEA/UFSC, ENS410064	Tópicos Especiais: Python in Environmental Applications - Prof. Leonardo Hoinaski
 
