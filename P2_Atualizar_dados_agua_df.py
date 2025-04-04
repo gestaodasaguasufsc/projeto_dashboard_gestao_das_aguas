@@ -27,7 +27,7 @@ dados_agua_df_vazio = pd.read_csv(caminho_colunas_df_csv)
 #passo1 = converter excel em df (para novos dados até código definitivo ficar pronto)
     
     
-nome_arquivo_xls= 'M00 - Dados mensais_R6.xlsx'
+nome_arquivo_xls= 'M00 - Dados mensais_2025_03.xlsx'
 
 xls_file = pd.ExcelFile(os.path.join(pasta_projeto, 'Dados', 'Origem', 'xls_origem', nome_arquivo_xls))
      
@@ -39,11 +39,7 @@ except:
 
 
 lista_ano_mes = [
-        '2024_10',
-        '2024_11',
-        '2024_12',
-        '2025_01',
-        '2025_02'
+        '2025_03'
                  ]
      
 for item in lista_ano_mes:
@@ -162,7 +158,7 @@ exportar_pd_unico_to_csv(dados_agua_df, pasta_atualizacao_df)
 #
 concatenar = 'SIM'
 
-caminho_dados_agua_df = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df.csv')
+caminho_dados_agua_df = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df_2.csv')
 dados_agua_df_antigo = pd.read_csv(caminho_dados_agua_df)
 dados_agua_df_antigo['Dtime']= pd.to_datetime(dados_agua_df_antigo['Dtime'])
 
