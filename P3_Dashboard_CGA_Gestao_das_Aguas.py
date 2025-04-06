@@ -1038,7 +1038,8 @@ with tab1:
             sem_dados = True
         
         with t1col1_14:
-            pass
+            pass       
+            
         
         if sem_dados == True:
             pass
@@ -1197,22 +1198,23 @@ with tab2:
                     ' Clique nos pontos de localização dos hidrômetros para visualizar imagem do local')
         
         
-        dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
-        dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
-        dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
-                 
-        chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
-        #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
-               
-        camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
-                        
-        adicionar_camadas_de_fundo_func(map)
-            
-        folium_static(map, width=1000, height=800)
-        verificador_dados = True
-        #except:
-         #   verificador_dados = False
-          #  st.caption('UC sem dados georreferenciados')
+        try:
+            dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
+            dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
+            dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
+                     
+            chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
+            #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
+                   
+            camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
+                            
+            adicionar_camadas_de_fundo_func(map)
+                
+            folium_static(map, width=1000, height=800)
+            verificador_dados = True
+        except:
+            verificador_dados = False
+            st.caption('UC sem dados georreferenciados')
             
     
     
