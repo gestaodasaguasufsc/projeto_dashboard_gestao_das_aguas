@@ -340,7 +340,7 @@ def camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UF
               '<br>'+'Campus: '+row['Campus']+
               '<br>'+'Cidade: '+row['Cidade']+
               '<br>'+'Setor: '+row['Setor de Abastecimento CGA']+
-              '<br>'+'SubSetor: '+row['Setor de Abastecimento CGA.1']
+              '<br>'+'SubSetor: '+row['Setor de Abastecimento CGA_1']
               )
     
               texto = texto if pd.isna(row['Matricula']) else texto + '<br>'+'Matrícula: '+str(int(row['Matricula']))
@@ -707,7 +707,7 @@ def localiza_lat_long_hidrometro_func (df_i, valor, shp):
 
 def gerador_lista_uc_local_por_campi_func (df, selecao_cidade):
     df = df[df['Cidade']!= 'Florianópolis  HU']
-    df = df.iloc[:,[1,11,9]]
+    df = df.iloc[:,[1,9,11]]
     df['nome_uc_local'] = df['Hidrometro'] + " " + df['Local']
     df_filtrada = df[df['Cidade'] == selecao_cidade]
     lista = df_filtrada['nome_uc_local'].tolist()
@@ -921,7 +921,6 @@ def grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, 
     lista = []
     
     for index, row in df_36m.iterrows():
-        print(row)
         lista.append(str(int(row['MES_N'])) +'-'+str(int(row['ANO'])))
         
     df_36m['MES_ANO'] = lista
@@ -990,25 +989,25 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa cadastral e dados m
 
 with tab1: 
     
-    col1, col2 = st.columns(2)
+    t1col1, t1col2 = st.columns(2)
     
-    with col1:
+    with t1col1:
              
-        col1_11, col1_12 = st.columns(2)
+        t1col1_11, t1col1_12 = st.columns(2)
          
         
         
-        with col1_11:     
+        with t1col1_11:     
             st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')   
             ano_selecionado_ind = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_indicadores_ano')
-        with col1_12:
+        with t1col1_12:
             st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
             mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
                  
                
-        col1_13, col1_14  = st.columns(2)
+        t1col1_13, t1col1_14  = st.columns(2)
     
-        with col1_13:
+        with t1col1_13:
             agrupamento_selecionado_ind = st.selectbox('Selecione o  agrupamento dos dados:', 
                                                lista_agrupamento, 
                                                index = 0, 
@@ -1038,13 +1037,13 @@ with tab1:
             st.caption('Dados inexistentes para o local/ano/mês selecionado')
             sem_dados = True
         
-        with col1_14:
+        with t1col1_14:
             pass
         
         if sem_dados == True:
             pass
         else:
-            col1_15, col1_16 = st.columns(2)
+            t1col1_15, t1col1_16 = st.columns(2)
             
             st.markdown(
                         """
@@ -1057,7 +1056,7 @@ with tab1:
                         unsafe_allow_html=True,
                     )
             
-            with col1_15:      
+            with t1col1_15:      
                     textov0 = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
                     textov1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
                     textov2 = (f'{volume_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
@@ -1072,7 +1071,7 @@ with tab1:
                               textov0, 
                               border=True)
             
-            with col1_16:
+            with t1col1_16:
                     textoc0 = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
                     textoc1 = (f'{custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
                     textoc2 = (f'{custo_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
@@ -1080,21 +1079,21 @@ with tab1:
                               textoc0,  
                               border=True, delta_color="inverse")
             
-            col1_17, col1_18 = st.columns(2)
+            t1col1_17, t1col1_18 = st.columns(2)
             
-            with col1_17:      
+            with t1col1_17:      
                     texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
                     st.metric("Volume médio dos últimos 6 meses", texto , border=True)
             
-            with col1_18:
+            with t1col1_18:
                     texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
                     st.metric("Custo médio dos últimos 6 meses", texto, border=True)
         
             st.caption('Variações de volume e custo em relação à média dos últimos 6 meses')
             
-            col1_19, col1_20 = st.columns(2)
+            t1col1_19, t1col1_20 = st.columns(2)
             
-            with col1_19:
+            with t1col1_19:
                     st.metric("Volume variação absoluta", 
                               "", textov1, 
                               border=True, delta_color="inverse")
@@ -1102,7 +1101,7 @@ with tab1:
                               "", textov2, 
                               border=True, delta_color="inverse")
                     
-            with col1_20:
+            with t1col1_20:
                     st.metric("Custo variação absoluta", 
                               "", textoc1, 
                               border=True, delta_color="inverse")
@@ -1110,7 +1109,7 @@ with tab1:
                               "", textoc2, 
                               border=True, delta_color="inverse")
               
-    with col2:
+    with t1col2:
         if sem_dados == True:
             pass
         else:
@@ -1130,28 +1129,30 @@ with tab1:
 
 with tab2:
             
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:     
+    t2col1, t2col2, t2col3, t2col4 = st.columns(4)
+    
+    with t2col1:     
         ano_selecionado_mapa = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_mapa_ano')
-    with col2:
+   
+    with t2col2:
         mes_selecionado_mapa = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_mapa_mes')
     
-    with col3:
+    with t2col3:
         st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')
         st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
         
         
             
-    col1, col2 = st.columns(2)
+    t2col5, t2col6 = st.columns(2)
     
-    with col1:
+    with t2col5:
         
         funcao = lista_cidades_index_func(cadastro_hidrometros_df)
         lista_cidades = funcao[0]
         index_cidades = funcao[1]
         selecao_cidade = st.selectbox('Selecione o campi/unidade', lista_cidades, index = index_cidades , key='selectbox_mapa_cidades')        
         
-    with col2: 
+    with t2col6: 
         
         funcao = gerador_lista_uc_local_por_campi_func (cadastro_hidrometros_df , selecao_cidade)
         lista_uc_local = funcao[0]
@@ -1165,10 +1166,11 @@ with tab2:
         
         
         if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
+            print('Sim')
             map = folium.Map(width = 950, height=750, location=[-27.6, -48.52], zoom_start=15.5)
             uc_selecionada = selecao_uc_mapa
         else: 
-            
+            print('Não')
             try:
                 dict_saida = localiza_lat_long_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, hidrometros_shp)
                 lat = dict_saida['lat']
@@ -1194,23 +1196,23 @@ with tab2:
                    ' Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações.'
                     ' Clique nos pontos de localização dos hidrômetros para visualizar imagem do local')
         
-        try:
-            dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
-            dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
-            dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
-                     
-            chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
-            #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
-                   
-            camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
-                            
-            adicionar_camadas_de_fundo_func(map)
-                
-            folium_static(map, width=1000, height=800)
-            verificador_dados = True
-        except:
-            verificador_dados = False
-            st.caption('UC sem dados georreferenciados')
+        
+        dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_sHU[(dados_agua_df_sHU['ANO'] == ano_selecionado_mapa) & (dados_agua_df_sHU['MES_N'] == mes_selecionado_mapa)]
+        dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
+        dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
+                 
+        chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
+        #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
+               
+        camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
+                        
+        adicionar_camadas_de_fundo_func(map)
+            
+        folium_static(map, width=1000, height=800)
+        verificador_dados = True
+        #except:
+         #   verificador_dados = False
+          #  st.caption('UC sem dados georreferenciados')
             
     
     
@@ -1292,10 +1294,10 @@ with tab3:
     
     st.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal. Por padrão o último mês com dados disponíveis está filtrado.")
     
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:     
+    t3col1, t3col2, t3col3, t3col4 = st.columns(4)
+    with t3col1:     
         ano_selecionado_dados_mensais = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_dados_mensais_ano')
-    with col2:
+    with t3col2:
         mes_selecionado_dados_mensais = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_dados_mensais_mes')         
     
     tab3_1, tab3_2, tab3_3, tab3_4 = st.tabs(['Volume',
