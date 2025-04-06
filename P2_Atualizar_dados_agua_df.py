@@ -65,7 +65,7 @@ for csv in os.listdir(pasta_atualizacao_df):
     else:
         print(csv)
         nome = (f'{csv[:-4]}_df')
-        df_csv = pd.read_csv(os.path.join(pasta_atualizacao_df, csv))
+        df_csv = pd.read_csv(os.path.join(pasta_atualizacao_df, csv),encoding='utf-8')
         df_csv = df_csv.dropna() 
         dict_dfs[nome] = df_csv
     
@@ -158,15 +158,15 @@ exportar_pd_unico_to_csv(dados_agua_df, pasta_atualizacao_df)
 #
 concatenar = 'SIM'
 
-caminho_dados_agua_df = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df_2.csv')
-dados_agua_df_antigo = pd.read_csv(caminho_dados_agua_df)
+caminho_dados_agua_df = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df.csv')
+dados_agua_df_antigo = pd.read_csv(caminho_dados_agua_df, encoding='utf-8')
 dados_agua_df_antigo['Dtime']= pd.to_datetime(dados_agua_df_antigo['Dtime'])
 
 if concatenar == 'SIM':
     
     dados_agua_df = pd.concat([dados_agua_df_antigo, dados_agua_df], ignore_index=True)
     #neste caso, origem e saida são o mesmo arquivo, irá sobreescrever
-    caminho_dados_agua_df_saida = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df_3.csv')
+    caminho_dados_agua_df_saida = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df_4.csv')
     dados_agua_df.to_csv(caminho_dados_agua_df_saida, index=False)
 else:
     pass

@@ -34,7 +34,7 @@ def pasta_produtos_func(pasta_projeto):
     #sub-def 3: -------------------------------------
 def abrir_csv_unico_func(pasta_produtos):
 
-    caminho_dados_agua_csv = os.path.join(pasta_produtos, 'dados_agua_df_2.csv')
+    caminho_dados_agua_csv = os.path.join(pasta_produtos, 'dados_agua_df_3.csv')
     dados_agua_df = pd.read_csv(caminho_dados_agua_csv)
     return dados_agua_df
 
@@ -55,37 +55,44 @@ def tratamento_de_dados_func(pasta):
     
     
     link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
-    df_cad = pd.read_csv(link, encoding='latin-1', sep = ';')
-    df_cad = df_cad.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
-    df_cad = df_cad.rename(columns={'Observacao': 'Faturamento'})
-    
-    df = main_abrir_csv_unico_func()
+    df_cad = pd.read_csv(link, sep = ';')
+    try:
+        df_cad = df_cad.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
+        df_cad = df_cad.rename(columns={'Observacao': 'Faturamento'})
+    except:
+        pass
+      
+     
+    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' , 'dados_agua_df_3.csv'))
     df['ANO'] = df['ANO'].astype('int')
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
     df = df.merge(df_cad, on='Hidrometro', how='left')
     
-        
+          
+    df_sHU = df[df['Hidrometro']!='H014']
+    
     anos = df['ANO'].unique().tolist()
     anos.sort(reverse=True)
     meses = df['MES_N'].unique().tolist()
     meses.sort(reverse=True)
-    
-    df['Dtime'] = pd.to_datetime(df['Dtime']) #formata a coluna Dtime para datetime
-    maior_tempo = df['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
+    df_sHU['Dtime'] = pd.to_datetime(df_sHU['Dtime'])
+    maior_tempo = df_sHU['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
+    menor_tempo = df_sHU['Dtime'].min()
     maior_ano = maior_tempo.year
     index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
     maior_mes = maior_tempo.month
     index_mes = meses.index(maior_mes) #encontra o index do maior mês para usar no sidebox do streamlit
+    menor_ano = menor_tempo.year
+    menor_mes = menor_tempo.month
     
-    # ordenando e filtrando colunas em dados_agua_df
-    df = df.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
-    df_sHU = df[df['Hidrometro']!='H014']
-        
+    
     lista_cidades = df_sHU['Cidade'].unique().tolist()
     
-       
-    saida = [df_cad, df, df_sHU, anos, meses, maior_ano, index_ano, maior_mes, index_mes, lista_cidades]
+    # ordenando e filtrando colunas em dados_agua_df
+    df_sHU = df_sHU.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
+    
+    saida = [df_cad, df, df_sHU, anos, meses, maior_ano, index_ano, maior_mes, index_mes, lista_cidades, menor_ano, menor_mes]
     return saida
 
 pasta_projeto = pasta_projeto_func()
@@ -725,26 +732,6 @@ texto = (f'{volume_media:,.2f} m³').replace(",", "_").replace(".", ",").replace
 #print(linha_mes_ano)
 #print(linha_mes_ano_m1)
 
-caminho_colunas_csv = os.path.join(pasta_projeto,'Dados' , 'Origem', 'colunas_df.csv')
-dados_agua_df_vazio= pd.read_csv(caminho_colunas_csv)
-
-dados_agua_df_atualizado = pd.read_csv(os.path.join(pasta_projeto,'Dados' , 'Origem', 'atualizacao_dfs','dados_agua_df_para_atualizar.csv'))
-dados_agua_df_original = pd.read_csv(os.path.join(pasta_projeto,'Dados' , 'Produtos', 'dados_agua_df.csv'))
-
-pasta_projeto = os.path.dirname(os.path.abspath('__file__')) 
-pasta_atualizacao_df = os.path.join(pasta_projeto,'Dados','Origem','atualizacao_dfs')
-
-dict_dfs = {}
-
-for csv in os.listdir(pasta_atualizacao_df):
-    nome = (f'{csv[:-4]}_df')
-    if 'dados' in csv == True:
-        pass
-    else:
-        df_csv = pd.read_csv(os.path.join(pasta_atualizacao_df, csv))
-        df_csv = df_csv.dropna() 
-        dict_dfs[nome] = df_csv
-
 
 def trat_acumulado_por_ano_func (dct, agr_sel):
 
@@ -834,9 +821,78 @@ def abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura):
             pass 
     return pdf         
     
-pdf = abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura)
-st.write(pdf, width=750, height=1100)
+#pdf = abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura)
+#st.write(pdf, width=750, height=1100)
 
 # open an HTML file on my own (Windows) computer
-url = pdf
-webbrowser.open(url,new=2)                                     
+#url = pdf
+#webbrowser.open(url,new=2)    
+
+#def indicadores_vol_cus_func_ultimos36meses(
+ #       agrupamento_selecionado_ind,
+  #      ano_selecionado_ind,
+   #     mes_selecionado_ind,
+    #    dict_dataframes):
+
+
+
+
+agrupamento_selecionado_ind = lista_agrupamento[0]
+ano_selecionado_ind = 2024
+mes_selecionado_ind = 12
+dct = dict_dataframes
+
+
+
+df = dict_dataframes[agrupamento_selecionado_ind] 
+
+df_j = df.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
+
+df = df_j
+ 
+df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].astype(int)
+ 
+df.info()
+
+condicao = ( df['ANO'] == ano_selecionado_ind) &  (df['MES_N']== mes_selecionado_ind)
+
+
+index_selecao_ind = df[condicao].index[0]
+if index_selecao_ind >= 36:
+    ver = 'Sim'
+    index_inicial = index_selecao_ind-36
+    df_36m = df.iloc[index_inicial:index_selecao_ind+1,:]
+else:
+    ver = 'Não'
+    df_36m = df
+    
+df_36m['ANO_MES'] = "1"
+for index, row in df_36m.iterrows():
+    row['ANO_MES'] = str(row['ANO']) +'-'+ str(row['MES_N'])
+    print(row)
+    #df_36m['ANO_MES'][i] = str(df_36m['ANO'][i]) #+ '_' + str(row['MES_N'])
+
+
+df = df_36m   
+chart = px.line(df,
+             x = df.index,  # Month (column index after pivot)
+             y="VOLUME_FATURADO", # Values
+             labels={'ANO_MES': 'ANO_MES','VOLUME_FATURADO': 'Volume Faturado (m³)' },
+             #color='ANO',  # Coluna para a cor
+             #color_discrete_sequence=color_discrete_sequence_,
+             )
+#chart.update_layout(xaxis=dict(dtick=1))
+
+# Definir o intervalo da legenda como 1 (se desejar)
+#min_value = df.index.min()
+#max_value = df.index.max()
+#tickvals = np.arange(min_value, max_value + 1, 1)
+#ticktext = tickvals.astype(str)
+#chart.update_layout(tickvals=tickvals, ticktext=ticktext)    
+
+#plot(chart)
+
+csv122024 = pd.read_csv(os.path.join(pasta_projeto,'Dados','Produtos','atualizacao_dfs','2024_12.csv' ))
+
+soma = csv122024['VOLUME_FATURADO'].sum()
+print(soma)

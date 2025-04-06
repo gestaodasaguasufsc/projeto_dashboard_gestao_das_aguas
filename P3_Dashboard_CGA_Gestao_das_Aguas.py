@@ -34,11 +34,15 @@ def tratamento_de_dados_func(pasta_projeto):
     
     
     link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
-    df_cad = pd.read_csv(link, encoding='latin-1', sep = ';')
-    df_cad = df_cad.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
-    df_cad = df_cad.rename(columns={'Observacao': 'Faturamento'})
+    df_cad = pd.read_csv(link, encoding='utf-8', sep = ';')
+    try:
+        df_cad = df_cad.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
+        df_cad = df_cad.rename(columns={'Observacao': 'Faturamento'})
+    except:
+        pass
     
-    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' , 'dados_agua_df_2.csv'))
+    
+    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' , 'dados_agua_df_4.csv'),encoding='utf-8')
     df['ANO'] = df['ANO'].astype('int')
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
@@ -892,6 +896,48 @@ def abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura):
     return pdf  
 
 
+def grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, mes_selecionado_ind, dict_dataframes):
+
+    df = dict_dataframes[agrupamento_selecionado_ind] 
+    
+    df = df.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
+       
+    df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].astype(int)
+       
+    condicao = ( df['ANO'] == ano_selecionado_ind) &  (df['MES_N']== mes_selecionado_ind)
+    
+    index_selecao_ind = df[condicao].index[0]
+    j=36
+    if index_selecao_ind >= j:
+        n = j
+        index_inicial = index_selecao_ind-j
+        df_36m = df.iloc[index_inicial:index_selecao_ind,:].reset_index()
+    else:
+        n = index_selecao_ind
+        index_inicial = 0
+        df_36m = df.iloc[index_inicial:index_selecao_ind,:].reset_index()
+        
+    
+    lista = []
+    
+    for index, row in df_36m.iterrows():
+        print(row)
+        lista.append(str(int(row['MES_N'])) +'-'+str(int(row['ANO'])))
+        
+    df_36m['MES_ANO'] = lista
+    
+    
+     
+    df_36m.info()
+    chart = px.line(df_36m,
+                 x = 'MES_ANO',  # Month (column index after pivot)
+                 y="VOLUME_FATURADO", # Values
+                 labels={'MES_ANO': 'Mes-Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
+                    )
+    chart.update_xaxes(dtick=3,tickangle=-60, showgrid=True, gridwidth=1, gridcolor='LightGray')
+   
+    return chart, df_36m, n
+
 ###_________________________________________________________________________________
 
 #Configurações Streamlit
@@ -944,25 +990,30 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa cadastral e dados m
 
 with tab1: 
     
-     
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:     
-        ano_selecionado_ind = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_indicadores_ano')
-    with col2:
-        mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
-    with col3:
-        st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')    
-        st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
-            
-    
-    col1, col2  = st.columns(2)
+    col1, col2 = st.columns(2)
     
     with col1:
-        agrupamento_selecionado_ind = st.selectbox('Selecione o  agrupamento dos dados:', 
-                                           lista_agrupamento, 
-                                           index = 0, 
-                                           key='selectbox_agrupamento_ind'
-                                           )
+             
+        col1_11, col1_12 = st.columns(2)
+         
+        
+        
+        with col1_11:     
+            st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')   
+            ano_selecionado_ind = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_indicadores_ano')
+        with col1_12:
+            st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
+            mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
+                 
+               
+        col1_13, col1_14  = st.columns(2)
+    
+        with col1_13:
+            agrupamento_selecionado_ind = st.selectbox('Selecione o  agrupamento dos dados:', 
+                                               lista_agrupamento, 
+                                               index = 0, 
+                                               key='selectbox_agrupamento_ind'
+                                               )
         sem_dados = False
         
         try:
@@ -987,88 +1038,93 @@ with tab1:
             st.caption('Dados inexistentes para o local/ano/mês selecionado')
             sem_dados = True
         
+        with col1_14:
+            pass
         
+        if sem_dados == True:
+            pass
+        else:
+            col1_15, col1_16 = st.columns(2)
             
-    
-                     
-    
-    
-    
-         
-    if sem_dados == True:
-        pass
-    else:
-        col1, col2, col3, col4 = st.columns(4)
+            st.markdown(
+                        """
+                    <style>
+                    [data-testid="stMetricValue"] {
+                        font-size: 25px;
+                    }
+                    </style>
+                    """,
+                        unsafe_allow_html=True,
+                    )
+            
+            with col1_15:      
+                    textov0 = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                    textov1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                    textov2 = (f'{volume_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
+                    
+                    #if volume_variacao_abs>0: 
+                      #  delta_color_t1 = 'inverse'
+                    #else:
+                     #   delta_color_t1 = 'normal'
+                    
+                    
+                    st.metric("Volume no mês/ano selecionados", 
+                              textov0, 
+                              border=True)
+            
+            with col1_16:
+                    textoc0 = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                    textoc1 = (f'{custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                    textoc2 = (f'{custo_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
+                    st.metric("Custo no mês/ano selecionados",
+                              textoc0,  
+                              border=True, delta_color="inverse")
+            
+            col1_17, col1_18 = st.columns(2)
+            
+            with col1_17:      
+                    texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                    st.metric("Volume médio dos últimos 6 meses", texto , border=True)
+            
+            with col1_18:
+                    texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                    st.metric("Custo médio dos últimos 6 meses", texto, border=True)
         
-        st.markdown(
-                    """
-                <style>
-                [data-testid="stMetricValue"] {
-                    font-size: 25px;
-                }
-                </style>
-                """,
-                    unsafe_allow_html=True,
-                )
-        
-        with col1:      
-                textov0 = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-                textov1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-                textov2 = (f'{volume_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
-                
-                #if volume_variacao_abs>0: 
-                  #  delta_color_t1 = 'inverse'
-                #else:
-                 #   delta_color_t1 = 'normal'
-                
-                
-                st.metric("Volume no mês/ano selecionados", 
-                          textov0, 
-                          border=True)
-        
-        with col2:
-                textoc0 = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-                textoc1 = (f'{custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-                textoc2 = (f'{custo_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
-                st.metric("Custo no mês/ano selecionados",
-                          textoc0,  
-                          border=True, delta_color="inverse")
-      
-        with col3:      
-                texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-                st.metric("Volume médio dos últimos 6 meses", texto , border=True)
-        
-        with col4:
-                texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-                st.metric("Custo médio dos últimos 6 meses", texto, border=True)
-    
-        st.caption('Variações de volume e custo em relação à média dos últimos 6 meses')
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-                st.metric("Volume variação absoluta", 
-                          "", textov1, 
-                          border=True, delta_color="inverse")
-                st.metric("Volume variação percentual", 
-                          "", textov2, 
-                          border=True, delta_color="inverse")
-                
-        with col2:
-                st.metric("Custo variação absoluta", 
-                          "", textoc1, 
-                          border=True, delta_color="inverse")
-                st.metric("Custo variação percentual", 
-                          "", textoc2, 
-                          border=True, delta_color="inverse")
-        
-        
-        
-        
-    #trat_acum_func = trat_acumulado_por_ano_func (dict_dataframes, agrupamento_selecionado)
-        
-    #volume_faturado_por_ano = trat_acum_func[0]
-    #custo_faturado_por_ano = trat_acum_func[1]
-    #df_selecionado_dataframe = trat_acum_func[2]
+            st.caption('Variações de volume e custo em relação à média dos últimos 6 meses')
+            
+            col1_19, col1_20 = st.columns(2)
+            
+            with col1_19:
+                    st.metric("Volume variação absoluta", 
+                              "", textov1, 
+                              border=True, delta_color="inverse")
+                    st.metric("Volume variação percentual", 
+                              "", textov2, 
+                              border=True, delta_color="inverse")
+                    
+            with col1_20:
+                    st.metric("Custo variação absoluta", 
+                              "", textoc1, 
+                              border=True, delta_color="inverse")
+                    st.metric("Custo variação percentual", 
+                              "", textoc2, 
+                              border=True, delta_color="inverse")
+              
+    with col2:
+        if sem_dados == True:
+            pass
+        else:
+            fun_graf_lin_ind = grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, mes_selecionado_ind, dict_dataframes)
+            
+            graf = fun_graf_lin_ind[0]
+            df = fun_graf_lin_ind[1]
+            numero_meses = fun_graf_lin_ind[2]
+            
+            st.caption(f'Volume faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
+            st.write(graf)
+            st.caption(f'Dados de volume dos últimos {numero_meses} meses para o agrupamento selecionado.')
+            df = df.iloc[:,[5,2,3,4]]
+            st.dataframe(df.reset_index(drop=True), height = 320 )
     
 #MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
 
