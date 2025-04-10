@@ -892,18 +892,32 @@ def grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, 
         lista.append(str(int(row['MES_N'])) +'-'+str(int(row['ANO'])))
         
     df_36m['MES_ANO'] = lista
-    
-    
-     
-    df_36m.info()
-    chart = px.line(df_36m,
+          
+    chart_vol = px.line(df_36m,
                  x = 'MES_ANO',  # Month (column index after pivot)
                  y="VOLUME_FATURADO", # Values
                  labels={'MES_ANO': 'Mes-Ano','VOLUME_FATURADO': 'Volume Faturado (m³)' },
                     )
-    chart.update_xaxes(dtick=3,tickangle=-60, showgrid=True, gridwidth=1, gridcolor='LightGray')
+    chart_vol.update_xaxes(dtick=3,tickangle=-60, showgrid=True, gridwidth=1, gridcolor='LightGray')
    
-    return chart, df_36m, n
+    chart_cus = px.line(df_36m,
+                 x = 'MES_ANO',  # Month (column index after pivot)
+                 y="VALOR_TOTAL", # Values
+                 labels={'MES_ANO': 'Mes-Ano','VALOR_TOTAL': 'Custo (R$)' },
+                    )
+    chart_cus.update_xaxes(dtick=3,tickangle=-60, showgrid=True, gridwidth=1, gridcolor='LightGray')
+    
+    df_36m['Valor_por_Volume'] = 0
+    try:
+        df_36m['Valor_por_Volume'] = df_36m['VALOR_TOTAL']/df_36m['VOLUME_FATURADO']
+    except:
+        pass
+    df_36m = df_36m.sort_values(by = 'index', ascending = False)
+    df_36m = df_36m.iloc[:,[5,3,4,6]]
+    
+                             
+        
+    return chart_vol, df_36m, n, chart_cus
 
 ###_________________________________________________________________________________
 
@@ -947,7 +961,9 @@ st.caption('Obs:: Última atualização 10/04/2025.'
            'Faturamento UFSC não inclui volumes e custos do Hospital Universitário.'
            'Dados do Hospital Universitário - HU não disponíveis no momento. '
            'Dados do Sapiens Park não disponíveis no momento, serão incluídos no faturamento UFSC desde 2017. '
-           'Informações do HU e Sapiens previstas de atualização.')
+           'Informações do HU e Sapiens a serem atualizadas.')
+
+st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}. Último ano/mês com dados disponível: {maior_ano}/{maior_mes}.') 
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa cadastral e dados mensais individualizados por UC", 
                                   "Dados gerais de UCs por ano e mês selecionado", "Dados agrupados anuais", "Dados agrupados mensais"])
@@ -966,10 +982,8 @@ with tab1:
         
         
         with t1col1_11:     
-            st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')   
             ano_selecionado_ind = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_indicadores_ano')
         with t1col1_12:
-            st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
             mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
                  
                
@@ -1018,7 +1032,7 @@ with tab1:
                         """
                     <style>
                     [data-testid="stMetricValue"] {
-                        font-size: 25px;
+                        font-size: 20px;
                     }
                     </style>
                     """,
@@ -1079,23 +1093,39 @@ with tab1:
                               border=True, delta_color="inverse")
               
     with t1col2:
+        tabvol_t1col2, tabcus_t1col2, tabdad_t1col2 = st.tabs(['Volume','Custo','Dados'])
         if sem_dados == True:
             pass
         else:
             fun_graf_lin_ind = grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, mes_selecionado_ind, dict_dataframes)
             
-            graf = fun_graf_lin_ind[0]
-            df = fun_graf_lin_ind[1]
+            graf_vol = fun_graf_lin_ind[0]
+            df_36m = fun_graf_lin_ind[1]
             numero_meses = fun_graf_lin_ind[2]
+            graf_cus = fun_graf_lin_ind[3]
             
-            st.caption(f'Volume faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
-            st.write(graf)
-            st.caption(f'Dados de volume dos últimos {numero_meses} meses para o agrupamento selecionado.')
-            df= df.sort_values(by = 'index', ascending = False)
-            df = df.iloc[:,[5,2,3,4]]
-            df.info()
+            with tabvol_t1col2:
+                st.caption(f'Volume faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
+                st.write(graf_vol)
             
-            st.dataframe(df.reset_index(drop=True), height = 320 )
+            with tabcus_t1col2:
+                st.caption(f'Custo faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
+                st.write(graf_cus)
+            
+            with tabdad_t1col2:
+                st.caption(f'Dados dos últimos {numero_meses} meses para o agrupamento selecionado.')
+                #df_36m.style.format({'Valor_por_Volume':'{:.2f}'},
+                                    #{'VALOR_TOTAL':'{:.2f}'}
+                                    #)
+                
+                df_36m = df_36m.rename(
+                    columns={
+                    'MES_ANO':'MÊS-Ano',
+                    'VOLUME_FATURADO': 'Volume Faturado m³',
+                    'VALOR_TOTAL': 'Valor Total R$',
+                    'Valor_por_Volume': 'R$/m³'
+                            })
+                st.dataframe(df_36m.reset_index(drop=True), height = 400 )
     
 #MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
 
