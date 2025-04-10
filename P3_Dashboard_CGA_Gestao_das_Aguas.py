@@ -22,14 +22,24 @@ import plotly.express as px
 import plotly.colors as pc
 
 
+#Configurações Streamlit 1
+
+st.set_page_config(
+    page_title="Dashboard",
+    page_icon="",
+    layout="wide",
+    initial_sidebar_state="expanded")
+
+#alt.themes.enable("dark")
 
 
+# Funções
+## Parte 1: Tratamento de dados
+### 1-1 Carregar dados_agua_df e cadastro_hidrometros_df
+### 1-2 Atribuir variáveis temporais (ano, mes, index relacionados)
+### 1-3 Gerar lista_cidades (agrupamentos em gráficos e tabelas)
 
-
-############## Parte 2 - código geração de mapas e dados tabulares de consumo de água de 2013 ao momento presente
-
-
-
+@st.cache_data
 def tratamento_de_dados_func(pasta_projeto):
     
     
@@ -47,17 +57,18 @@ def tratamento_de_dados_func(pasta_projeto):
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
     df = df.merge(df_cad, on='Hidrometro', how='left')
+    df['Dtime'] = pd.to_datetime(df['Dtime'])
+       
     
-          
-    df_sHU = df[df['Hidrometro']!='H014']
+    
     
     anos = df['ANO'].unique().tolist()
     anos.sort(reverse=True)
     meses = df['MES_N'].unique().tolist()
     meses.sort(reverse=True)
-    df_sHU['Dtime'] = pd.to_datetime(df_sHU['Dtime'])
-    maior_tempo = df_sHU['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
-    menor_tempo = df_sHU['Dtime'].min()
+    
+    maior_tempo = df['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
+    menor_tempo = df['Dtime'].min()
     maior_ano = maior_tempo.year
     index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
     maior_mes = maior_tempo.month
@@ -66,11 +77,14 @@ def tratamento_de_dados_func(pasta_projeto):
     menor_mes = menor_tempo.month
     
     
-    lista_cidades = df_sHU['Cidade'].unique().tolist()
+    lista_cidades = df['Cidade'].unique().tolist()
+    
+    df = df.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
+     
+    df_sHU = df[df['Hidrometro']!='H014']
     
     # ordenando e filtrando colunas em dados_agua_df
-    df_sHU = df_sHU.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
-    
+        
     saida = [df_cad, df, df_sHU, anos, meses, maior_ano, index_ano, maior_mes, index_mes, lista_cidades, menor_ano, menor_mes]
     return saida
 
@@ -105,62 +119,77 @@ menor_mes =                 trat_func[11]
 #GDB Esri
 #pasta_projeto = ""
 
-shapes_pasta = os.path.join(pasta_projeto, 'Dados','Origem','Shapes')
-print(shapes_pasta)
+@st.cache_data
+def dict_shapes_func():
+    
+    shapes_pasta = os.path.join(pasta_projeto, 'Dados','Origem','Shapes')
+    
+    dict_SAA_UFSC = {
+        'hidrometros':'UFSC_Hidrometros',
+        'Limite_UFSC' :  'CGA_Limite_Campus_UFSC_Trindade_112021_editado',
+        'Rede_Interna_UFSC' : 'Rede_Interna_UFSC',
+        'Rede_CASAN' : 'Rede_Casan_',
+        'Reservatorios' : 'Reservatorios',
+        'SubSetores_Agua' : 'SubSetores_Agua'
+                    }
+    
+    dict_shapes = {}
+    
+    for chave in dict_SAA_UFSC:
+      nome_shp =  f'{dict_SAA_UFSC[chave]}.shp'
+      link = os.path.join(shapes_pasta,nome_shp)
+      shape = gpd.read_file(link)
+      shape = shape.to_crs(epsg=4326)
+      dict_shapes[chave] = shape
+    
+    return dict_shapes
 
-dict_SAA_UFSC = {
-    'hidrometros':'UFSC_Hidrometros',
-    'Limite_UFSC' :  'CGA_Limite_Campus_UFSC_Trindade_112021_editado',
-    'Rede_Interna_UFSC' : 'Rede_Interna_UFSC',
-    'Rede_CASAN' : 'Rede_Casan_',
-    'Reservatorios' : 'Reservatorios',
-    'SubSetores_Agua' : 'SubSetores_Agua'
-}
-
-dict_shapes = {}
-
-for chave in dict_SAA_UFSC:
-  nome_shp =  f'{dict_SAA_UFSC[chave]}.shp'
-  link = ""  
-  link = os.path.join(shapes_pasta,nome_shp)
-  shape = gpd.read_file(link)
-  shape = shape.to_crs(epsg=4326)
-  dict_shapes[chave] = shape
-
-
+dict_shapes = dict_shapes_func()
 
 #Passo 3 - edição hidrometros_shp
 
 
 #remover colunas 4 e 5 hidrometro_shp
 
-x = 4 #coluna 4 - Xcoord
-y = 5 #coluna 5 - Ycoord
-hidrometros_shp = dict_shapes['hidrometros']
-colunas_a_manter = np.r_[0:x, x+1:y, y+1:hidrometros_shp.shape[1]]
-hidrometros_shp = hidrometros_shp.iloc[:,colunas_a_manter]
-hidrometros_shp.rename(columns={'Nome_hidro': 'Hidrometro'}, inplace=True)
+def carregar_shapes_func(dict_shapes, cadastro_hidrometros_df):
+    
+    #shape 1: hidrometros_shp
+    
+    x = 4 #coluna 4 - Xcoord
+    y = 5 #coluna 5 - Ycoord
+    hidrometros_shp = dict_shapes['hidrometros']
+    colunas_a_manter = np.r_[0:x, x+1:y, y+1:hidrometros_shp.shape[1]]
+    hidrometros_shp = hidrometros_shp.iloc[:,colunas_a_manter]
+    hidrometros_shp.rename(columns={'Nome_hidro': 'Hidrometro'}, inplace=True)
+    
+    #shape 2: subsetores_agua_shp
+    
+    subsetores_agua_shp = dict_shapes['SubSetores_Agua']
+    subsetores_agua_shp.rename(columns={'Hidrômetr': 'Hidrometro'}, inplace=True)
+    #filtered_subsetores_agua = subsetores_agua[subsetores_agua['Hidrometro'] != 'H014']
+    hidrometros_shp_merge = hidrometros_shp.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
+    
+    
+    #shape 3, 4, 5 e 6: shapes fixos
+    
+    reservatorios = dict_shapes['Reservatorios']
+    redes_CASAN = dict_shapes['Rede_CASAN']
+    rede_interna_UFSC = dict_shapes['Rede_Interna_UFSC']
+    limite_UFSC = dict_shapes['Limite_UFSC']
+    
+      
+    return hidrometros_shp, subsetores_agua_shp, reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge
 
-#Passo 4 - retirar o consumo do hospital universitario, valor muito alto em relação aos demais pontos
+funcao_shp = carregar_shapes_func(dict_shapes, cadastro_hidrometros_df)
 
-hidrometros_shp_filtered = hidrometros_shp[hidrometros_shp['Hidrometro'] != 'H014']
+hidrometros_shp = funcao_shp[0]
+hidrometros_shp_merge = funcao_shp[6]
 
-#Passo 5 - Correções no arquivo subsetores_agua
-
-subsetores_agua = dict_shapes['SubSetores_Agua']
-subsetores_agua.rename(columns={'Hidrômetr': 'Hidrometro'}, inplace=True)
-filtered_subsetores_agua = subsetores_agua[subsetores_agua['Hidrometro'] != 'H014']
-
-#passo 6 - carregar shapes fixos
-
-reservatorios = dict_shapes['Reservatorios']
-redes_CASAN = dict_shapes['Rede_CASAN']
-rede_interna_UFSC = dict_shapes['Rede_Interna_UFSC']
-limite_UFSC = dict_shapes['Limite_UFSC']
-
-#passo 7 - carregar hidrometros shape e mesclar com cadastro, para gerar hidrometros_shp_merge (com H014)
-
-hidrometros_shp_merge = hidrometros_shp.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
+subsetores_agua_shp = funcao_shp[1]
+reservatorios = funcao_shp[2]
+redes_CASAN = funcao_shp[3]
+rede_interna_UFSC = funcao_shp[4]
+limite_UFSC = funcao_shp[5]
 
 
 #Plot with folium
@@ -172,18 +201,18 @@ hidrometros_shp_merge = hidrometros_shp.merge(cadastro_hidrometros_df, on='Hidro
 # folium.Choropleth para subsetores_agua - Camada de fundo
 
 
-def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, filtered_subsetores_agua):
+def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, subsetores_agua_shp):
   from folium.features import GeoJsonTooltip, GeoJsonPopup
 
-  subsetores_agua_merged = filtered_subsetores_agua.merge(dados_agua_df_ano_mes_selecionado, on='Hidrometro', how='left')
+  subsetores_agua_shp_merged = subsetores_agua_shp.merge(dados_agua_df_ano_mes_selecionado, on='Hidrometro', how='left')
 
   subsetores_group = folium.FeatureGroup(name="Subsetores", show=True)
 
   # Create Choropleth layer (without tooltip)
   choropleth = folium.Choropleth(
-      geo_data=subsetores_agua_merged,
+      geo_data=subsetores_agua_shp_merged,
       name='Sub Setores Água',
-      data=subsetores_agua_merged,
+      data=subsetores_agua_shp_merged,
       columns=['Hidrometro', 'VOLUME_FATURADO'],
       key_on='feature.properties.Hidrometro',
       fill_color='YlOrRd',
@@ -195,13 +224,13 @@ def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, filtered_s
 
   # Add GeoJson layer for popups
   folium.GeoJson(
-      data=subsetores_agua_merged,
+      data=subsetores_agua_shp_merged,
       name='Sub Setores Água - Popups',  # Give it a name
       style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
       tooltip=None,  # Disable tooltip for this layer
       popup=folium.GeoJsonPopup(
-          fields=['Hidrometro', 'Local','Setor', 'SubSetor', 'Campus','Cidade','VOLUME_FATURADO'],
-          aliases=['Hidrometro', 'Local','Setor', 'SubSetor:', 'Campus','Cidade', 'Volume Faturado (m³):'],
+          fields=['Hidrometro', 'Local','Setor', 'SubSetor', 'Campus','Cidade','VOLUME_FATURADO','VALOR_TOTAL'],
+          aliases=['Hidrometro', 'Local','Setor', 'SubSetor:', 'Campus','Cidade', 'Volume Faturado para o ano e mês selecionados (m³):','Valor total para o ano e mês selecionados (m³):'],
           localize=True,
           style="""
               background-color: #F0EFEF;
@@ -404,79 +433,6 @@ def camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UF
     hidrometros_group.add_to(map)
 
 
-#### ____________________________________________________________________________________________________________________________
-#### Parte xx -
-# Classificando hidrômetros de acordo com o volume - alteram no tempo
-
-
-def classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado):
-
-    hidrometros_shp_volume = hidrometros_shp_filtered.merge(dados_agua_df_ano_mes_selecionado, on='Hidrometro', how='left')
-    hidrometros_shp_volume = hidrometros_shp_volume.dropna(subset=['VOLUME_FATURADO'])
-
-    # Color scheme
-    scheme = mc.Quantiles(hidrometros_shp_volume['VOLUME_FATURADO'], k=10)
-
-    # Point sizes
-    min_consumption = hidrometros_shp_volume['VOLUME_FATURADO'].min()
-    max_consumption = hidrometros_shp_volume['VOLUME_FATURADO'].max()
-    second_max_consuption = hidrometros_shp_volume['VOLUME_FATURADO'].nlargest(2).iloc[-1]
-
-    def get_point_size(volume):
-      return (volume - min_consumption) / (max_consumption - min_consumption) * 10 + 10
-
-        # Colormap
-    cmap = cm.get_cmap('inferno_r')
-
-    # Creating the FeatureGroup with embedded legend
-    points_group = folium.FeatureGroup(name="Pontos Hidrômetros - Volume Faturado", show=True)
-
-    # Add CircleMarkers directly to the map
-    for index, row in hidrometros_shp_volume.iterrows():
-        consumption = row['VOLUME_FATURADO']
-        point_size = get_point_size(consumption)
-
-        # Get color from the colormap (normalized consumption value)
-        color_rgba = cmap((consumption - min_consumption) / (max_consumption - min_consumption))
-        color_hex = "#%02x%02x%02x" % tuple(int(c * 255) for c in color_rgba[:3])
-
-        folium.CircleMarker(
-            location=[row.geometry.y, row.geometry.x],
-            radius=point_size,
-            color=color_hex,
-            fill=True,
-            fill_color=color_hex,
-            fill_opacity=0.7,
-            popup=f"Volume Faturado: {consumption:.2f} m³ <br> Hidrometro: {row['Hidrometro']}"
-        ).add_to(points_group)
-
-
-
-
-    # Adding the custom legend HTML to the FeatureGroup
-    legend_html = """
-        <div id="consumption-legend" style="position: fixed;
-                    bottom: 50px; left: 50px; width: 150px; height: 150px;
-                    border:2px solid grey; z-index:9999; font-size:10px;
-                    background-color: white;
-                    ">
-            &nbsp; <b>Volume Faturado (m³)</b><br>
-        """
-    # Add legend entries for each quantile
-    for i in range(scheme.k-1):
-        color_rgba = cmap(i / scheme.k)  # Get color for the quantile
-        color_hex = "#%02x%02x%02x" % tuple(int(c * 255) for c in color_rgba[:3])
-        legend_html += f"""
-            &nbsp; <i class="fa fa-circle fa-1x" style="color:{color_hex}"></i>
-            &nbsp; {scheme.bins[i]:.0f} - {scheme.bins[i + 1]:.0f}<br>
-        """
-    legend_html += """
-        </div>
-    """
-
-    points_group.add_child(folium.Element(legend_html))
-    points_group.add_to(map)
-
 def adicionar_camadas_de_fundo_func(map):
     #Map Folium Configuração 2:
 
@@ -572,6 +528,7 @@ def boxplot_func_px(df):
     
     return chart
 
+
 def scatter_func_px_vol(df):
    
     chart = px.scatter(df,
@@ -592,6 +549,7 @@ def scatter_func_px_vol(df):
     chart.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))
     
     return chart
+
 
 def scatter_func_px_cus(df):
    
@@ -614,6 +572,7 @@ def scatter_func_px_cus(df):
     
     return chart
 
+@st.cache_data
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip("#")  # Remove "#" se presente
     r = int(hex_color[0:2], 16)  # Converte os primeiros 2 caracteres para decimal (vermelho)
@@ -688,6 +647,7 @@ def line_func_px(df):
 #### Defs streamlit
 
 #Localiza hidrômetro, entrada com cadastro_hidrometros_df, valor selecionado)  
+
 def localiza_lat_long_hidrometro_func (df_i, valor, shp):
     df = df_i.iloc[:,[1,11]]
     df['nome_uc_local'] = df['Hidrometro'] +" " + df['Local']
@@ -705,8 +665,9 @@ def localiza_lat_long_hidrometro_func (df_i, valor, shp):
         dict_saida[item] = saida[i]
     return dict_saida
 
+
 def gerador_lista_uc_local_por_campi_func (df, selecao_cidade):
-    df = df[df['Cidade']!= 'Florianópolis  HU']
+    #df = df[df['Cidade']!= 'Florianópolis  HU']
     df = df.iloc[:,[1,9,11]]
     df['nome_uc_local'] = df['Hidrometro'] + " " + df['Local']
     df_filtrada = df[df['Cidade'] == selecao_cidade]
@@ -716,19 +677,21 @@ def gerador_lista_uc_local_por_campi_func (df, selecao_cidade):
     index_ = lista.index("UFSC - visão geral")
     return lista, index_
 
+
 def lista_cidades_index_func(df):
-        df = df[df['Cidade']!= 'Florianópolis  HU']
+        #df = df[df['Cidade']!= 'Florianópolis  HU']
         lista = df['Cidade'].unique().tolist()
         index_ = lista.index('Florianópolis - Trindade')
         return lista, index_
    
-    
+  
 def funcao_graf_uc_ano_func(df, selecao_uc_mapa):
     df = df[df['Hidrometro']==selecao_uc_mapa]
     vol_uc = df.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
     cus_uc = df.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
     graf_uc = agrupado_por_ano_func(vol_uc, cus_uc)
     return graf_uc[0], graf_uc[1]
+
 
 def funcao_graf_uc_mes_func(df, selecao_uc_mapa):
     df = df[df['Hidrometro']==selecao_uc_mapa]
@@ -738,20 +701,24 @@ def funcao_graf_uc_mes_func(df, selecao_uc_mapa):
 #gerando dicionário com dataframes filtrados por agrupamentos de campi
 
 
+@st.cache_data
+def dict_agrupamento_func():
+    dict_agrupamento = {
+        'UFSC - Total':['UFSC - Total'],
+        'Campus Florianópolis - todos':['Florianópolis - Trindade', 'Florianópolis - Outros'],
+        'UFSC - Total campi excluído Florianópolis':['Araquari', 'Curitibanos', 'Joinville', 'Araranguá', 'Blumenau'],
+        'Campus Florianópolis - excluído Campus Trindade':['Florianópolis - Outros'],
+        'Campus Florianópolis - somente Campus Trindade':['Florianópolis - Trindade'],
+        'Campus Araranguá':['Araranguá'],
+        'Campus Blumenau': ['Blumenau'],
+        'Campus Curitibanos':['Curitibanos'],
+        'Campus Joinville': ['Joinville'],
+        'Unidade Araquari':['Araquari'],
+        'Florianópolis  HU':['Florianópolis  HU']
+        }
+    return dict_agrupamento
 
-dict_agrupamento = {
-    'UFSC - Total':['UFSC - Total'],
-    'Campus Florianópolis - todos':['Florianópolis - Trindade', 'Florianópolis - Outros'],
-    'UFSC - Total campi excluído Florianópolis':['Araquari', 'Curitibanos', 'Joinville', 'Araranguá', 'Blumenau'],
-    'Campus Florianópolis - excluído Campus Trindade':['Florianópolis - Outros'],
-    'Campus Florianópolis - somente Campus Trindade':['Florianópolis - Trindade'],
-    'Campus Araranguá':['Araranguá'],
-    'Campus Blumenau': ['Blumenau'],
-    'Campus Curitibanos':['Curitibanos'],
-    'Campus Joinville': ['Joinville'],
-    'Unidade Araquari':['Araquari']
-    }
-
+dict_agrupamento = dict_agrupamento_func()
 
 
 
@@ -800,6 +767,7 @@ def trat_acumulado_por_ano_func (dct, agr_sel):
 funcao_dict_dfs = dict_dataframes_func(dict_agrupamento, dados_agua_df_sHU)
 lista_agrupamento = funcao_dict_dfs[0]
 dict_dataframes = funcao_dict_dfs[1]
+
 
 def indicadores_vol_cus_func(
         agrupamento_selecionado_ind,
@@ -911,11 +879,11 @@ def grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, 
     if index_selecao_ind >= j:
         n = j
         index_inicial = index_selecao_ind-j
-        df_36m = df.iloc[index_inicial:index_selecao_ind,:].reset_index()
+        df_36m = df.iloc[index_inicial:index_selecao_ind+1,:].reset_index()
     else:
         n = index_selecao_ind
         index_inicial = 0
-        df_36m = df.iloc[index_inicial:index_selecao_ind,:].reset_index()
+        df_36m = df.iloc[index_inicial:index_selecao_ind+1,:].reset_index()
         
     
     lista = []
@@ -939,16 +907,9 @@ def grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, 
 
 ###_________________________________________________________________________________
 
-#Configurações Streamlit
 
-st.set_page_config(
-    page_title="Dashboard",
-    page_icon="",
-    layout="wide",
-    initial_sidebar_state="expanded")
 
-#alt.themes.enable("dark")
-
+#Configurações Streamlit 2
 
 # Map Folium Configurações 1 - Iniciais
 
@@ -980,6 +941,12 @@ with st.sidebar:
     st.sidebar.caption("Coordenadoria de Gestão Ambiental - CGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
     st.sidebar.caption("Projeto desenvolvido em Python 3.10 - mar/2025")
     st.sidebar.caption("contato: gestaodasaguas@contato.ufsc.br")
+
+st.caption('Obs:: Última atualização 10/04/2025.'
+           'Faturamento UFSC não inclui volumes e custos do Hospital Universitário.'
+           'Dados do Hospital Universitário - HU não disponíveis no momento. '
+           'Dados do Sapiens Park não disponíveis no momento, serão incluídos no faturamento UFSC desde 2017. '
+           'Informações do HU e Sapiens previstas de atualização.')
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa cadastral e dados mensais individualizados por UC", 
                                   "Dados gerais de UCs por ano e mês selecionado", "Dados agrupados anuais", "Dados agrupados mensais"])
@@ -1123,7 +1090,10 @@ with tab1:
             st.caption(f'Volume faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
             st.write(graf)
             st.caption(f'Dados de volume dos últimos {numero_meses} meses para o agrupamento selecionado.')
+            df= df.sort_values(by = 'index', ascending = False)
             df = df.iloc[:,[5,2,3,4]]
+            df.info()
+            
             st.dataframe(df.reset_index(drop=True), height = 320 )
     
 #MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
@@ -1203,7 +1173,7 @@ with tab2:
             dados_agua_df_ano_mes_selecionado_mapa = dados_agua_df_ano_mes_selecionado_mapa.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
             dados_agua_df_ano_mes_selecionado_mapa.index = np.arange(1, len(dados_agua_df_ano_mes_selecionado_mapa) + 1)
                      
-            chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, filtered_subsetores_agua)
+            chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado_mapa, subsetores_agua_shp)
             #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
                    
             camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
