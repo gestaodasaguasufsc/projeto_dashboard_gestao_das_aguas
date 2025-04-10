@@ -907,17 +907,28 @@ def grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, 
                     )
     chart_cus.update_xaxes(dtick=3,tickangle=-60, showgrid=True, gridwidth=1, gridcolor='LightGray')
     
+    
+    
     df_36m['Valor_por_Volume'] = 0
     try:
         df_36m['Valor_por_Volume'] = df_36m['VALOR_TOTAL']/df_36m['VOLUME_FATURADO']
+        
     except:
         pass
+    
+    chart_cus_por_vol = px.line(df_36m,
+                 x = 'MES_ANO',  # Month (column index after pivot)
+                 y='Valor_por_Volume', # Values
+                 labels={'MES_ANO': 'Mes-Ano','Valor_por_Volume': 'Custo/Volume (R$/m³)' },
+                    )
+    chart_cus_por_vol.update_xaxes(dtick=3,tickangle=-60, showgrid=True, gridwidth=1, gridcolor='LightGray')
+    
     df_36m = df_36m.sort_values(by = 'index', ascending = False)
     df_36m = df_36m.iloc[:,[5,3,4,6]]
     
                              
         
-    return chart_vol, df_36m, n, chart_cus
+    return chart_vol, df_36m, n, chart_cus, chart_cus_por_vol 
 
 ###_________________________________________________________________________________
 
@@ -1093,7 +1104,7 @@ with tab1:
                               border=True, delta_color="inverse")
               
     with t1col2:
-        tabvol_t1col2, tabcus_t1col2, tabdad_t1col2 = st.tabs(['Volume','Custo','Dados'])
+        tabvol_t1col2, tabcus_t1col2, tabcus_vol_t1col2, tabdad_t1col2 = st.tabs(['Volume','Custo','Custo por Volume','Dados'])
         if sem_dados == True:
             pass
         else:
@@ -1103,6 +1114,7 @@ with tab1:
             df_36m = fun_graf_lin_ind[1]
             numero_meses = fun_graf_lin_ind[2]
             graf_cus = fun_graf_lin_ind[3]
+            graf_cus_por_vol = fun_graf_lin_ind[4]
             
             with tabvol_t1col2:
                 st.caption(f'Volume faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
@@ -1111,6 +1123,10 @@ with tab1:
             with tabcus_t1col2:
                 st.caption(f'Custo faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
                 st.write(graf_cus)
+                
+            with tabcus_vol_t1col2:
+                st.caption(f'Custo por volume faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
+                st.write(graf_cus_por_vol)
             
             with tabdad_t1col2:
                 st.caption(f'Dados dos últimos {numero_meses} meses para o agrupamento selecionado.')
@@ -1123,9 +1139,11 @@ with tab1:
                     'MES_ANO':'MÊS-Ano',
                     'VOLUME_FATURADO': 'Volume Faturado m³',
                     'VALOR_TOTAL': 'Valor Total R$',
-                    'Valor_por_Volume': 'R$/m³'
+                    'Valor_por_Volume': 'Custo/Volume (R$/m³)'
                             })
                 st.dataframe(df_36m.reset_index(drop=True), height = 400 )
+            
+            
     
 #MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
 
