@@ -29,3 +29,5 @@ Obs: No requirements.txt é necessário retirar os módulos de windows pywin32 p
 
 Obs: Projeto iniciado em 09/2024, na disciplina de Pós-Graduação em Engenharia Ambiental PPGEA/UFSC, ENS410064	Tópicos Especiais: Python in Environmental Applications - Prof. Leonardo Hoinaski
 
+https://gist.github.com/ash2shukla/ff180d7fbe8ec3a0240f19f4452acde7
+
