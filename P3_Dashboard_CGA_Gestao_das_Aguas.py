@@ -941,6 +941,7 @@ with st.sidebar:
     st.sidebar.caption("Coordenadoria de Gestão Ambiental - CGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
     st.sidebar.caption("Projeto desenvolvido em Python 3.10 - mar/2025")
     st.sidebar.caption("contato: gestaodasaguas@contato.ufsc.br")
+    st.sidebar.caption("contato: gestaoambiental@contato.ufsc.br")
 
 st.caption('Obs:: Última atualização 10/04/2025.'
            'Faturamento UFSC não inclui volumes e custos do Hospital Universitário.'
