@@ -966,15 +966,17 @@ with st.sidebar:
     st.sidebar.caption("Coordenadoria de Gestão Ambiental - CGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
     st.sidebar.caption("Projeto desenvolvido em Python 3.10 - mar/2025")
     st.sidebar.caption("contato: gestaodasaguas@contato.ufsc.br")
-    st.sidebar.caption("contato: gestaoambiental@contato.ufsc.br")
+       
+    st.sidebar.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}. Último ano/mês com dados disponível: {maior_ano}/{maior_mes}.') 
+    st.sidebar.caption('Obs:: Última atualização 10/04/2025.'
+               'Faturamento UFSC não inclui volumes e custos do Hospital Universitário.'
+               'Dados do Hospital Universitário - HU não disponíveis no momento. '
+               'Dados do Sapiens Park não disponíveis no momento, serão incluídos no faturamento UFSC desde 2017. '
+               'Informações do HU e Sapiens a serem atualizadas.')
 
-st.caption('Obs:: Última atualização 10/04/2025.'
-           'Faturamento UFSC não inclui volumes e custos do Hospital Universitário.'
-           'Dados do Hospital Universitário - HU não disponíveis no momento. '
-           'Dados do Sapiens Park não disponíveis no momento, serão incluídos no faturamento UFSC desde 2017. '
-           'Informações do HU e Sapiens a serem atualizadas.')
+    
 
-st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}. Último ano/mês com dados disponível: {maior_ano}/{maior_mes}.') 
+
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa cadastral e dados mensais individualizados por UC", 
                                   "Dados gerais de UCs por ano e mês selecionado", "Dados agrupados anuais", "Dados agrupados mensais"])
@@ -984,28 +986,28 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa cadastral e dados m
 
 with tab1: 
     
-    t1col1, t1col2 = st.columns(2)
+    t1col1ini, t1col2ini, t1col3ini , t1col4ini = st.columns(4)
     
-    with t1col1:
-             
-        t1col1_11, t1col1_12 = st.columns(2)
-         
+    with t1col1ini:     
+        ano_selecionado_ind = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_indicadores_ano')
         
-        
-        with t1col1_11:     
-            ano_selecionado_ind = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_indicadores_ano')
-        with t1col1_12:
-            mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
-                 
-               
-        t1col1_13, t1col1_14  = st.columns(2)
+    with t1col2ini:
+        mes_selecionado_ind = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_indicadores_mes')
     
-        with t1col1_13:
-            agrupamento_selecionado_ind = st.selectbox('Selecione o  agrupamento dos dados:', 
+    with t1col3ini:
+        agrupamento_selecionado_ind = st.selectbox('Selecione o  agrupamento dos dados:', 
                                                lista_agrupamento, 
                                                index = 0, 
                                                key='selectbox_agrupamento_ind'
                                                )
+        
+    t1col1, t1col2 = st.columns(2)
+    
+    with t1col1:
+               
+        t1col1_13, t1col1_14  = st.columns(2)
+    
+        
         sem_dados = False
         
         try:
@@ -1104,7 +1106,7 @@ with tab1:
                               border=True, delta_color="inverse")
               
     with t1col2:
-        tabvol_t1col2, tabcus_t1col2, tabcus_vol_t1col2, tabdad_t1col2 = st.tabs(['Volume','Custo','Custo por Volume','Dados'])
+        tabvol_t1col2, tabcus_t1col2, tabcus_vol_t1col2, tabdad_t1col2, tabest_t1col2 = st.tabs(['Volume','Custo','Custo por Volume','Dados', 'Estatísticas'])
         if sem_dados == True:
             pass
         else:
@@ -1143,7 +1145,8 @@ with tab1:
                             })
                 st.dataframe(df_36m.reset_index(drop=True), height = 400 )
             
-            
+            with tabest_t1col2:
+                st.dataframe(df_36m.describe())
     
 #MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
 
@@ -1155,12 +1158,7 @@ with tab2:
         ano_selecionado_mapa = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_mapa_ano')
    
     with t2col2:
-        mes_selecionado_mapa = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_mapa_mes')
-    
-    with t2col3:
-        st.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}')
-        st.caption(f'Último ano/mês com dados disponível: {maior_ano}/{maior_mes}')
-        
+        mes_selecionado_mapa = st.selectbox('Selecione o mes', meses, index = index_mes, key='selectbox_mapa_mes')    
         
             
     t2col5, t2col6 = st.columns(2)
@@ -1287,7 +1285,8 @@ with tab2:
                     st.write(funcao_graf_uc_mes[1])
     
         with tab2_4:
-             
+            
+            
             pdf = abrir_fatura_pdf(uc_selecionada, ano_selecionado_mapa, mes_selecionado_mapa)
             if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
                 st.caption('Selecione uma unidade consumidora para mostrar fatura.')
@@ -1298,6 +1297,7 @@ with tab2:
             
             else:
                 st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')  
+                
                 st.download_button(
                     label="Download PDF",
                     data=pdf,
