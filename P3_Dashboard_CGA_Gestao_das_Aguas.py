@@ -919,6 +919,12 @@ def abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura):
     mes_fatura_texto = mes_fatura_str  + ' - ' + meses[mes_fatura-1].upper()  
     pasta_faturas = os.path.join(pasta_projeto, 'Dados', 'Origem', 'CGA - Faturas', str(ano_fatura), mes_fatura_texto)
     pdf = 0
+    
+    lista_joinville = ['H108', 'H109', 'H110', 'H111','H112','H113']
+    if uc_selecionada in lista_joinville:
+        uc_selecionada = 'H108'
+    else:
+        pass
     try:
         for item in os.listdir(pasta_faturas):
             
