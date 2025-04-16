@@ -1302,7 +1302,7 @@ with tab2:
     with tab2_col7:
                 
         check_tab2 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab2')
-        st.caption('Incluir dados do HU altera apenas agrupamento UFSC - Total.')
+        st.caption('Incluir dados do HU altera apenas a escala gráfica do consumo do mês no mapa.')
     
     st.write('Mapa cadastral de unidades consumidoras (UC), redes e subsetores de água da UFSC. ')
     st.caption('Descrição: Os subsetores correspondem a área estimada que cada UC abastece. '
