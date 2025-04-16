@@ -1711,62 +1711,64 @@ with tab4:
     else:
         df_i = dados_agua_df_sHU
     
-    df = df_i[(df_i['ANO'] == ano_selecionado_dados_mensais) & (df_i['MES_N'] == mes_selecionado_dados_mensais)]
-    df_vol = df.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
-    df_vol.index = np.arange(1, len(df_vol) + 1)
-    df_cus = df.sort_values(by=['VALOR_TOTAL'], ascending=False).reset_index(drop=True)
-    df_cus.index = np.arange(1, len(df_vol) + 1)
-       
-    
-    tab4_1, tab4_2, tab4_3, tab4_4 = st.tabs(['Volume',
-                          'Custo', 'Dados selecionados', 'Estatísticas'
-                          ])    
-    
-    with tab4_1:
-        st.caption("\n Volume faturado (m³) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
-        fig1 = barplot_para_mes_ano_selecionado_func(df_vol)[0]
-        st.write(fig1)
-    with tab4_2:
-        st.caption("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
-        fig2 = barplot_para_mes_ano_selecionado_func(df_cus)[1]
-        st.write(fig2)
-    with tab4_3:
+    try:
+        df = df_i[(df_i['ANO'] == ano_selecionado_dados_mensais) & (df_i['MES_N'] == mes_selecionado_dados_mensais)]
+        df_vol = df.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
+        df_vol.index = np.arange(1, len(df_vol) + 1)
+        df_cus = df.sort_values(by=['VALOR_TOTAL'], ascending=False).reset_index(drop=True)
+        df_cus.index = np.arange(1, len(df_vol) + 1)
+           
         
- 
-        dataframe = df_vol
-        dataframe = dataframe.rename(
-            columns={
-            'VOLUME_FATURADO': 'Volume Faturado m³',
-            'VALOR_TOTAL': 'Valor Total R$',
-            'ANO': 'Ano',
-            'MES_N': 'Mês',
-            'Matricula':'Matrícula',
-            'LEIT_ANT': 'Leitura Anterior',
-            'LEIT_ATUAL':'Leitura Atual',
-            'OCORRENCIA': 'Ocorrência',
-            'ANORMALIDADE':'Anormalidade',
-            'VALOR_AGUA':'Valor Água',
-            'VALOR_ESGOTO':'Valor Esgoto',
-            'DESCONTOS':'Desconto',
-            'OUTROS':'Outros',
-            'MULTAS_JUROS':'Multas e Juros',
-            'ECON_PUB':'Econ. Pública',
-            'ECON_IND':'Econ. Industrial',
-            'ECON_COM':'Econ. Comercial',
-            'ECON_RES':'Econ. Residencial',
-            'ECON_TOTAL':'Econ. Total'
-                    }
-                                  )
+        tab4_1, tab4_2, tab4_3, tab4_4 = st.tabs(['Volume',
+                              'Custo', 'Dados selecionados', 'Estatísticas'
+                              ])    
         
-        st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
-        st.caption("Dados:")
-        st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
-    
-    with tab4_4:
-        st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
-        st.caption('Estatísticas:')
-        st.dataframe(dataframe.describe(), width=1200, height=400)
- 
+        with tab4_1:
+            st.caption("\n Volume faturado (m³) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
+            fig1 = barplot_para_mes_ano_selecionado_func(df_vol)[0]
+            st.write(fig1)
+        with tab4_2:
+            st.caption("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
+            fig2 = barplot_para_mes_ano_selecionado_func(df_cus)[1]
+            st.write(fig2)
+        with tab4_3:
+            
+     
+            dataframe = df_vol
+            dataframe = dataframe.rename(
+                columns={
+                'VOLUME_FATURADO': 'Volume Faturado m³',
+                'VALOR_TOTAL': 'Valor Total R$',
+                'ANO': 'Ano',
+                'MES_N': 'Mês',
+                'Matricula':'Matrícula',
+                'LEIT_ANT': 'Leitura Anterior',
+                'LEIT_ATUAL':'Leitura Atual',
+                'OCORRENCIA': 'Ocorrência',
+                'ANORMALIDADE':'Anormalidade',
+                'VALOR_AGUA':'Valor Água',
+                'VALOR_ESGOTO':'Valor Esgoto',
+                'DESCONTOS':'Desconto',
+                'OUTROS':'Outros',
+                'MULTAS_JUROS':'Multas e Juros',
+                'ECON_PUB':'Econ. Pública',
+                'ECON_IND':'Econ. Industrial',
+                'ECON_COM':'Econ. Comercial',
+                'ECON_RES':'Econ. Residencial',
+                'ECON_TOTAL':'Econ. Total'
+                        }
+                                      )
+            
+            st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
+            st.caption("Dados:")
+            st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
+        
+        with tab4_4:
+            st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
+            st.caption('Estatísticas:')
+            st.dataframe(dataframe.describe(), width=1200, height=400)
+    except:
+        st.caption('Dados indisponíveis para ano e mês selecionados.')
 
 
        
