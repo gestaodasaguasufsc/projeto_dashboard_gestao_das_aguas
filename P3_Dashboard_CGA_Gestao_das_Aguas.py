@@ -581,20 +581,11 @@ def hex_to_rgb(hex_color):
     return (r, g, b)  # Retorna a tupla RGB
 
 
-def line_func_px(df):
+def line_func_px(df, cor1, cor2, cor3):
     
       
     # Defina as duas cores desejadas
     
-    container1 = st.container()
-    with container1:
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            cor1 =  st.color_picker("Escolha a cor 1", '#3100FB')
-        with col2:    
-            cor2 =  st.color_picker("Escolha a cor 2", '#E411E4')
-        with col3:    
-            cor3 =  st.color_picker("Escolha a cor 3", '#CEE411')
         
     cor1_rgb = hex_to_rgb(cor1)
     cor2_rgb = hex_to_rgb(cor2)
@@ -1060,8 +1051,8 @@ with st.sidebar:
 
 
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', 'Mapa cadastral', 'Dados por agrupamentos e individualizados por UC', 
-                                  'Dados gerais de UCs por ano e mês selecionado', 'Dados agrupados mensais'])
+tab1, tab2, tab3, tab4 = st.tabs(['Indicadores', 'Mapa cadastral', 'Dados por agrupamentos e individualizados por UC', 
+                                  'Dados gerais de UCs por ano e mês selecionado'])
 
 
 #INDICADORES--------------------------------------------
@@ -1401,8 +1392,9 @@ with tab3:
         uc_selecionada = localiza_hidrometro_func(df_i, selecao_uc_tab3)
         
     
-    tab3_1, tab3_2 , tab3_3 = st.tabs(['Dados agrupados anuais da UC selecionada',
+    tab3_1, tab3_2 , tab3_4 , tab3_3 = st.tabs(['Dados agrupados anuais da UC selecionada',
                           'Dados mensais da UC selecionada',
+                          'Dados mensais por agrupamento',
                           'Fatura no mês e ano selecionados'
                                      ])        
     with tab3_1:
@@ -1482,7 +1474,156 @@ with tab3:
             st.caption('Estatísticas:')
             st.dataframe(tab3_2_df.describe(), width=800, height=320)
     
-       
+    with tab3_4:
+          
+          tab3_4_col1, tab3_4_col2, tab3_4_col3, tab3_4_col4 = st.columns(4)
+          
+          with tab3_4_col1:
+              agrupamento_selecionado_tab3_4 = st.selectbox('Selecione o  agrupamento dos dados:', 
+                                                     lista_agrupamento, 
+                                                     index = 0, 
+                                                     key='selectbox_agrupamento_tab3_4'
+                                                     )
+                            
+          
+          if agrupamento_selecionado_tab3_4 == 'UFSC - Total':
+              if check_tab3 == True:
+                  df_tab3_4 = dict_dataframes[agrupamento_selecionado_tab3_4]
+              else:
+                  df_tab3_4 = dict_dataframes[agrupamento_selecionado_tab3_4]
+                  df_tab3_4 = df_tab3_4[df_tab3_4['Cidade'] != 'Florianópolis  HU']  
+          else:
+              df_tab3_4 = dict_dataframes[agrupamento_selecionado_tab3_4] 
+              
+          
+          df_tab3_4 = df_tab3_4.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
+          
+          ##############
+          
+          tab3_4_1, tab3_4_2, tab3_4_3 = st.tabs(['ScatterPlot','BoxPlot','LinePlot'])
+                                 
+          with tab3_4_1:
+              
+              
+              anos_selecionados_tab3_4_1 = st.multiselect(    "Selecione os anos desejados no gráfico:",
+                  options = df_tab3_4['ANO'].unique(),  # Opções do multi-check
+                  default = df_tab3_4['ANO'].unique(),  # Valores padrão selecionados
+                  key='multiselect_anos_tab3_4_1'
+                  )
+              
+              df_tab3_4_1 = df_tab3_4[df_tab3_4['ANO'].isin(anos_selecionados_tab3_4_1)]
+              
+              
+              ##############
+              
+              tab3_4_1_1, tab3_4_1_2, tab3_4_1_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
+              
+              with tab3_4_1_1:
+              
+                  scatter_tab3_4 = scatter_func_px_vol(df_tab3_4_1)
+                  
+                  st.plotly_chart(scatter_tab3_4, theme="streamlit", use_container_width=True)
+              
+                  
+              
+              
+              with tab3_4_1_2:
+                  
+                  st.caption('Dados selecionados:')
+                  
+                  df_tab3_4_1 = df_tab3_4_1.rename(columns=      {'ANO':'Ano',
+                                                             'VALOR_TOTAL': 'Custo Total (R$)',
+                                                             'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                             })
+                  
+                  st.dataframe(df_tab3_4_1.sort_index(ascending=False), width=600, height=400)  
+                  
+              with tab3_4_1_3:  
+                  
+                  st.caption('Estatísticas:')
+                   
+                  st.dataframe(df_tab3_4_1.describe(), width=600, height=320)
+          
+          with tab3_4_2:
+              
+              anos_selecionados_tab3_4_2 = st.multiselect("Selecione os anos desejados no gráfico:",
+                  options = df_tab3_4['ANO'].unique(),  # Opções do multi-check
+                  default = df_tab3_4['ANO'].unique(),
+                  key='multiselect_anos_tab3_4_2'
+                  )
+          
+              df_tab3_4_2 = df_tab3_4[df_tab3_4['ANO'].isin(anos_selecionados_tab3_4_2)]
+              boxplot_tab3_4 = boxplot_func_px(df_tab3_4_2)
+              
+              ##############
+              
+              tab3_4_2_1, tab3_4_2_2, tab3_4_2_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
+              
+              with tab3_4_2_1:
+              
+                  st.plotly_chart(boxplot_tab3_4, theme="streamlit", use_container_width=True)
+                  
+                  df_tab3_4_2 = df_tab3_4_2.rename(columns=
+                                                            {'ANO':'Ano',
+                                                            'VALOR_TOTAL': 'Custo Total (R$)',
+                                                            'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                            }                                              )
+              
+              with tab3_4_2_2:
+                  st.caption('Dados:')
+                  st.dataframe(df_tab3_4_2.sort_index(ascending=False), width=600, height=400) 
+              
+              with tab3_4_2_3:
+                  st.caption('Estatísticas:')
+                  st.dataframe(df_tab3_4_2.describe(), width=600, height=320)
+              
+              
+              
+              
+
+          with tab3_4_3:
+              
+              anos_selecionados_tab3_4_3 = st.multiselect("Selecione os anos desejados no gráfico:",
+                  options = df_tab3_4['ANO'].unique(),  # Opções do multi-check
+                  default = df_tab3_4['ANO'].unique(),
+                  key='multiselect_anos_tab3_4_3'
+                  )
+          
+              df_tab3_4_3 = df_tab3_4[df_tab3_4['ANO'].isin(anos_selecionados_tab3_4_3)]
+              
+              tab3_4_3_container = st.container()
+              with tab3_4_3_container:
+                  col1, col2, col3 = st.columns(3)
+                  with col1:
+                      cor1 =  st.color_picker("Escolha a cor 1", '#3100FB', key = 'cor1_tab3_4_3')
+                  with col2:    
+                      cor2 =  st.color_picker("Escolha a cor 2", '#E411E4', key = 'cor2_tab3_4_3')
+                  with col3:    
+                      cor3 =  st.color_picker("Escolha a cor 3", '#CEE411', key = 'cor3_tab3_4_3')
+              
+              lineplot_tab3_4 = line_func_px(df_tab3_4_3, cor1, cor2, cor3)
+              
+              tab3_4_3_1, tab3_4_3_2, tab3_4_3_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
+              
+              with tab3_4_3_1:
+              
+                  st.plotly_chart(lineplot_tab3_4, theme="streamlit", use_container_width=True)
+                  
+                  df_tab3_4_3 = df_tab3_4_3.rename(columns=
+                                                             {'ANO':'Ano',
+                                                             'VALOR_TOTAL': 'Custo Total (R$)',
+                                                             'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                             }                                              )
+                     
+              with tab3_4_3_2:
+              
+                  st.caption('Dados:')
+                  st.dataframe(df_tab3_4_3.sort_index(ascending=False), width=600, height=400)          
+
+              with tab3_4_3_3:
+                  
+                  st.caption('Estatísticas:')
+                  st.dataframe(df_tab3_4_3.describe(), width=600, height=325)
     
     with tab3_3:
         
@@ -1502,8 +1643,6 @@ with tab3:
         elif pdf == 0:
             st.caption('Fatura não disponível para o ano e mês da unidade selecionada.')
             
-            st.caption('As faturas CASAN podem também ser acessadas diretamente em https:ecasan.com.br.')
-        
         else:
             st.caption(f'Fatura da UC {selecao_uc_tab3} no mês e ano selecionado.')  
             
@@ -1597,160 +1736,6 @@ with tab4:
         st.dataframe(dataframe.describe(), width=1200, height=400)
  
 
-with tab5:
 
-    st.caption('Gráficos de volumes acumulados por ano para o agrupamento selecionado:')
-    
-    
-    tab5_col1, tab5_col2, tab5_col3, tab5_col4 = st.columns(4)
-    
-    with tab5_col1:
-        agrupamento_selecionado_tab5 = st.selectbox('Selecione o  agrupamento dos dados:', 
-                                               lista_agrupamento, 
-                                               index = 0, 
-                                               key='selectbox_agrupamento_tab5'
-                                               )
-    
-    with tab5_col2:
-    
-        check_tab5 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab5')
-
-    with tab5_col3:
-        st.caption('Incluir dados do HU altera apenas agrupamento UFSC - Total.')
-
-    if check_tab5:
-        check_tab5 = True
-    else:
-        check_tab5 = False
-    
-    
-    if agrupamento_selecionado_tab5 == 'UFSC - Total':
-        if check_tab5 == True:
-            df_tab5 = dict_dataframes[agrupamento_selecionado_tab5]
-        else:
-            df_tab5 = dict_dataframes[agrupamento_selecionado_tab5]
-            df_tab5 = df_tab5[df_tab5['Cidade'] != 'Florianópolis  HU']  
-    else:
-        df_tab5 = dict_dataframes[agrupamento_selecionado_tab5] 
-        
-    
-    df_tab5 = df_tab5.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
-    
-    ##############
-    
-    tab5_1, tab5_2, tab5_3 = st.tabs(['ScatterPlot','BoxPlot','LinePlot'])
-                           
-    with tab5_1:
-        
-        
-        anos_selecionados_tab5_1 = st.multiselect(    "Selecione os anos desejados no gráfico:",
-            options = df_tab5['ANO'].unique(),  # Opções do multi-check
-            default = df_tab5['ANO'].unique(),  # Valores padrão selecionados
-            key='multiselect_anos_tab5_1'
-            )
-        
-        df_tab5_1 = df_tab5[df_tab5['ANO'].isin(anos_selecionados_tab5_1)]
-        
-        
-        ##############
-        
-        tab5_1_1, tab5_1_2, tab5_1_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
-        
-        with tab5_1_1:
-        
-            scatter_tab5 = scatter_func_px_vol(df_tab5_1)
-            
-            st.write(scatter_tab5, theme="streamlit", use_container_width=True)
-        
-            
-        
-        
-        with tab5_1_2:
-            
-            st.caption('Dados selecionados:')
-            
-            df_tab5_1 = df_tab5_1.rename(columns=      {'ANO':'Ano',
-                                                       'VALOR_TOTAL': 'Custo Total (R$)',
-                                                       'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                       })
-            
-            st.dataframe(df_tab5_1.sort_index(ascending=False), width=600, height=400)  
-            
-        with tab5_1_3:  
-            
-            st.caption('Estatísticas:')
-             
-            st.dataframe(df_tab5_1.describe(), width=600, height=320)
-    
-    with tab5_2:
-        
-        anos_selecionados_tab5_2 = st.multiselect("Selecione os anos desejados no gráfico:",
-            options = df_tab5['ANO'].unique(),  # Opções do multi-check
-            default = df_tab5['ANO'].unique(),
-            key='multiselect_anos_tab5_2'
-            )
-    
-        df_tab5_2 = df_tab5[df_tab5['ANO'].isin(anos_selecionados_tab5_2)]
-        boxplot_tab5 = boxplot_func_px(df_tab5_2)
-        
-        ##############
-        
-        tab5_2_1, tab5_2_2, tab5_2_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
-        
-        with tab5_2_1:
-        
-            st.write(boxplot_tab5, theme="streamlit", use_container_width=True)
-            
-            df_tab5_2 = df_tab5_2.rename(columns=
-                                                      {'ANO':'Ano',
-                                                      'VALOR_TOTAL': 'Custo Total (R$)',
-                                                      'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                      }                                              )
-        
-        with tab5_2_2:
-            st.caption('Dados:')
-            st.dataframe(df_tab5_2.sort_index(ascending=False), width=600, height=400) 
-        
-        with tab5_2_3:
-            st.caption('Estatísticas:')
-            st.dataframe(df_tab5_2.describe(), width=600, height=320)
-        
-        
-        
-        
-
-    with tab5_3:
-        
-        anos_selecionados_tab5_3 = st.multiselect("Selecione os anos desejados no gráfico:",
-            options = df_tab5['ANO'].unique(),  # Opções do multi-check
-            default = df_tab5['ANO'].unique(),
-            key='multiselect_anos_tab5_3'
-            )
-    
-        df_tab5_3 = df_tab5[df_tab5['ANO'].isin(anos_selecionados_tab5_3)]
-        lineplot_tab5 = line_func_px(df_tab5_3)
-        
-        tab5_3_1, tab5_3_2, tab5_3_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
-        
-        with tab5_3_1:
-        
-            st.write(lineplot_tab5, theme="streamlit", use_container_width=True)
-            
-            df_tab5_3 = df_tab5_3.rename(columns=
-                                                       {'ANO':'Ano',
-                                                       'VALOR_TOTAL': 'Custo Total (R$)',
-                                                       'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                       }                                              )
-               
-        with tab5_3_2:
-        
-            st.caption('Dados:')
-            st.dataframe(df_tab5_3.sort_index(ascending=False), width=600, height=400)          
-
-        with tab5_3_3:
-            
-            st.caption('Estatísticas:')
-            st.dataframe(df_tab5_3.describe(), width=600, height=325)
-   
        
 
