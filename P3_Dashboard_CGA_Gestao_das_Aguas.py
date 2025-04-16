@@ -516,7 +516,7 @@ def agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano):
 
 def boxplot_func_px(df):
    
-    chart = px.box(df,
+    chart_vol = px.box(df,
                  x="MES_N",  # Month (column index after pivot)
                  y="VOLUME_FATURADO", # Values
                  #color='ANO',
@@ -524,9 +524,20 @@ def boxplot_func_px(df):
                  boxmode='group',
                  points='all'
                  )
-    chart.update_layout(xaxis=dict(dtick=1))    
+    chart_vol.update_layout(xaxis=dict(dtick=1))    
     
-    return chart
+    chart_cus = px.box(df,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VALOR_TOTAL", # Values
+                 #color='ANO',
+                 labels={'ANO': 'Ano','VALOR_TOTAL': 'Valor Total (R$)','MES_N':'Mês' },
+                 boxmode='group',
+                 points='all'
+                 )
+    chart_cus.update_layout(xaxis=dict(dtick=1)) 
+    
+    return chart_vol, chart_cus
+
 
 
 def scatter_func_px_vol(df):
@@ -616,22 +627,33 @@ def line_func_px(df, cor1, cor2, cor3):
     color_discrete_sequence_ = lista_cores
     
         
-    chart = px.line(df,
+    chart_vol = px.line(df,
                  x="MES_N",  # Month (column index after pivot)
                  y="VOLUME_FATURADO", # Values
                  labels={'ANO': 'Ano','VOLUME_FATURADO': 'Volume Faturado (m³)', 'MES_N':'Mês' },
                  color='ANO',  # Coluna para a cor
                  color_discrete_sequence=color_discrete_sequence_,
                  )
-    chart.update_layout(xaxis=dict(dtick=1))
+    chart_vol.update_layout(xaxis=dict(dtick=1))
+    
+    chart_cus = px.line(df,
+                 x="MES_N",  # Month (column index after pivot)
+                 y="VALOR_TOTAL", # Values
+                 labels={'ANO': 'Ano','VALOR_TOTAL': 'Valor Total (R$)', 'MES_N':'Mês' },
+                 color='ANO',  # Coluna para a cor
+                 color_discrete_sequence=color_discrete_sequence_,
+                 )
+    chart_cus.update_layout(xaxis=dict(dtick=1))   
+    
     # Definir o intervalo da legenda como 1 (se desejar)
     min_value = int(df['ANO'].min())
     max_value = int(df['ANO'].max())
     tickvals = np.arange(min_value, max_value + 1, 1)
     ticktext = tickvals.astype(str)
-    chart.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))    
+    chart_vol.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))    
+    chart_cus.update_layout(coloraxis=dict(colorbar=dict(tickvals=tickvals, ticktext=ticktext)))    
     
-    return chart
+    return chart_vol, chart_cus
 
 
 
@@ -1516,15 +1538,19 @@ with tab3:
               
               ##############
               
-              tab3_4_1_1, tab3_4_1_2, tab3_4_1_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
+              tab3_4_1_1, tab3_4_1_4, tab3_4_1_2, tab3_4_1_3 = st.tabs(['Volume','Custo','Dados selecionados','Estatísticas'])
               
               with tab3_4_1_1:
               
-                  scatter_tab3_4 = scatter_func_px_vol(df_tab3_4_1)
+                  scatter_tab3_4_vol = scatter_func_px_vol(df_tab3_4_1)
                   
-                  st.plotly_chart(scatter_tab3_4, theme="streamlit", use_container_width=True)
+                  st.plotly_chart(scatter_tab3_4_vol, theme="streamlit", use_container_width=True)
               
+              with tab3_4_1_4:
+              
+                  scatter_tab3_4_cus = scatter_func_px_cus(df_tab3_4_1)
                   
+                  st.plotly_chart(scatter_tab3_4_cus, theme="streamlit", use_container_width=True)   
               
               
               with tab3_4_1_2:
@@ -1557,19 +1583,23 @@ with tab3:
               
               ##############
               
-              tab3_4_2_1, tab3_4_2_2, tab3_4_2_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
+              tab3_4_2_1, tab3_4_2_4, tab3_4_2_2, tab3_4_2_3 = st.tabs(['Volume','Custo','Dados selecionados','Estatísticas'])
               
               with tab3_4_2_1:
               
-                  st.plotly_chart(boxplot_tab3_4, theme="streamlit", use_container_width=True)
-                  
+                  st.plotly_chart(boxplot_tab3_4[0], theme="streamlit", use_container_width=True)
+              
+              with tab3_4_2_4:
+            
+                  st.plotly_chart(boxplot_tab3_4[1], theme="streamlit", use_container_width=True)
+              
+              with tab3_4_2_2:
                   df_tab3_4_2 = df_tab3_4_2.rename(columns=
                                                             {'ANO':'Ano',
                                                             'VALOR_TOTAL': 'Custo Total (R$)',
                                                             'VOLUME_FATURADO': 'Volume Faturado (m³)'
                                                             }                                              )
-              
-              with tab3_4_2_2:
+                  
                   st.caption('Dados:')
                   st.dataframe(df_tab3_4_2.sort_index(ascending=False), width=600, height=400) 
               
@@ -1603,20 +1633,22 @@ with tab3:
               
               lineplot_tab3_4 = line_func_px(df_tab3_4_3, cor1, cor2, cor3)
               
-              tab3_4_3_1, tab3_4_3_2, tab3_4_3_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
+              
+              tab3_4_3_1, tab3_4_3_4, tab3_4_3_2, tab3_4_3_3 = st.tabs(['Volume','Custo','Dados selecionados','Estatísticas'])
               
               with tab3_4_3_1:
-              
-                  st.plotly_chart(lineplot_tab3_4, theme="streamlit", use_container_width=True)
+                  st.plotly_chart(lineplot_tab3_4[0], theme="streamlit", use_container_width=True)
+                  
+              with tab3_4_3_4:
+                  st.plotly_chart(lineplot_tab3_4[1], theme="streamlit", use_container_width=True)
+                     
+              with tab3_4_3_2:
                   
                   df_tab3_4_3 = df_tab3_4_3.rename(columns=
                                                              {'ANO':'Ano',
                                                              'VALOR_TOTAL': 'Custo Total (R$)',
                                                              'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                             }                                              )
-                     
-              with tab3_4_3_2:
-              
+                                                             })
                   st.caption('Dados:')
                   st.dataframe(df_tab3_4_3.sort_index(ascending=False), width=600, height=400)          
 
