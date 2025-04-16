@@ -1041,7 +1041,7 @@ with st.sidebar:
     
      
     st.sidebar.caption("Coordenadoria de Gestão Ambiental - CGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
-    st.sidebar.caption("Projeto desenvolvido em Python 3.10")
+    st.sidebar.caption("Projeto desenvolvido em Python 3.10.11")
     st.sidebar.caption("Contato: gestaodasaguas@contato.ufsc.br")
     st.sidebar.caption("Desenvolvido por: djesser.zechner@ufsc.br")
     
