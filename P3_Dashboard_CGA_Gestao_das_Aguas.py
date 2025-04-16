@@ -648,10 +648,17 @@ def line_func_px(df):
 
 #Localiza hidrômetro, entrada com cadastro_hidrometros_df, valor selecionado)  
 
-def localiza_lat_long_hidrometro_func (df_i, valor, shp):
-    df = df_i.iloc[:,[1,11]]
+def localiza_hidrometro_func (df_i, valor):    
+    df = df_i.loc[:,['Hidrometro','Local']]
     df['nome_uc_local'] = df['Hidrometro'] +" " + df['Local']
     selecao = df.loc[df['nome_uc_local']==valor, 'Hidrometro'].iloc[0]
+    return selecao
+
+
+
+def localiza_lat_long_hidrometro_func (df_i, valor, shp):
+    
+    selecao = localiza_hidrometro_func(df_i, valor)
     try:
         lat = shp.loc[shp['Hidrometro']==selecao,'Latitude'].iloc[0]
         long = shp.loc[shp['Hidrometro']==selecao,'Longitude'].iloc[0]
@@ -673,29 +680,75 @@ def gerador_lista_uc_local_por_campi_func (df, selecao_cidade):
     df_filtrada = df[df['Cidade'] == selecao_cidade]
     lista = df_filtrada['nome_uc_local'].tolist()
     lista.sort()
-    lista.append("UFSC - visão geral")
-    index_ = lista.index("UFSC - visão geral")
+    lista.append('UFSC - Total')
+    index_ = lista.index('UFSC - Total')
     return lista, index_
 
 
 def lista_cidades_index_func(df):
         #df = df[df['Cidade']!= 'Florianópolis  HU']
         lista = df['Cidade'].unique().tolist()
-        index_ = lista.index('Florianópolis - Trindade')
+        lista.append('UFSC - Total')
+        index_ = lista.index('UFSC - Total')
         return lista, index_
    
   
-def funcao_graf_uc_ano_func(df, selecao_uc_mapa):
-    df = df[df['Hidrometro']==selecao_uc_mapa]
-    vol_uc = df.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
-    cus_uc = df.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
-    graf_uc = agrupado_por_ano_func(vol_uc, cus_uc)
-    return graf_uc[0], graf_uc[1]
+def funcao_graf_uc_ano_func(df, selecao_uc_mapa, check):
+    
+    if selecao_uc_mapa == 'UFSC - Total':
+                
+        if check:
+            pass
+        else:
+            df = df[df['Cidade'] != 'Florianópolis  HU']     
+                
+    else:
+        df = df[df['Hidrometro']==selecao_uc_mapa]
+    
+    
+    vol_df = df.groupby(['ANO'])['VOLUME_FATURADO'].sum().reset_index()
+    cus_df = df.groupby(['ANO'])['VALOR_TOTAL'].sum().reset_index()
+    graf = agrupado_por_ano_func(vol_df, cus_df)
+    graf_vol = graf[0] 
+    graf_cus = graf[1]
+    df = pd.concat([vol_df, cus_df['VALOR_TOTAL']],axis=1).reset_index()
+    df['Selecao'] = selecao_uc_mapa
+    df = df.sort_index(ascending=False)
+    df = df.rename(columns=
+                                                              {'ANO':'Ano',
+                                                                  'VALOR_TOTAL': 'Custo Total (R$)',
+                                                               'VOLUME_FATURADO': 'Volume Faturado (m³)',
+                                                               'Selecao':'Seleção'
+                                                               })
+    df = df.iloc[:,[1,2,3,4]]
+    
+    return graf_vol, graf_cus, df
 
 
-def funcao_graf_uc_mes_func(df, selecao_uc_mapa):
-    df = df[df['Hidrometro']==selecao_uc_mapa]
-    return scatter_func_px_vol(df), scatter_func_px_cus(df)
+def funcao_graf_uc_mes_func(df, selecao_uc_mapa, check):
+    if selecao_uc_mapa == 'UFSC - Total':
+                
+        if check:
+            pass
+        else:
+            df = df[df['Cidade'] != 'Florianópolis  HU']     
+                
+    else:
+        df = df[df['Hidrometro']==selecao_uc_mapa]
+        
+    df = df.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index() 
+    df = df.sort_index(ascending = False)
+    graf_vol = scatter_func_px_vol(df)
+    graf_cus = scatter_func_px_cus(df)
+    df = df.rename(columns=
+                        {'ANO':'Ano',
+                         'VALOR_TOTAL': 'Custo Total (R$)',
+                         'VOLUME_FATURADO': 'Volume Faturado (m³)',
+                         'MES_N':'Mês'
+                        })
+    
+    
+    return graf_vol, graf_cus , df
 
 
 #gerando dicionário com dataframes filtrados por agrupamentos de campi
@@ -763,8 +816,6 @@ def trat_acumulado_por_ano_func (dct, agr_sel, check):
     
     df = pd.concat([vol_ano, cus_ano['VALOR_TOTAL']],axis=1).reset_index()
     df['Agrupamento Selecionado'] = agr_sel
-    #df['VALOR_TOTAL'] = df['VALOR_TOTAL'].apply(lambda x: f"{x:.2f}")
-    #df['VOLUME_FATURADO'] = df['VOLUME_FATURADO'].apply(lambda x: f"{x:.0f}")
     df = df.sort_values(by='ANO', ascending=False)
     df = df.rename(columns=
                                                               {'ANO':'Ano',
@@ -991,8 +1042,8 @@ with st.sidebar:
      
     st.sidebar.caption("Coordenadoria de Gestão Ambiental - CGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
     st.sidebar.caption("Projeto desenvolvido em Python 3.10")
-    st.sidebar.caption("contato: gestaodasaguas@contato.ufsc.br")
-    st.sidebar.caption("Desenvolvimento: Djesser Zechner Sergio")
+    st.sidebar.caption("Contato: gestaodasaguas@contato.ufsc.br")
+    st.sidebar.caption("Desenvolvido por: djesser.zechner@ufsc.br")
     
     st.sidebar.caption(f'Primeiro ano/mês com dados disponível: {menor_ano}/{menor_mes}.')
     st.sidebar.caption(f' Último ano/mês com dados disponível: {maior_ano}/{maior_mes}.') 
@@ -1003,42 +1054,43 @@ with st.sidebar:
 
 
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', "Mapa cadastral e dados mensais individualizados por UC", 
-                                  "Dados gerais de UCs por ano e mês selecionado", "Dados agrupados anuais", "Dados agrupados mensais"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(['Indicadores', 'Mapa cadastral', 'Dados por agrupamentos e individualizados por UC', 
+                                  'Dados gerais de UCs por ano e mês selecionado', 'Dados agrupados mensais'])
 
 
 #INDICADORES--------------------------------------------
 
 with tab1: 
     
-    t1col1ini, t1col2ini, t1col3ini , t1col4ini = st.columns(4)
+    tab1_col1_ini, tab1_col2_ini, tab1_col3_ini , tab1_col4_ini = st.columns(4)
     
-    with t1col1ini:     
+    with tab1_col1_ini:     
         ano_selecionado_ind = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_indicadores_ano')
         
-    with t1col2ini:
+    with tab1_col2_ini:
         mes_selecionado_ind = st.selectbox('Selecione o mês', meses, index = index_mes, key='selectbox_indicadores_mes')
     
-    with t1col3ini:
+    with tab1_col3_ini:
         agrupamento_selecionado_ind = st.selectbox('Selecione o  agrupamento dos dados:', 
                                                lista_agrupamento, 
                                                index = 0, 
                                                key='selectbox_agrupamento_ind'
                                                )
      
-    with t1col4ini:    
+    with tab1_col4_ini:    
         check_tab1 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab1')
-
+        st.caption('Incluir dados do HU altera apenas agrupamento UFSC - Total.')  
+        
         if check_tab1:
             check_tab1 = True
         else:
             check_tab1 = False
             
-    t1col1, t1col2 = st.columns(2)
+    tab1_col1, tab1_col2 = st.columns(2)
     
-    with t1col1:
+    with tab1_col1:
                
-        t1col1_13, t1col1_14  = st.columns(2)
+        tab1_col1_11, tab1_col1_12  = st.columns(2)
     
         
         sem_dados = False
@@ -1065,14 +1117,13 @@ with tab1:
             st.caption('Dados inexistentes para o local/ano/mês selecionado')
             sem_dados = True
         
-        with t1col1_14:
-            pass       
+         
             
         
         if sem_dados == True:
             pass
         else:
-            t1col1_15, t1col1_16 = st.columns(2)
+            tab1_col1_15, tab1_col1_16 = st.columns(2)
             
             st.markdown(
                         """
@@ -1085,7 +1136,7 @@ with tab1:
                         unsafe_allow_html=True,
                     )
             
-            with t1col1_15:      
+            with tab1_col1_15:      
                     textov0 = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
                     try:
                         textov1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
@@ -1104,7 +1155,7 @@ with tab1:
                               textov0, 
                               border=True)
             
-            with t1col1_16:
+            with tab1_col1_16:
                     textoc0 = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
                     try:
                         textoc1 = (f'{custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
@@ -1117,21 +1168,21 @@ with tab1:
                               textoc0,  
                               border=True, delta_color="inverse")
             
-            t1col1_17, t1col1_18 = st.columns(2)
+            tab1_col1_17, tab1_col1_18 = st.columns(2)
             
-            with t1col1_17:      
+            with tab1_col1_17:      
                     texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
                     st.metric("Volume médio dos últimos 6 meses", texto , border=True)
             
-            with t1col1_18:
+            with tab1_col1_18:
                     texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
                     st.metric("Custo médio dos últimos 6 meses", texto, border=True)
         
             st.caption('Variações de volume e custo em relação à média dos últimos 6 meses')
             
-            t1col1_19, t1col1_20 = st.columns(2)
+            tab1_col1_19, tab1_col1_20 = st.columns(2)
             
-            with t1col1_19:
+            with tab1_col1_19:
                 st.metric("Volume variação absoluta", 
                               "", textov1, 
                               border=True, delta_color="inverse")
@@ -1139,7 +1190,7 @@ with tab1:
                               "", textov2, 
                               border=True, delta_color="inverse")
                 
-            with t1col1_20:
+            with tab1_col1_20:
                 st.metric("Custo variação absoluta", 
                               "", textoc1, 
                               border=True, delta_color="inverse")
@@ -1147,8 +1198,8 @@ with tab1:
                               "", textoc2, 
                               border=True, delta_color="inverse")
                 
-    with t1col2:
-        tabvol_t1col2, tabcus_t1col2, tabcus_vol_t1col2, tabdad_t1col2, tabest_t1col2 = st.tabs(['Volume','Custo','Custo por Volume','Dados', 'Estatísticas'])
+    with tab1_col2:
+        tab2_col2_1, tab2_col2_2, tab2_col2_3, tab2_col2_4, tab2_col2_5 = st.tabs(['Volume','Custo','Custo por Volume','Dados', 'Estatísticas'])
         if sem_dados == True:
             pass
         else:
@@ -1160,20 +1211,20 @@ with tab1:
             graf_cus = fun_graf_lin_ind[3]
             graf_cus_por_vol = fun_graf_lin_ind[4]
             
-            with tabvol_t1col2:
-                st.caption(f'Volume faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
+            with tab2_col2_1:
+                st.caption(f'Volume faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
                 st.write(graf_vol)
             
-            with tabcus_t1col2:
-                st.caption(f'Custo faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
+            with tab2_col2_2:
+                st.caption(f'Custo faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
                 st.write(graf_cus)
                 
-            with tabcus_vol_t1col2:
-                st.caption(f'Custo por volume faturado nos últimos {numero_meses} meses para o agrupamento selecionado.')
+            with tab2_col2_3:
+                st.caption(f'Custo por volume médio faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
                 st.write(graf_cus_por_vol)
             
-            with tabdad_t1col2:
-                st.caption(f'Dados dos últimos {numero_meses} meses para o agrupamento selecionado.')
+            with tab2_col2_4:
+                st.caption(f'Dados mensais ddos últimos {numero_meses} meses para o agrupamento selecionado.')
                 #df_jm.style.format({'Valor_por_Volume':'{:.2f}'},
                                     #{'VALOR_TOTAL':'{:.2f}'}
                                     #)
@@ -1187,32 +1238,34 @@ with tab1:
                             })
                 st.dataframe(df_jm.reset_index(drop=True), height = 400 )
             
-            with tabest_t1col2:
+            with tab2_col2_5:
+                st.caption(f'Estatísticas de dados mensais ddos últimos {numero_meses} meses para o agrupamento selecionado.')
                 st.dataframe(df_jm.describe())
     
 #MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
 
 with tab2:
             
-    t2col1, t2col2, t2col3, t2col4 = st.columns(4)
+    tab2_col1, tab2_col2, tab2_col3, tab2_col4 = st.columns(4)
     
-    with t2col1:     
+    with tab2_col1:     
         ano_selecionado_mapa = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_mapa_ano')
    
-    with t2col2:
+    with tab2_col2:
         mes_selecionado_mapa = st.selectbox('Selecione o mês', meses, index = index_mes, key='selectbox_mapa_mes')    
-        
-            
-    t2col5, t2col6 = st.columns(2)
     
-    with t2col5:
+          
+            
+    tab2_col5, tab2_col6, tab2_col7, tab2_col8 = st.columns(4)
+    
+    with tab2_col5:
         
         funcao = lista_cidades_index_func(cadastro_hidrometros_df)
         lista_cidades = funcao[0]
         index_cidades = funcao[1]
         selecao_cidade = st.selectbox('Selecione o campi/unidade', lista_cidades, index = index_cidades , key='selectbox_mapa_cidades')        
         
-    with t2col6: 
+    with tab2_col6: 
         
         funcao = gerador_lista_uc_local_por_campi_func (cadastro_hidrometros_df , selecao_cidade)
         lista_uc_local = funcao[0]
@@ -1226,152 +1279,257 @@ with tab2:
         
         
         if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
-            print('Sim')
-            map = folium.Map(width = 950, height=750, location=[-27.6, -48.52], zoom_start=15.5)
+            
+            map = folium.Map(width = 1150, height=750, location=[-27.6, -48.52], zoom_start=15.5)
             uc_selecionada = selecao_uc_mapa
         else: 
-            print('Não')
+            
             try:
                 dict_saida = localiza_lat_long_hidrometro_func(cadastro_hidrometros_df, selecao_uc_mapa, hidrometros_shp)
                 lat = dict_saida['lat']
                 long = dict_saida['long']
                 uc_selecionada = dict_saida['hid_sel']
-                map = folium.Map(width = 950, height=750, location=[lat, long], zoom_start=18)
-                verificador_mapa  = True
+                map = folium.Map(width = 1150, height=750, location=[lat, long], zoom_start=18)
+                
             except:
-                verificador_mapa  = False
+                st.caption('Localização da unidade consumidora (UC) indisponível. Escolha outra UC. ')
+                map = folium.Map(width = 1150, height=750, location=[-27.6, -48.52], zoom_start=15.5)
+                selecao_uc_mapa == lista_uc_local[index_visao_geral]
+                uc_selecionada = selecao_uc_mapa
+                
                 pass
     
-    tab2_1, tab2_2, tab2_3 , tab2_4 = st.tabs(["Mapa", 
-                          'Dados agrupados anuais da UC selecionada',
+    with tab2_col7:
+                
+        check_tab2 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab2')
+        st.caption('Incluir dados do HU altera apenas agrupamento UFSC - Total.')
+    
+    st.write('Mapa cadastral de unidades consumidoras (UC), redes e subsetores de água da UFSC. ')
+    st.caption('Descrição: Os subsetores correspondem a área estimada que cada UC abastece. '
+               'Cada UC possui um hidrômetro que mede o consumo do seu respectivo subsetor. ' 
+               'O mapa apresenta os subsetores com o consumo do ano e mês selecionados acima, '
+               'cuja escala de cores representa uma faixa de consumo entre o menor e maior consumo. '
+               'Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios. ')
+    st.caption('INSTRUÇÕES: Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações. '
+               'Clique nos pontos de localização dos hidrômetros para visualizar imagem de localização da unidade consumidora (UC). '
+               'Selecione um campus e uma UC para aproximar da sua localização no mapa.')
+          
+    if check_tab2:
+        df_i = dados_agua_df
+            
+    else:
+        df_i = dados_agua_df_sHU
+            
+    try:
+        df = df_i[(df_i['ANO'] == ano_selecionado_mapa) & (df_i['MES_N'] == mes_selecionado_mapa)]
+        df = df.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
+        df.index = np.arange(1, len(df) + 1)
+                 
+        chropleth_subsetores_agua_func(df, subsetores_agua_shp)
+        #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
+               
+        camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
+                        
+        adicionar_camadas_de_fundo_func(map)
+            
+        folium_static(map, width=1200, height=800)
+        
+        verificador_dados = True
+    except:
+        st.caption('Ano e mês escolhidos fora da faixa de dados disponíveis.')
+        verificador_dados = False
+        pass
+                 
+            
+
+
+with tab3:            
+        
+    tab3_col1, tab3_col2, tab3_col3, tab3_col4 = st.columns(4)
+    
+    with tab3_col1:     
+        ano_selecionado_tab3 = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_tab3_ano')
+   
+    with tab3_col2:
+        mes_selecionado_tab3 = st.selectbox('Selecione o mês', meses, index = index_mes, key='selectbox_tab3_mes')    
+    
+          
+            
+    tab3_col5, tab3_col6, tab3_col7, tab3_col8 = st.columns(4)
+    
+    with tab3_col5:
+        
+        funcao = lista_cidades_index_func(cadastro_hidrometros_df)
+        lista_cidades = funcao[0]
+        index_cidades = funcao[1]
+        selecao_cidade = st.selectbox('Selecione o campi/unidade', lista_cidades, index = index_cidades , key='selectbox_tab3_cidades')        
+        
+    with tab3_col6: 
+        
+        funcao = gerador_lista_uc_local_por_campi_func (cadastro_hidrometros_df , selecao_cidade)
+        lista_uc_local = funcao[0]
+        index_visao_geral = funcao[1]
+    
+        selecao_uc_tab3 = st.selectbox('Selecione a unidade consumidora', 
+                                       lista_uc_local, 
+                                       index = index_visao_geral , 
+                                       key='selectbox_tab3_uc'
+                                       )               
+    
+    with tab3_col7:
+                
+        check_tab3 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab3')
+        st.caption('Incluir dados do HU altera apenas agrupamento UFSC - Total.') 
+    
+    if check_tab3:
+        df_i = dados_agua_df
+            
+    else:
+        df_i = dados_agua_df_sHU
+    
+    
+    
+    if selecao_uc_tab3 == lista_uc_local[index_visao_geral]:
+        uc_selecionada = selecao_uc_tab3
+    else: 
+        uc_selecionada = localiza_hidrometro_func(df_i, selecao_uc_tab3)
+        
+    
+    tab3_1, tab3_2 , tab3_3 = st.tabs(['Dados agrupados anuais da UC selecionada',
                           'Dados mensais da UC selecionada',
                           'Fatura no mês e ano selecionados'
-                                     ])
+                                     ])        
+    with tab3_1:
+                
+                               
+        tab3_1_1, tab3_1_2, tab3_1_3 , tab3_1_4 = st.tabs(['Volume',
+                              'Custo', 'Dados selecionados', 'Estatísticas']) 
+         
+        
+        
+                
+        funcao_graf_uc_ano = funcao_graf_uc_ano_func(df_i, uc_selecionada, check_tab3)
+        tab3_1_graf_vol = funcao_graf_uc_ano[0]
+        tab3_1_graf_cus = funcao_graf_uc_ano[1]
+        tab3_1_df = funcao_graf_uc_ano[2]
+        
+        with tab3_1_1:
+            if selecao_uc_tab3 == lista_uc_local[index_visao_geral]:
+                st.caption('Dados totais! Para filtrar por UC, selecione um campus, e a respectiva unidade consumidora.')  
+                st.write(tab3_1_graf_vol)
+            else:
+                st.caption(f'Volume da UC {selecao_uc_tab3} agrupado por ano.')   
+                st.write(tab3_1_graf_vol)
+                                        
+        with tab3_1_2:
+            if selecao_uc_tab3 == lista_uc_local[index_visao_geral]:
+                st.caption('Dados totais! Para filtrar por UC, selecione um campus, e a respectiva unidade consumidora.')  
+                st.write(tab3_1_graf_cus)
+            else:        
+                st.caption(f'Custo da UC {selecao_uc_tab3} agrupado por ano.')   
+                st.write(tab3_1_graf_cus)
+                
+        with tab3_1_3:
+            st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
+            st.caption('Dados:')
+            st.dataframe(tab3_1_df, width=800, height=600) 
+            
+        with tab3_1_4:
+            st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
+            st.caption('Estatísticas:')
+            st.dataframe(tab3_1_df.describe(), width=800, height=320)    
+        
+    with tab3_2:
     
-    with tab2_1:
-        st.caption('Mapa de hidrômetros, redes e subsetores de Água da UFSC: Os subsetores correspondem a área estimada que cada hidrômetro abastece. ' 
-                   'O mapa apresenta os subsetores com o consumo do mês selecionado ao lado. '
-                   'Também pode ser visualizado as redes da UFSC e da concessionária e os reservatórios. '
-                   'Clique nas camadas do mapa, como hidrômetros, redes e área de subsetores para visualizar maiores informações. '
-                   'Clique nos pontos de localização dos hidrômetros para visualizar imagem do local.')
+        tab3_2_1, tab3_2_2, tab3_2_3 , tab3_2_4 = st.tabs(['Volume',
+                              'Custo', 'Dados selecionados', 'Estatísticas']) 
+                      
+        funcao_graf_uc_mes = funcao_graf_uc_mes_func(df_i, uc_selecionada, check_tab3)
+        tab3_2_graf_vol = funcao_graf_uc_mes[0]
+        tab3_2_graf_cus = funcao_graf_uc_mes[1]
+        tab3_2_df = funcao_graf_uc_mes[2]
         
-        check_tab2 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab2')
+        with tab3_2_1:
+            if selecao_uc_tab3 == lista_uc_local[index_visao_geral]:
+                st.caption('Dados totais! Para filtrar por UC, selecione um campus, e a respectiva unidade consumidora.')  
+                st.write(tab3_2_graf_vol)
+            else:
+                st.caption(f'Volume da UC {selecao_uc_tab3} distribuído por mês.')   
+                st.write(tab3_2_graf_vol)
+                                        
+        with tab3_2_2:
+            if selecao_uc_tab3 == lista_uc_local[index_visao_geral]:
+                st.caption('Dados totais! Para filtrar por UC, selecione um campus, e a respectiva unidade consumidora.')  
+                st.write(tab3_2_graf_cus)
+            else:        
+                st.caption(f'Custo da UC {selecao_uc_tab3} distribuído por mês.')   
+                st.write(tab3_2_graf_cus)
+   
+        with tab3_2_3:
+            
+            st.caption("\n Volume e custo por mês para o agrupamento selecionado:")
+            st.caption('Dados:')
+            st.dataframe(tab3_2_df, width=800, height=600) # Or any other way you want to display the data
 
-        if check_tab2:
-            df_i = dados_agua_df
-        else:
-            df_i = dados_agua_df_sHU
-        
+        with tab3_2_4:
+            st.caption("\n Volume e custo por mês para o agrupamento selecionado:")
+            st.caption('Estatísticas:')
+            st.dataframe(tab3_2_df.describe(), width=800, height=320)
+    
+       
+    
+    with tab3_3:
         
         try:
-            df = df_i[(df_i['ANO'] == ano_selecionado_mapa) & (df_i['MES_N'] == mes_selecionado_mapa)]
-            df = df.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
-            df.index = np.arange(1, len(df) + 1)
-                     
-            chropleth_subsetores_agua_func(df, subsetores_agua_shp)
-            #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
-                   
-            camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
-                            
-            adicionar_camadas_de_fundo_func(map)
-                
-            folium_static(map, width=1000, height=800)
-            verificador_dados = True
+            df = df_i
+            df = df[df['Hidrometro'] == uc_selecionada]
+            df = df.sort_index(ascending = False)
+            st.caption('Dados da UC no ano e mês selecionados:')
+            st.dataframe(df, width=1100, height=200)
         except:
-            verificador_dados = False
-            st.caption('UC sem dados georreferenciados')
-            
-    
-    
+            st.caption('UC sem dados disponíveis no mês e ano selecionados.')
         
+                
+        pdf = abrir_fatura_pdf(uc_selecionada, ano_selecionado_tab3, mes_selecionado_tab3)
+        if selecao_uc_tab3 == lista_uc_local[index_visao_geral]:
+            st.caption('Selecione uma unidade consumidora para mostrar fatura.')
+        elif pdf == 0:
+            st.caption('Fatura não disponível para o ano e mês da unidade selecionada.')
+            
+            st.caption('As faturas CASAN podem também ser acessadas diretamente em https:ecasan.com.br.')
         
-    with tab2_2:
-        tab2_2_1, tab2_2_2 = st.tabs(['Volume',
-                              'Custo'
-                              ])  
-        funcao_graf_uc_ano = funcao_graf_uc_ano_func(dados_agua_df, uc_selecionada)
-        
-        with tab2_2_1:
-            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
-                st.caption('Selecione uma unidade consumidora para mostrar gráfico.')   
-            else:
-                st.caption(f'Volume da UC {selecao_uc_mapa} agrupado por ano.')   
-                st.write(funcao_graf_uc_ano[0])
-                                        
-        with tab2_2_2:
-            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
-                st.caption('Selecione uma unidade consumidora para mostrar gráfico.')
-            else:        
-                st.caption(f'Custo da UC {selecao_uc_mapa} agrupado por ano.')   
-                st.write(funcao_graf_uc_ano[1])
-                
-    if verificador_dados == False:
-        st.caption('UC sem dados disponíveis no mês e ano')
-        pass
-    else:
-        
-        with tab2_3:
-            tab2_3_1, tab2_3_2 = st.tabs(['Volume',
-                                  'Custo'
-                                  ])  
+        else:
+            st.caption(f'Fatura da UC {selecao_uc_tab3} no mês e ano selecionado.')  
             
-                   
-            with tab2_3_1:
-                if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
-                    st.caption('Selecione uma unidade consumidora para mostrar gráfico.')   
-                else:
-                    st.caption(f'Volume da UC {selecao_uc_mapa} distribuído por mês.')   
-                    funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df, uc_selecionada)
-                    st.write(funcao_graf_uc_mes[0])
-                                            
-            with tab2_3_2:
-                if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
-                    st.caption('Selecione uma unidade consumidora para mostrar gráfico.')
-                else:        
-                    st.caption(f'Custo da UC {selecao_uc_mapa} distribuído por mês.')   
-                    funcao_graf_uc_mes = funcao_graf_uc_mes_func(dados_agua_df, uc_selecionada)
-                    st.write(funcao_graf_uc_mes[1])
-    
-        with tab2_4:
-            
-            
-            pdf = abrir_fatura_pdf(uc_selecionada, ano_selecionado_mapa, mes_selecionado_mapa)
-            if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
-                st.caption('Selecione uma unidade consumidora para mostrar fatura.')
-            elif pdf == 0:
-                st.caption('Fatura não disponível para o ano e mês da unidade selecionada.')
-                
-                st.caption('As faturas CASAN podem também ser acessadas diretamente em https:ecasan.com.br.')
-            
-            else:
-                st.caption(f'Fatura da UC {selecao_uc_mapa} no mês e ano selecionado.')  
-                
-                st.download_button(
-                    label="Download PDF",
-                    data=pdf,
-                    file_name= f'{ano_selecionado_mapa}_{mes_selecionado_mapa}_{selecao_uc_mapa}.pdf',
-                    mime="text/pdf",
-                    icon=":material/download:",
-                                    )
-                pdf_viewer(pdf, width=1200, height=2400)   
-                
-               
+            st.download_button(
+                label="Download PDF",
+                data=pdf,
+                file_name= f'{ano_selecionado_tab3}_{mes_selecionado_tab3}_{selecao_uc_tab3}.pdf',
+                mime="text/pdf",
+                icon=":material/download:",
+                                )
+            pdf_viewer(pdf, width=1200, height=2400)   
+                          
                 
                 
             
-with tab3:
+with tab4:
     
     st.caption("Escolha o mês e ano para visualizar distribuição do consumo mensal. Por padrão o último mês com dados disponíveis está filtrado.")
     
-    t3col1, t3col2, t3col3, t3col4 = st.columns(4)
-    with t3col1:     
+    tab4_col1, tab4_col2, tab4_col3, tab4_col4 = st.columns(4)
+    with tab4_col1:     
         ano_selecionado_dados_mensais = st.selectbox('Selecione o ano', anos , index = index_ano, key='selectbox_dados_mensais_ano')
-    with t3col2:
+    with tab4_col2:
         mes_selecionado_dados_mensais = st.selectbox('Selecione o mês', meses, index = index_mes, key='selectbox_dados_mensais_mes')         
     
-    check_tab3 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab3')
+    with tab4_col3:
+        check_tab4 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab4')
 
-    if check_tab3:
+    with tab4_col4:
+        st.caption('Incluir dados do HU altera apenas agrupamento UFSC - Total.')
+    
+    if check_tab4:
         df_i = dados_agua_df
     else:
         df_i = dados_agua_df_sHU
@@ -1383,19 +1541,19 @@ with tab3:
     df_cus.index = np.arange(1, len(df_vol) + 1)
        
     
-    tab3_1, tab3_2, tab3_3, tab3_4 = st.tabs(['Volume',
+    tab4_1, tab4_2, tab4_3, tab4_4 = st.tabs(['Volume',
                           'Custo', 'Dados selecionados', 'Estatísticas'
                           ])    
     
-    with tab3_1:
+    with tab4_1:
         st.caption("\n Volume faturado (m³) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
         fig1 = barplot_para_mes_ano_selecionado_func(df_vol)[0]
         st.write(fig1)
-    with tab3_2:
+    with tab4_2:
         st.caption("\n Custo faturado (R$) por unidade consumidora em ordem descrescente no mês e ano selecionados:")
         fig2 = barplot_para_mes_ano_selecionado_func(df_cus)[1]
         st.write(fig2)
-    with tab3_3:
+    with tab4_3:
         
  
         dataframe = df_vol
@@ -1427,153 +1585,117 @@ with tab3:
         st.caption("Dados:")
         st.dataframe(dataframe, width=1200, height=500) # Or any other way you want to display the data
     
-    with tab3_4:
+    with tab4_4:
         st.caption("\n Relação de unidades consumidoras em ordem descrescente de volume faturado (m³) no mês e ano selecionados:")
         st.caption('Estatísticas:')
         st.dataframe(dataframe.describe(), width=1200, height=400)
  
-with tab4:
-
-    st.caption('Acumulados anuais: Volume e Custo')
-    
-    
-       
-    agrupamento_selecionado = st.selectbox('Selecione o  agrupamento dos dados:', 
-                                           lista_agrupamento, 
-                                           index = 0, 
-                                           key='selectbox_agrupamento1'
-                                           )
-    check_tab4 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab4')
-
-    if check_tab4:
-        check_tab4 = True
-    else:
-        check_tab4 = False
-    
-    trat_acum_func = trat_acumulado_por_ano_func (dict_dataframes, agrupamento_selecionado, check_tab4)
-        
-    volume_faturado_por_ano = trat_acum_func[0]
-    custo_faturado_por_ano = trat_acum_func[1]
-    df_selecionado_dataframe = trat_acum_func[2]
-        
-        
-    tab4_1, tab4_2, tab4_3 , tab4_4 = st.tabs(['Volume',
-                          'Custo', 'Dados selecionados', 'Estatísticas'                          ])    
-    with tab4_1:
-    #Volume Faturado acumulado por ano
-        st.caption('Volume acumulado por ano')
-        
-        fig3 = agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano)[0]
-        st.write(fig3)
-    
-    
-    with tab4_2:
-        
-        st.caption('Custo acumulado por ano')
-        fig4 = agrupado_por_ano_func(volume_faturado_por_ano, custo_faturado_por_ano)[1]
-        st.write(fig4)
-    
-    
-    with tab4_3:
-        
-        st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
-        st.caption('Dados:')
-        st.dataframe(df_selecionado_dataframe, width=800, height=600) # Or any other way you want to display the data
-
-    with tab4_4:
-        st.caption("\n Volume e custo acumulado por ano para o agrupamento selecionado:")
-        st.caption('Estatísticas:')
-        st.dataframe(df_selecionado_dataframe.describe(), width=800, height=320)
 
 with tab5:
 
     st.caption('Gráficos de volumes acumulados por ano para o agrupamento selecionado:')
     
-    agrupamento_selecionado2 = st.selectbox('Selecione o  agrupamento dos dados:', 
-                                           lista_agrupamento, 
-                                           index = 0, 
-                                           key='selectbox_agrupamento2'
-                                           )
     
-    check_tab5 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab5')
+    tab5_col1, tab5_col2, tab5_col3, tab5_col4 = st.columns(4)
+    
+    with tab5_col1:
+        agrupamento_selecionado_tab5 = st.selectbox('Selecione o  agrupamento dos dados:', 
+                                               lista_agrupamento, 
+                                               index = 0, 
+                                               key='selectbox_agrupamento_tab5'
+                                               )
+    
+    with tab5_col2:
+    
+        check_tab5 = st.checkbox("Incluir Hospital Universitário (HU)?", key = 'check_tab5')
+
+    with tab5_col3:
+        st.caption('Incluir dados do HU altera apenas agrupamento UFSC - Total.')
 
     if check_tab5:
         check_tab5 = True
     else:
         check_tab5 = False
     
+    
+    if agrupamento_selecionado_tab5 == 'UFSC - Total':
+        if check_tab5 == True:
+            df_tab5 = dict_dataframes[agrupamento_selecionado_tab5]
+        else:
+            df_tab5 = dict_dataframes[agrupamento_selecionado_tab5]
+            df_tab5 = df_tab5[df_tab5['Cidade'] != 'Florianópolis  HU']  
+    else:
+        df_tab5 = dict_dataframes[agrupamento_selecionado_tab5] 
+        
+    
+    df_tab5 = df_tab5.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
+    
+    ##############
+    
     tab5_1, tab5_2, tab5_3 = st.tabs(['ScatterPlot','BoxPlot','LinePlot'])
                            
     with tab5_1:
         
-       
-        if agrupamento_selecionado_ind == 'UFSC - Total':
-            if check_tab5 == True:
-                df_selecionado2 = dict_dataframes[agrupamento_selecionado2]
-            else:
-                df_selecionado2 = dict_dataframes[agrupamento_selecionado2]
-                df_selecionado2 = df_selecionado2[df_selecionado2['Cidade'] != 'Florianópolis  HU']  
-        else:
-            df_selecionado2 = dict_dataframes[agrupamento_selecionado_ind] 
-       
-           
         
-        
-        df_selecionado2 = df_selecionado2.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
-        #volume_faturado_pivot = volume_faturado_por_mes_ano.pivot(index='ANO', columns='MES_N', values='VOLUME_FATURADO')
-    
-        anos_selecionados_fig2 = st.multiselect(    "Selecione os anos desejados no gráfico:",
-            options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
-            default=df_selecionado2['ANO'].unique(),  # Valores padrão selecionados
-            key='multiselect_anos_fig2'
+        anos_selecionados_tab5_1 = st.multiselect(    "Selecione os anos desejados no gráfico:",
+            options = df_tab5['ANO'].unique(),  # Opções do multi-check
+            default = df_tab5['ANO'].unique(),  # Valores padrão selecionados
+            key='multiselect_anos_tab5_1'
             )
         
-            # Filtrar o DataFrame com base nos anos selecionados
-        filtered_df_fig2 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig2)]
+        df_tab5_1 = df_tab5[df_tab5['ANO'].isin(anos_selecionados_tab5_1)]
+        
+        
+        ##############
         
         tab5_1_1, tab5_1_2, tab5_1_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
         
         with tab5_1_1:
         
-            fig2 = scatter_func_px_vol(filtered_df_fig2)
+            scatter_tab5 = scatter_func_px_vol(df_tab5_1)
             
-            st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
+            st.write(scatter_tab5, theme="streamlit", use_container_width=True)
         
-            filtered_df_fig2 = filtered_df_fig2.rename(columns=
-                                                       {'ANO':'Ano',
-                                                       'VALOR_TOTAL': 'Custo Total (R$)',
-                                                       'VOLUME_FATURADO': 'Volume Faturado (m³)'
-                                                       }                                              )
+            
         
         
         with tab5_1_2:
             
             st.caption('Dados selecionados:')
-            st.dataframe(filtered_df_fig2.sort_values(by='Ano',ascending=False), width=600, height=400)  
-     
+            
+            df_tab5_1 = df_tab5_1.rename(columns=      {'ANO':'Ano',
+                                                       'VALOR_TOTAL': 'Custo Total (R$)',
+                                                       'VOLUME_FATURADO': 'Volume Faturado (m³)'
+                                                       })
+            
+            st.dataframe(df_tab5_1.sort_index(ascending=False), width=600, height=400)  
+            
         with tab5_1_3:  
+            
             st.caption('Estatísticas:')
-            st.dataframe(filtered_df_fig2.describe(), width=600, height=320)
+             
+            st.dataframe(df_tab5_1.describe(), width=600, height=320)
     
     with tab5_2:
-    
-        anos_selecionados_fig1 = st.multiselect("Selecione os anos desejados no gráfico:",
-            options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
-            default=df_selecionado2['ANO'].unique(),
-            key='multiselect_anos_fig1'
+        
+        anos_selecionados_tab5_2 = st.multiselect("Selecione os anos desejados no gráfico:",
+            options = df_tab5['ANO'].unique(),  # Opções do multi-check
+            default = df_tab5['ANO'].unique(),
+            key='multiselect_anos_tab5_2'
             )
     
-        # Filtrar o DataFrame com base nos anos selecionados
-        filtered_df_fig1 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig1)]
-        fig1 = boxplot_func_px(filtered_df_fig1)
+        df_tab5_2 = df_tab5[df_tab5['ANO'].isin(anos_selecionados_tab5_2)]
+        boxplot_tab5 = boxplot_func_px(df_tab5_2)
+        
+        ##############
         
         tab5_2_1, tab5_2_2, tab5_2_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
         
         with tab5_2_1:
         
-            st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
+            st.write(boxplot_tab5, theme="streamlit", use_container_width=True)
             
-            filtered_df_fig1 = filtered_df_fig1.rename(columns=
+            df_tab5_2 = df_tab5_2.rename(columns=
                                                       {'ANO':'Ano',
                                                       'VALOR_TOTAL': 'Custo Total (R$)',
                                                       'VOLUME_FATURADO': 'Volume Faturado (m³)'
@@ -1581,11 +1703,11 @@ with tab5:
         
         with tab5_2_2:
             st.caption('Dados:')
-            st.dataframe(filtered_df_fig1.sort_values(by='Ano',ascending=False), width=600, height=400)
+            st.dataframe(df_tab5_2.sort_index(ascending=False), width=600, height=400) 
         
         with tab5_2_3:
             st.caption('Estatísticas:')
-            st.dataframe(filtered_df_fig1.describe(), width=600, height=320)
+            st.dataframe(df_tab5_2.describe(), width=600, height=320)
         
         
         
@@ -1593,24 +1715,22 @@ with tab5:
 
     with tab5_3:
         
-        anos_selecionados_fig3 = st.multiselect(    "Selecione os anos desejados no gráfico:",
-            options=df_selecionado2['ANO'].unique(),  # Opções do multi-check
-            default=df_selecionado2['ANO'].unique(),   # Valores padrão selecionados
-            key='multiselect_anos_fig3'
+        anos_selecionados_tab5_3 = st.multiselect("Selecione os anos desejados no gráfico:",
+            options = df_tab5['ANO'].unique(),  # Opções do multi-check
+            default = df_tab5['ANO'].unique(),
+            key='multiselect_anos_tab5_3'
             )
     
-        # Filtrar o DataFrame com base nos anos selecionados
-        filtered_df_fig3 = df_selecionado2[df_selecionado2['ANO'].isin(anos_selecionados_fig3)]
-    
-        fig3 = line_func_px(filtered_df_fig3)
+        df_tab5_3 = df_tab5[df_tab5['ANO'].isin(anos_selecionados_tab5_3)]
+        lineplot_tab5 = line_func_px(df_tab5_3)
         
         tab5_3_1, tab5_3_2, tab5_3_3 = st.tabs(['Gráfico','Dados selecionados','Estatísticas'])
         
         with tab5_3_1:
         
-            st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
+            st.write(lineplot_tab5, theme="streamlit", use_container_width=True)
             
-            filtered_df_fig3 = filtered_df_fig3.rename(columns=
+            df_tab5_3 = df_tab5_3.rename(columns=
                                                        {'ANO':'Ano',
                                                        'VALOR_TOTAL': 'Custo Total (R$)',
                                                        'VOLUME_FATURADO': 'Volume Faturado (m³)'
@@ -1619,12 +1739,12 @@ with tab5:
         with tab5_3_2:
         
             st.caption('Dados:')
-            st.dataframe(filtered_df_fig3.sort_values(by='Ano',ascending=False), width=600, height=400)           
+            st.dataframe(df_tab5_3.sort_index(ascending=False), width=600, height=400)          
 
         with tab5_3_3:
             
             st.caption('Estatísticas:')
-            st.dataframe(filtered_df_fig3.describe(), width=600, height=325)
+            st.dataframe(df_tab5_3.describe(), width=600, height=325)
    
        
 

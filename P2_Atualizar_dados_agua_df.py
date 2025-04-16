@@ -27,7 +27,7 @@ dados_agua_df_vazio = pd.read_csv(caminho_colunas_df_csv)
 #passo1 = converter excel em df (para novos dados até código definitivo ficar pronto)
     
     
-nome_arquivo_xls= 'M00 - Dados mensais_2025_03.xlsx'
+nome_arquivo_xls= 'M00 - Dados Mensais 202210 a 202303.xlsx'
 
 xls_file = pd.ExcelFile(os.path.join(pasta_projeto, 'Dados', 'Origem', 'xls_origem', nome_arquivo_xls))
      
@@ -38,23 +38,29 @@ except:
     pass
 
 
-lista_ano_mes = [
-        '2025_03'
-                 ]
+##Rotina caso queira escolher as planilhas
+#lista_ano_mes = ['2025_03']
      
-for item in lista_ano_mes:
-    for sheet_name in xls_file.sheet_names:   
-        if item == sheet_name:
-            df = pd.read_excel(xls_file, sheet_name)
-            df = df.dropna()
-            df.columns = dados_agua_df_vazio.columns
-            df.to_csv(os.path.join(pasta_atualizacao_df,f'{sheet_name}.csv'), index=False)
-    else:
-        pass
-else:
-    pass
+#for item in lista_ano_mes:
+ #   for sheet_name in xls_file.sheet_names:   
+  #      if item == sheet_name:
+   #         df = pd.read_excel(xls_file, sheet_name)
+    #        df = df.dropna()
+     #       df.columns = dados_agua_df_vazio.columns
+      #      df.to_csv(os.path.join(pasta_atualizacao_df,f'{sheet_name}.csv'), index=False)
+        #else:
+         #   pass
+     
+        
+##Rotina caso queira incluir todas as planilhas do arquivo xls:
 
-
+     
+for sheet_name in xls_file.sheet_names:   
+      
+    df = pd.read_excel(xls_file, sheet_name)    
+    df.columns = dados_agua_df_vazio.columns
+    df.to_csv(os.path.join(pasta_atualizacao_df,f'{sheet_name}.csv'), index=False)
+    
 
 dict_dfs = {}
 
@@ -66,7 +72,7 @@ for csv in os.listdir(pasta_atualizacao_df):
         print(csv)
         nome = (f'{csv[:-4]}_df')
         df_csv = pd.read_csv(os.path.join(pasta_atualizacao_df, csv),encoding='utf-8')
-        df_csv = df_csv.dropna() 
+        #df_csv = df_csv.dropna() 
         dict_dfs[nome] = df_csv
     
 

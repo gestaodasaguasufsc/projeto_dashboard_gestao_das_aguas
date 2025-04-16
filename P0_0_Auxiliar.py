@@ -892,7 +892,11 @@ chart = px.line(df,
 
 #plot(chart)
 
-csv122024 = pd.read_csv(os.path.join(pasta_projeto,'Dados','Produtos','atualizacao_dfs','2024_12.csv' ))
-
-soma = csv122024['VOLUME_FATURADO'].sum()
+#csv = '122024'
+csv = '2025_03'
+csv = pd.read_csv(os.path.join(pasta_projeto,'Dados','Produtos','atualizacao_dfs',f'{csv}.csv' ))
+soma = (csv['VOLUME_FATURADO'].sum() - csv[csv['CIDADE']=='Florianópolis  HU']['VOLUME_FATURADO'])
+#print(csv[csv['CIDADE']=='Florianópolis  HU']['VOLUME_FATURADO'])
 print(soma)
+print(csv['VOLUME_FATURADO'])
+
