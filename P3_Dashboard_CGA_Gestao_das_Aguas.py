@@ -1105,174 +1105,181 @@ with tab1:
         else:
             check_tab1 = False
             
-    tab1_col1, tab1_col2 = st.columns(2)
+    tab1_painel, tab1_dados = st.tabs(['Painel indicadores', 'Dados selecionados'])
     
-    with tab1_col1:
-               
-        tab1_col1_11, tab1_col1_12  = st.columns(2)
+    with tab1_painel:
+        
     
+        tab1_col1, tab1_col2 = st.columns(2)
         
-        sem_dados = False
+        with tab1_col1:
+                   
+            tab1_col1_11, tab1_col1_12  = st.columns(2)
         
-        try:
-            funcao_indicadores = indicadores_vol_cus_func(
-                    agrupamento_selecionado_ind,
-                    ano_selecionado_ind,
-                    mes_selecionado_ind,
-                    dict_dataframes, check_tab1)
-          
-            df_selecionado_ind = funcao_indicadores[0]
-            linha_mes_ano = df_selecionado_ind[(df_selecionado_ind['ANO']== ano_selecionado_ind) & (df_selecionado_ind['MES_N'] == mes_selecionado_ind)]
-            index_ind = linha_mes_ano.index[0]
-            volume_mes = linha_mes_ano['VOLUME_FATURADO'].iloc[0]
-            volume_media = linha_mes_ano['VOL_MED_U6M'].iloc[0]
-            volume_variacao_abs = linha_mes_ano['VOL_VAR_ABS'].iloc[0]
-            volume_variacao_per = linha_mes_ano['VOL_VAR_PER'].iloc[0]
-            custo_mes = linha_mes_ano['VALOR_TOTAL'].iloc[0]
-            custo_media = linha_mes_ano['CUS_MED_U6M'].iloc[0]
-            custo_variacao_abs = linha_mes_ano['CUS_VAR_ABS'].iloc[0]
-            custo_variacao_per = linha_mes_ano['CUS_VAR_PER'].iloc[0]
             
+            sem_dados = False
             
+            try:
+                funcao_indicadores = indicadores_vol_cus_func(
+                        agrupamento_selecionado_ind,
+                        ano_selecionado_ind,
+                        mes_selecionado_ind,
+                        dict_dataframes, check_tab1)
+              
+                df_selecionado_ind = funcao_indicadores[0]
+                linha_mes_ano = df_selecionado_ind[(df_selecionado_ind['ANO']== ano_selecionado_ind) & (df_selecionado_ind['MES_N'] == mes_selecionado_ind)]
+                index_ind = linha_mes_ano.index[0]
+                volume_mes = linha_mes_ano['VOLUME_FATURADO'].iloc[0]
+                volume_media = linha_mes_ano['VOL_MED_U6M'].iloc[0]
+                volume_variacao_abs = linha_mes_ano['VOL_VAR_ABS'].iloc[0]
+                volume_variacao_per = linha_mes_ano['VOL_VAR_PER'].iloc[0]
+                custo_mes = linha_mes_ano['VALOR_TOTAL'].iloc[0]
+                custo_media = linha_mes_ano['CUS_MED_U6M'].iloc[0]
+                custo_variacao_abs = linha_mes_ano['CUS_VAR_ABS'].iloc[0]
+                custo_variacao_per = linha_mes_ano['CUS_VAR_PER'].iloc[0]
+                
+                
+                
+            except:
+                st.caption('Dados inexistentes para o local/ano/mês selecionado')
+                sem_dados = True
             
-        except:
-            st.caption('Dados inexistentes para o local/ano/mês selecionado')
-            sem_dados = True
-        
-         
+             
+                
             
-        
-        if sem_dados == True:
-            pass
-        else:
-            tab1_col1_15, tab1_col1_16 = st.columns(2)
+            if sem_dados == True:
+                pass
+            else:
+                tab1_col1_15, tab1_col1_16 = st.columns(2)
+                
+                st.markdown(
+                            """
+                        <style>
+                        [data-testid="stMetricValue"] {
+                            font-size: 20px;
+                        }
+                        </style>
+                        """,
+                            unsafe_allow_html=True,
+                        )
+                
+                with tab1_col1_15:      
+                        textov0 = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                        try:
+                            textov1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                            textov2 = (f'{volume_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
+                        except:
+                            textov1 = ""
+                            textov2 = ""
+                            st.caption('Período de dados não permite cálculo de variação de volume')
+                        #if volume_variacao_abs>0: 
+                          #  delta_color_t1 = 'inverse'
+                        #else:
+                         #   delta_color_t1 = 'normal'
+                        
+                        
+                        st.metric("Volume no mês/ano selecionados", 
+                                  textov0, 
+                                  border=True)
+                
+                with tab1_col1_16:
+                        textoc0 = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                        try:
+                            textoc1 = (f'{custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                            textoc2 = (f'{custo_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
+                        except:
+                            st.caption('Período de dados não permite cálculo de variação de custo')
+                            textoc1 = ""
+                            textoc2 = ""
+                        st.metric("Custo no mês/ano selecionados",
+                                  textoc0,  
+                                  border=True, delta_color="inverse")
+                
+                tab1_col1_17, tab1_col1_18 = st.columns(2)
+                
+                with tab1_col1_17:      
+                        texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
+                        st.metric("Volume médio dos últimos 6 meses", texto , border=True)
+                
+                with tab1_col1_18:
+                        texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
+                        st.metric("Custo médio dos últimos 6 meses", texto, border=True)
             
-            st.markdown(
-                        """
-                    <style>
-                    [data-testid="stMetricValue"] {
-                        font-size: 20px;
-                    }
-                    </style>
-                    """,
-                        unsafe_allow_html=True,
-                    )
-            
-            with tab1_col1_15:      
-                    textov0 = (f'{volume_mes:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-                    try:
-                        textov1 = (f'{volume_variacao_abs:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-                        textov2 = (f'{volume_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
-                    except:
-                        textov1 = ""
-                        textov2 = ""
-                        st.caption('Período de dados não permite cálculo de variação de volume')
-                    #if volume_variacao_abs>0: 
-                      #  delta_color_t1 = 'inverse'
-                    #else:
-                     #   delta_color_t1 = 'normal'
+                st.caption('Variações de volume e custo em relação à média dos últimos 6 meses')
+                
+                tab1_col1_19, tab1_col1_20 = st.columns(2)
+                
+                with tab1_col1_19:
+                    st.metric("Volume variação absoluta", 
+                                  "", textov1, 
+                                  border=True, delta_color="inverse")
+                    st.metric("Volume variação percentual", 
+                                  "", textov2, 
+                                  border=True, delta_color="inverse")
                     
+                with tab1_col1_20:
+                    st.metric("Custo variação absoluta", 
+                                  "", textoc1, 
+                                  border=True, delta_color="inverse")
+                    st.metric("Custo variação percentual", 
+                                  "", textoc2, 
+                                  border=True, delta_color="inverse")
                     
-                    st.metric("Volume no mês/ano selecionados", 
-                              textov0, 
-                              border=True)
-            
-            with tab1_col1_16:
-                    textoc0 = (f'R$ {custo_mes:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-                    try:
-                        textoc1 = (f'{custo_variacao_abs:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-                        textoc2 = (f'{custo_variacao_per*100:,.0f} %').replace(",", "_").replace(".", ",").replace("_", ".")
-                    except:
-                        st.caption('Período de dados não permite cálculo de variação de custo')
-                        textoc1 = ""
-                        textoc2 = ""
-                    st.metric("Custo no mês/ano selecionados",
-                              textoc0,  
-                              border=True, delta_color="inverse")
-            
-            tab1_col1_17, tab1_col1_18 = st.columns(2)
-            
-            with tab1_col1_17:      
-                    texto = (f'{volume_media:,.0f} m³').replace(",", "_").replace(".", ",").replace("_", ".")
-                    st.metric("Volume médio dos últimos 6 meses", texto , border=True)
-            
-            with tab1_col1_18:
-                    texto = (f'R$ {custo_media:,.2f}').replace(",", "_").replace(".", ",").replace("_", ".")
-                    st.metric("Custo médio dos últimos 6 meses", texto, border=True)
-        
-            st.caption('Variações de volume e custo em relação à média dos últimos 6 meses')
-            
-            tab1_col1_19, tab1_col1_20 = st.columns(2)
-            
-            with tab1_col1_19:
-                st.metric("Volume variação absoluta", 
-                              "", textov1, 
-                              border=True, delta_color="inverse")
-                st.metric("Volume variação percentual", 
-                              "", textov2, 
-                              border=True, delta_color="inverse")
+        with tab1_col2:
+            tab2_col2_1, tab2_col2_2, tab2_col2_3, tab2_col2_4, tab2_col2_5 = st.tabs(['Volume','Custo','Custo por Volume','Dados', 'Estatísticas'])
+            if sem_dados == True:
+                pass
+            else:
+                fun_graf_lin_ind = grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, mes_selecionado_ind, dict_dataframes, check_tab1)
                 
-            with tab1_col1_20:
-                st.metric("Custo variação absoluta", 
-                              "", textoc1, 
-                              border=True, delta_color="inverse")
-                st.metric("Custo variação percentual", 
-                              "", textoc2, 
-                              border=True, delta_color="inverse")
+                graf_vol = fun_graf_lin_ind[0]
+                df_jm = fun_graf_lin_ind[1]
+                numero_meses = fun_graf_lin_ind[2]
+                graf_cus = fun_graf_lin_ind[3]
+                graf_cus_por_vol = fun_graf_lin_ind[4]
                 
-    with tab1_col2:
-        tab2_col2_1, tab2_col2_2, tab2_col2_3, tab2_col2_4, tab2_col2_5 = st.tabs(['Volume','Custo','Custo por Volume','Dados', 'Estatísticas'])
-        if sem_dados == True:
-            pass
-        else:
-            fun_graf_lin_ind = grafico_linha_indicadores(agrupamento_selecionado_ind, ano_selecionado_ind, mes_selecionado_ind, dict_dataframes, check_tab1)
-            
-            graf_vol = fun_graf_lin_ind[0]
-            df_jm = fun_graf_lin_ind[1]
-            numero_meses = fun_graf_lin_ind[2]
-            graf_cus = fun_graf_lin_ind[3]
-            graf_cus_por_vol = fun_graf_lin_ind[4]
-            
-            with tab2_col2_1:
-                st.caption(f'Volume faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
-                st.write(graf_vol)
-            
-            with tab2_col2_2:
-                st.caption(f'Custo faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
-                st.write(graf_cus)
+                with tab2_col2_1:
+                    st.caption(f'Volume faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
+                    st.write(graf_vol)
                 
-            with tab2_col2_3:
-                st.caption(f'Custo por volume médio faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
-                st.write(graf_cus_por_vol)
-            
-            with tab2_col2_4:
-                st.caption(f'Dados mensais dos últimos {numero_meses} meses para o agrupamento selecionado.')
-                #df_jm.style.format({'Valor_por_Volume':'{:.2f}'},
-                                    #{'VALOR_TOTAL':'{:.2f}'}
-                                    #)
+                with tab2_col2_2:
+                    st.caption(f'Custo faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
+                    st.write(graf_cus)
+                    
+                with tab2_col2_3:
+                    st.caption(f'Custo por volume médio faturado mensal nos últimos {numero_meses} meses para o agrupamento selecionado.')
+                    st.write(graf_cus_por_vol)
                 
-                df_jm = df_jm.rename(
-                    columns={
-                    'MES_ANO':'Mês-Ano',
-                    'VOLUME_FATURADO': 'Volume Faturado m³',
-                    'VALOR_TOTAL': 'Custo R$',
-                    'Valor_por_Volume': 'Custo/Volume (R$/m³)'
-                            })
-                st.dataframe(df_jm.reset_index(drop=True), height = 400 )
-            
-            with tab2_col2_5:
-                st.caption(f'Estatísticas de dados mensais ddos últimos {numero_meses} meses para o agrupamento selecionado.')
-                st.dataframe(df_jm.describe())
+                with tab2_col2_4:
+                    st.caption(f'Dados mensais dos últimos {numero_meses} meses para o agrupamento selecionado.')
+                    #df_jm.style.format({'Valor_por_Volume':'{:.2f}'},
+                                        #{'VALOR_TOTAL':'{:.2f}'}
+                                        #)
+                    
+                    df_jm = df_jm.rename(
+                        columns={
+                        'MES_ANO':'Mês-Ano',
+                        'VOLUME_FATURADO': 'Volume Faturado m³',
+                        'VALOR_TOTAL': 'Custo R$',
+                        'Valor_por_Volume': 'Custo/Volume (R$/m³)'
+                                })
+                    st.dataframe(df_jm.reset_index(drop=True), height = 400 )
+                
+                with tab2_col2_5:
+                    st.caption(f'Estatísticas de dados mensais ddos últimos {numero_meses} meses para o agrupamento selecionado.')
+                    st.dataframe(df_jm.describe())
       
-    if sem_dados == True:
-        pass
-    else:
-        df_m = funcao_indicadores[1]
-        df_m = df_m[(df_m['ANO']== ano_selecionado_ind) & (df_m['MES_N'] == mes_selecionado_ind)]
-        df_m = df_m.sort_values(by = 'VOLUME_FATURADO', ascending = False)
-        
-        st.caption(f'Dados em ordem descrescente de volume para o agrupamento = {agrupamento_selecionado_ind}, ano = {ano_selecionado_ind}, e mês = {mes_selecionado_ind} selecionados. Demais colunas podem ser ordenadas diretamente na tabela.')
-        st.dataframe(df_m, height = 250)
+    with tab1_dados:
+    
+        if sem_dados == True:
+            pass
+        else:
+            df_m = funcao_indicadores[1]
+            df_m = df_m[(df_m['ANO']== ano_selecionado_ind) & (df_m['MES_N'] == mes_selecionado_ind)]
+            df_m = df_m.sort_values(by = 'VOLUME_FATURADO', ascending = False)
+            
+            st.caption(f'Dados em ordem descrescente de volume para o agrupamento = {agrupamento_selecionado_ind}, ano = {ano_selecionado_ind}, e mês = {mes_selecionado_ind} selecionados. Demais colunas podem ser ordenadas diretamente na tabela.')
+            st.dataframe(df_m, height = 400)
     
     
 #MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
