@@ -853,15 +853,15 @@ def indicadores_vol_cus_func(
 
     if agrupamento_selecionado_ind == 'UFSC - Total':
         if check:
-            df_selecionado_ind = dict_dataframes[agrupamento_selecionado_ind]
+            df = dict_dataframes[agrupamento_selecionado_ind]
         else:
-            df_selecionado_ind = dict_dataframes[agrupamento_selecionado_ind]
-            df_selecionado_ind = df_selecionado_ind[df_selecionado_ind['Cidade'] != 'Florianópolis  HU']
+            df = dict_dataframes[agrupamento_selecionado_ind]
+            df = df[df['Cidade'] != 'Florianópolis  HU']
         
     else:
-        df_selecionado_ind = dict_dataframes[agrupamento_selecionado_ind]
+        df = dict_dataframes[agrupamento_selecionado_ind]
 
-    df_selecionado_ind = df_selecionado_ind.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
+    df_selecionado_ind = df.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
     
     df_selecionado_ind['VOLUME_FATURADO'] = df_selecionado_ind['VOLUME_FATURADO'].astype(int)
     #gerando a coluna de médias
@@ -918,7 +918,7 @@ def indicadores_vol_cus_func(
             df_selecionado_ind['CUS_VAR_PER'][i] = variacao_per
 
 
-    return df_selecionado_ind
+    return df_selecionado_ind, df
 
 
 def abrir_fatura_pdf(uc_selecionada, ano_fatura, mes_fatura):
@@ -1115,12 +1115,13 @@ with tab1:
         sem_dados = False
         
         try:
-            df_selecionado_ind = indicadores_vol_cus_func(
+            funcao_indicadores = indicadores_vol_cus_func(
                     agrupamento_selecionado_ind,
                     ano_selecionado_ind,
                     mes_selecionado_ind,
                     dict_dataframes, check_tab1)
           
+            df_selecionado_ind = funcao_indicadores[0]
             linha_mes_ano = df_selecionado_ind[(df_selecionado_ind['ANO']== ano_selecionado_ind) & (df_selecionado_ind['MES_N'] == mes_selecionado_ind)]
             index_ind = linha_mes_ano.index[0]
             volume_mes = linha_mes_ano['VOLUME_FATURADO'].iloc[0]
@@ -1131,6 +1132,8 @@ with tab1:
             custo_media = linha_mes_ano['CUS_MED_U6M'].iloc[0]
             custo_variacao_abs = linha_mes_ano['CUS_VAR_ABS'].iloc[0]
             custo_variacao_per = linha_mes_ano['CUS_VAR_PER'].iloc[0]
+            
+            
             
         except:
             st.caption('Dados inexistentes para o local/ano/mês selecionado')
@@ -1243,7 +1246,7 @@ with tab1:
                 st.write(graf_cus_por_vol)
             
             with tab2_col2_4:
-                st.caption(f'Dados mensais ddos últimos {numero_meses} meses para o agrupamento selecionado.')
+                st.caption(f'Dados mensais dos últimos {numero_meses} meses para o agrupamento selecionado.')
                 #df_jm.style.format({'Valor_por_Volume':'{:.2f}'},
                                     #{'VALOR_TOTAL':'{:.2f}'}
                                     #)
@@ -1260,6 +1263,17 @@ with tab1:
             with tab2_col2_5:
                 st.caption(f'Estatísticas de dados mensais ddos últimos {numero_meses} meses para o agrupamento selecionado.')
                 st.dataframe(df_jm.describe())
+      
+    if sem_dados == True:
+        pass
+    else:
+        df_m = funcao_indicadores[1]
+        df_m = df_m[(df_m['ANO']== ano_selecionado_ind) & (df_m['MES_N'] == mes_selecionado_ind)]
+        df_m = df_m.sort_values(by = 'VOLUME_FATURADO', ascending = False)
+        
+        st.caption(f'Dados em ordem descrescente de volume para o agrupamento = {agrupamento_selecionado_ind}, ano = {ano_selecionado_ind}, e mês = {mes_selecionado_ind} selecionados. Demais colunas podem ser ordenadas diretamente na tabela.')
+        st.dataframe(df_m, height = 250)
+    
     
 #MAPA CADASTRAL E INFORMAÇÕES   ----------------------------------
 

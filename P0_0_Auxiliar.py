@@ -607,12 +607,17 @@ lm = []
 df_selecionado_ind['VOL_MED_U6M'] = 0
 df_selecionado_ind['VOL_VAR_ABS'] = 0 #VOLUME NO MÊS - MEDIA
 df_selecionado_ind['VOL_VAR_PER'] = 0
+df_selecionado_ind['VOL_VAR_ABS_MES_ANT'] = 0
+df_selecionado_ind['VOL_VAR_PER_MES_ANT'] = 0
 df_selecionado_ind['CUS_MED_U6M'] = 0
 df_selecionado_ind['CUS_VAR_ABS'] = 0 #VOLUME NO MÊS - MEDIA
 df_selecionado_ind['CUS_VAR_PER'] = 0
+df_selecionado_ind['CUS_VAR_ABS_MES_ANT'] = 0
+df_selecionado_ind['CUS_VAR_PER_MES_ANT'] = 0
 
-
+item_ant = 0
 for i, item in enumerate(df_selecionado_ind['VOLUME_FATURADO']):
+    
     if i<=5:
         lm.append(item)
     
@@ -622,11 +627,24 @@ for i, item in enumerate(df_selecionado_ind['VOLUME_FATURADO']):
         media = int("{:.0f}".format(media))
         variacao_abs = item - media
         variacao_per = variacao_abs/item
+        
         df_selecionado_ind['VOL_MED_U6M'][i] = media
         df_selecionado_ind['VOL_VAR_ABS'][i] = variacao_abs
         df_selecionado_ind['VOL_VAR_PER'][i] = variacao_per
-
+        
+    if i==0:
+        variacao_abs_mes_ant = 0
+        variacao_per_mes_ant = 0
+    else:
+        variacao_abs_mes_ant = item - item_ant
+        variacao_per_mes_ant = variacao_abs_mes_ant/item
+    
+    df_selecionado_ind['VOL_VAR_ABS_MES_ANT'][i] = variacao_abs_mes_ant
+    df_selecionado_ind['VOL_VAR_PER_MES_ANT'][i] = variacao_per_mes_ant
+    item_ant = item
+    
 lm = []
+item_ant = 0
 for i, item in enumerate(df_selecionado_ind['VALOR_TOTAL']):
     if i<=5:
         lm.append(item)
@@ -637,12 +655,24 @@ for i, item in enumerate(df_selecionado_ind['VALOR_TOTAL']):
         media = int("{:.0f}".format(media))
         variacao_abs = item - media
         variacao_per = variacao_abs/item
+        
+        
         df_selecionado_ind['CUS_MED_U6M'][i] = media
         df_selecionado_ind['CUS_VAR_ABS'][i] = variacao_abs
         df_selecionado_ind['CUS_VAR_PER'][i] = variacao_per
+    
+    if i==0:
+        variacao_abs_mes_ant = 0
+        variacao_per_mes_ant = 0
+    else:
+        variacao_abs_mes_ant = item - item_ant
+        variacao_per_mes_ant = variacao_abs_mes_ant/item  
+        
+    df_selecionado_ind['CUS_VAR_ABS_MES_ANT'][i] = variacao_abs_mes_ant
+    df_selecionado_ind['CUS_VAR_PER_MES_ANT'][i] = variacao_per_mes_ant
+    item_ant = item
+    
 
-
-  
     
 def indicadores_vol_cus_func(
         agrupamento_selecionado_ind,
@@ -651,7 +681,7 @@ def indicadores_vol_cus_func(
         dict_dataframes):
 
 
-    df_selecionado_ind = dict_dataframes[agrupamento_selecionado_ind] 
+    df_selecionado_agrupamento_ind = dict_dataframes[agrupamento_selecionado_ind] 
 
 
     df_selecionado_ind = df_selecionado_agrupamento_ind.groupby(['ANO', 'MES_N'])[['VOLUME_FATURADO','VALOR_TOTAL']].sum().reset_index()
@@ -660,7 +690,7 @@ def indicadores_vol_cus_func(
     #gerando a coluna de médias
 
     lm = []
-
+    item_ant = 0
 
     df_selecionado_ind['VOL_MED_U6M'] = 0
     df_selecionado_ind['VOL_VAR_ABS'] = 0 #VOLUME NO MÊS - MEDIA
@@ -668,6 +698,10 @@ def indicadores_vol_cus_func(
     df_selecionado_ind['CUS_MED_U6M'] = 0
     df_selecionado_ind['CUS_VAR_ABS'] = 0 #VOLUME NO MÊS - MEDIA
     df_selecionado_ind['CUS_VAR_PER'] = 0
+    df_selecionado_ind['VOL_VAR_ABS_MES_ANT'] = 0
+    df_selecionado_ind['VOL_VAR_PER_MES_ANT'] = 0
+    df_selecionado_ind['CUS_VAR_ABS_MES_ANT'] = 0
+    df_selecionado_ind['CUS_VAR_PER_MES_ANT'] = 0
 
 
     for i, item in enumerate(df_selecionado_ind['VOLUME_FATURADO']):
@@ -683,8 +717,20 @@ def indicadores_vol_cus_func(
             df_selecionado_ind['VOL_MED_U6M'][i] = media
             df_selecionado_ind['VOL_VAR_ABS'][i] = variacao_abs
             df_selecionado_ind['VOL_VAR_PER'][i] = variacao_per
+            
+        if i==0:
+            variacao_abs_mes_ant = 0
+            variacao_per_mes_ant = 0
+        else:
+            variacao_abs_mes_ant = item - item_ant
+            variacao_per_mes_ant = variacao_abs_mes_ant/item
+        
+        df_selecionado_ind['VOL_VAR_ABS_MES_ANT'][i] = variacao_abs_mes_ant
+        df_selecionado_ind['VOL_VAR_PER_MES_ANT'][i] = variacao_per_mes_ant
+        item_ant = item
 
     lm = []
+    item_ant = 0
     for i, item in enumerate(df_selecionado_ind['VALOR_TOTAL']):
         if i<=5:
             lm.append(item)
@@ -698,8 +744,19 @@ def indicadores_vol_cus_func(
             df_selecionado_ind['CUS_MED_U6M'][i] = media
             df_selecionado_ind['CUS_VAR_ABS'][i] = variacao_abs
             df_selecionado_ind['CUS_VAR_PER'][i] = variacao_per
+        
+        if i==0:
+            variacao_abs_mes_ant = 0
+            variacao_per_mes_ant = 0
+        else:
+            variacao_abs_mes_ant = item - item_ant
+            variacao_per_mes_ant = variacao_abs_mes_ant/item  
             
-    return df_selecionado_ind
+        df_selecionado_ind['CUS_VAR_ABS_MES_ANT'][i] = variacao_abs_mes_ant
+        df_selecionado_ind['CUS_VAR_PER_MES_ANT'][i] = variacao_per_mes_ant
+        item_ant = item
+            
+    return df_selecionado_ind, df_selecionado_agrupamento_ind
 
 linha_mes_ano = df_selecionado_ind[(df_selecionado_ind['ANO']== ano_selecionado_ind) & (df_selecionado_ind['MES_N'] == mes_selecionado_ind)]
 index_ind = linha_mes_ano.index[0]
