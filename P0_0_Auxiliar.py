@@ -63,22 +63,23 @@ def tratamento_de_dados_func(pasta):
         pass
       
      
-    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' , 'dados_agua_df_3.csv'))
+    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' , 'dados_agua_df_4.csv'),encoding='utf-8')
     df['ANO'] = df['ANO'].astype('int')
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
     df = df.merge(df_cad, on='Hidrometro', how='left')
+    df['Dtime'] = pd.to_datetime(df['Dtime'])
+       
     
-          
-    df_sHU = df[df['Hidrometro']!='H014']
+    
     
     anos = df['ANO'].unique().tolist()
     anos.sort(reverse=True)
     meses = df['MES_N'].unique().tolist()
     meses.sort(reverse=True)
-    df_sHU['Dtime'] = pd.to_datetime(df_sHU['Dtime'])
-    maior_tempo = df_sHU['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
-    menor_tempo = df_sHU['Dtime'].min()
+    
+    maior_tempo = df['Dtime'].max() #encontra o último mês e ano com dados disponíveis no banco de dados
+    menor_tempo = df['Dtime'].min()
     maior_ano = maior_tempo.year
     index_ano = anos.index(maior_ano) #encontra o index do maior ano para usar no sidebox do streamlit
     maior_mes = maior_tempo.month
@@ -87,10 +88,11 @@ def tratamento_de_dados_func(pasta):
     menor_mes = menor_tempo.month
     
     
-    lista_cidades = df_sHU['Cidade'].unique().tolist()
+    lista_cidades = df['Cidade'].unique().tolist()
     
-    # ordenando e filtrando colunas em dados_agua_df
-    df_sHU = df_sHU.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
+    df = df.iloc[:,[2,21,4,24,33,12,20,10,11,13,14,15,16,17,18,19,31,32,5,6,7,8,9,39,26,29,30,34,36,37]]
+     
+    df_sHU = df[df['Hidrometro']!='H014']
     
     saida = [df_cad, df, df_sHU, anos, meses, maior_ano, index_ano, maior_mes, index_mes, lista_cidades, menor_ano, menor_mes]
     return saida
@@ -957,3 +959,9 @@ soma = (csv['VOLUME_FATURADO'].sum() - csv[csv['CIDADE']=='Florianópolis  HU'][
 print(soma)
 print(csv['VOLUME_FATURADO'])
 
+
+df = dados_agua_df
+
+df = df[df['Hidrometro']!='H130']
+df = df[df['Hidrometro']!='H131']
+df
