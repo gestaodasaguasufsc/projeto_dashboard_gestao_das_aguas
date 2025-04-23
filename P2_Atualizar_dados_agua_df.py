@@ -38,22 +38,6 @@ except:
     pass
 
 
-##Rotina caso queira escolher as planilhas
-#lista_ano_mes = ['2025_03']
-     
-#for item in lista_ano_mes:
- #   for sheet_name in xls_file.sheet_names:   
-  #      if item == sheet_name:
-   #         df = pd.read_excel(xls_file, sheet_name)
-    #        df = df.dropna()
-     #       df.columns = dados_agua_df_vazio.columns
-      #      df.to_csv(os.path.join(pasta_atualizacao_df,f'{sheet_name}.csv'), index=False)
-        #else:
-         #   pass
-     
-        
-##Rotina caso queira incluir todas as planilhas do arquivo xls:
-
      
 for sheet_name in xls_file.sheet_names:   
       

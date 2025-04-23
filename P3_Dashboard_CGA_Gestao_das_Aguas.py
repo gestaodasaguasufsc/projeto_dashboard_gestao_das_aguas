@@ -52,7 +52,7 @@ def tratamento_de_dados_func(pasta_projeto):
         pass
     
     
-    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' , 'dados_agua_df_4.csv'),encoding='utf-8')
+    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' ,'dados_agua_df_5_202503_com_sapiens.csv'),encoding='utf-8')
     df['ANO'] = df['ANO'].astype('int')
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
@@ -673,8 +673,16 @@ def localiza_lat_long_hidrometro_func (df_i, valor, shp):
     
     selecao = localiza_hidrometro_func(df_i, valor)
     try:
-        lat = shp.loc[shp['Hidrometro']==selecao,'Latitude'].iloc[0]
-        long = shp.loc[shp['Hidrometro']==selecao,'Longitude'].iloc[0]
+        lista_joinville = ['H108', 'H109', 'H110', 'H111','H112','H113']
+        if selecao in lista_joinville:
+            selecao_lat_long = 'H108'
+        else:
+            selecao_lat_long = selecao
+            pass
+        
+        
+        lat = shp.loc[shp['Hidrometro']==selecao_lat_long,'Latitude'].iloc[0]
+        long = shp.loc[shp['Hidrometro']==selecao_lat_long,'Longitude'].iloc[0]
     except:
         lat = ""
         long = ""

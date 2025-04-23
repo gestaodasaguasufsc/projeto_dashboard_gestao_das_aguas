@@ -959,9 +959,3 @@ soma = (csv['VOLUME_FATURADO'].sum() - csv[csv['CIDADE']=='Florianópolis  HU'][
 print(soma)
 print(csv['VOLUME_FATURADO'])
 
-
-df = dados_agua_df
-
-df = df[df['Hidrometro']!='H130']
-df = df[df['Hidrometro']!='H131']
-df
