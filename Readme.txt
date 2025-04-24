@@ -10,24 +10,21 @@ Projeto de Dashboard:
 Projeto:
 Dashboard Monitoramento do Consumo de Água da UFSC
 
-Versão: 21/03/2025 - emissão inicial
+Versão inicial divulgada: 24/04/2025
 
 Descrição geral:
---> programa gerado em python versão 3.10 (versão superiores geraram conflito no streamlit cloud em 21/03/2025).
+--> App gerado em python versão 3.10 (versões superiores geraram conflito no streamlit cloud em 21/03/2025).
 
 Pastas:
 - Auxiliar: contém arquivos de auxílio na organização e apresentação do projeto
 - Dados: contém duas subpastas, Origem e Produtos. 
---> Pasta Origem contém dados brutos de consumo de água e faturamento por unidades consumidora desde 2013 em planilha excel e csv. Além disto contém os arquivos shapefile e documentos em PDF usados no app.
---> Pasta Produtos contém o arquivo tratado dados_agua_df.csv com dados o agrupamento dos dados de consumo usados no app.
+--> Pasta Origem contém dados brutos de consumo de água e faturamento por unidades consumidoras. Contém arquivos shapefile e faturas em PDF usadas no app.
+--> Pasta Produtos contém o arquivo tratado dados_agua_df(&"complementos").csv com dados o agrupamento dos dados de consumo usados no app. Maior numeração representa a última versão.
 
 Arquivos principais:
-Arquivo main = Dashboard_CGA_Gestao_das_Aguas.py
-Arquivo auxiliar = Run_Streamlit.py para rodar em localhost o arquivo main.
+Arquivo main = P3_Dashboard_CGA_Gestao_das_Aguas.py
+Arquivo run = Run_Streamlit.py para rodar em localhost o arquivo main.
 requirements.txt requerido pelo streamlit cloud para importar bibliotecas quando do deploy.
-Obs: No requirements.txt é necessário retirar os módulos de windows pywin32 para rodar no streamlit.
+Obs: No requirements.txt é necessário retirar os módulos de windows pywin32.
 
 Obs: Projeto iniciado em 09/2024, na disciplina de Pós-Graduação em Engenharia Ambiental PPGEA/UFSC, ENS410064	Tópicos Especiais: Python in Environmental Applications - Prof. Leonardo Hoinaski
-
-https://gist.github.com/ash2shukla/ff180d7fbe8ec3a0240f19f4452acde7
-
