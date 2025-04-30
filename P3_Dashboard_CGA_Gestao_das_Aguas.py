@@ -52,7 +52,7 @@ def tratamento_de_dados_func(pasta_projeto):
         pass
     
     
-    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' ,'dados_agua_df_5_202503_com_sapiens.csv'),encoding='utf-8')
+    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' ,'dados_agua_df.csv'),encoding='utf-8')
     df['ANO'] = df['ANO'].astype('int')
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})

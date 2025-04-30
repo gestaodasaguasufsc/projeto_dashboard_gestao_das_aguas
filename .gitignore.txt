@@ -1,1 +1,14 @@
 desktop.ini
+temp-plot.html
+P0_0_Auxiliar.py
+P0_0_Auxiliar2_-_nao_utilizado.py
+P0_Gerar_coluna_csv_df.py
+P1_0 _Gerar_dados_agua_df.py
+P1_1_Auxiliar_dados_Sapiens.py
+P2_Atualizar_dados_agua_df.py
+P4_Run_Streamlit.py
+C:\Users\Usuario\Projetos Python GitHub\projeto_dashborad_gestao_das_aguas\Auxiliar\Info_Hidrometros\Auxiliar
+C:\Users\Usuario\Projetos Python GitHub\projeto_dashborad_gestao_das_aguas\Dados\Origem\CSVs
+C:\Users\Usuario\Projetos Python GitHub\projeto_dashborad_gestao_das_aguas\Dados\Origem\xls_origem
+C:\Users\Usuario\Projetos Python GitHub\projeto_dashborad_gestao_das_aguas\Dados\Produtos\atualizacao_dfs
+C:\Users\Usuario\Projetos Python GitHub\projeto_dashborad_gestao_das_aguas\Dados\Produtos\Auxiliar_produtos
