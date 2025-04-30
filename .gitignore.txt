@@ -5,5 +5,5 @@ temp-plot.html
 Auxiliar/Info_Hidrometros/Auxiliar
 Dados/Origem/CSVs
 Dados/Origem/xls_origem
-Dados/Produtos\atualizacao_dfs
+Dados/Produtos/atualizacao_dfs
 Dados/Produtos/Auxiliar_produtos
