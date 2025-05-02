@@ -176,6 +176,7 @@ spyder-kernels==3.0.3
 stack-data==0.6.3
 statsmodels==0.14.4
 streamlit==1.43.2
+streamlit_analytics2==0.10.4
 streamlit-pdf-viewer==0.0.21
 streamlit_folium==0.24.0
 superqt==0.7.2
