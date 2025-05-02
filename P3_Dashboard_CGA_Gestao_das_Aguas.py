@@ -20,6 +20,9 @@ import plotly.express as px
 from streamlit_folium import folium_static
 import plotly.express as px
 import plotly.colors as pc
+import streamlit_analytics2 as streamlit_analytics
+
+
 
 
 #Configurações Streamlit 1
@@ -1800,5 +1803,6 @@ with tab4:
         st.caption('Dados indisponíveis para ano e mês selecionados.')
 
 
+analyticsdata = streamlit_analytics.track()
        
 
