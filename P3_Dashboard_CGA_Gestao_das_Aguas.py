@@ -22,6 +22,8 @@ import plotly.express as px
 import plotly.colors as pc
 import streamlit_analytics2 as streamlit_analytics
 
+streamlit_analytics.start_tracking()
+
 
 
 
@@ -1803,6 +1805,6 @@ with tab4:
         st.caption('Dados indisponíveis para ano e mês selecionados.')
 
 
-analyticsdata = streamlit_analytics.track()
-       
+
+streamlit_analytics.stop_tracking()      
 
