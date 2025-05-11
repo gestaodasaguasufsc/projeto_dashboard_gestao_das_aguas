@@ -12358,7 +12358,6 @@ H302 2025 Março,Medidor faturado pela UFSC,2025,Março,107568,Araranguá,A22LN0
 H401 2025 Março,Medidor faturado pela UFSC,2025,Março,38988,Blumenau,A12S141289,H401,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2750",1,0,0,0,1,3844.0,3844.0,32.0,LIDO,Sem ocorrência,232.72,254.64,-24.06,0.0,0.0,463.3,3,2025-03-20
 H402 2025 Março,Medidor faturado pela UFSC,2025,Março,55308,Blumenau,Y17AA00025980,H402,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2514",1,0,0,0,1,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,3,2025-03-20
 H403 2025 Março,Medidor faturado pela UFSC,2025,Março,13390,Blumenau,0,H403,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau   Rua Marechal Rondon, 880",1,0,0,0,1,27348.0,27348.0,138.0,LIDO,Sem ocorrência,1140.08,0.0,0.0,0.0,1.55,1141.63,3,2025-03-20
->>>>>>> parent of 0fe57a0 (Update dados_agua_df.csv)
 H001 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,2297094.0,Trindade,A16S366817,H001,CASAN,Florianópolis - Trindade,Almoxarifado e Transportes (PU 11 e 06),1.0,0.0,0.0,0.0,1.0,1504.0,1566.0,23.0,LIDO,Sem ocorrência,358.36,358.36,-81.40000000000009,0.0,144.69,780.01,4,2025-04-20
 H002 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,2297116.0,Trindade,A04S381708,H002,CASAN,Florianópolis - Trindade,"Patrimônio e Digitalização (DAG08 e 06), LAMAQ (CCB20)",2.0,0.0,0.0,0.0,2.0,3241.0,3321.0,36.0,LIDO,Sem ocorrência,527.92,527.92,-122.58999999999992,0.0,241.53,1174.78,4,2025-04-20
 H003 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,2297124.0,Trindade,C11C010369,H003,CASAN,Florianópolis - Trindade,Biotério Central (BIC 01 a 10),1.0,0.0,0.0,0.0,1.0,12210.0,12705.0,271.0,LIDO,Sem ocorrência,5040.6,5040.6,-1108.800000000001,0.0,1652.1,10624.5,4,2025-04-20
@@ -12445,8 +12444,5 @@ H300 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,196916.0,Araranguá,A15L
 H302 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,107568.0,Araranguá,A22LN0055338,H302,SAMAE ARARANGUÁ,Araranguá,SAMAE Araranguá  R. Pedro M. Pacheco (Medicina),1.0,0.0,0.0,0.0,1.0,4701.0,229.0,20.0,LIDO,Sem ocorrência,222.11,163.03,0.0,0.0,0.0,385.14,4,2025-04-20
 H401 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,38988.0,Blumenau,A12S141289,H401,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2750",1.0,0.0,0.0,0.0,1.0,3812.0,3933.0,89.0,LIDO,Sem ocorrência,720.64,752.0,0.0,0.0,0.0,1472.64,4,2025-04-20
 H402 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,55308.0,Blumenau,Y17AA00025980,H402,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau  Rua João Pessoa, 2514",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,4,2025-04-20
-<<<<<<< HEAD
 H403 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,13390.0,Blumenau,0,H403,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau   Rua Marechal Rondon, 880",1.0,0.0,0.0,0.0,1.0,27210.0,27667.0,319.0,LIDO,Sem ocorrência,2689.44,0.0,0.0,0.0,20.16,2709.6,4,2025-04-20
-=======
 H403 2025 Abril,Medidor faturado pela UFSC,2025.0,Abril,13390.0,Blumenau,0,H403,SAMAE BLUMENAU,Blumenau,"SAMAE Blumenau   Rua Marechal Rondon, 880",1.0,0.0,0.0,0.0,1.0,27210.0,27667.0,319.0,LIDO,Sem ocorrência,2689.44,0.0,0.0,0.0,20.16,2709.6,4,2025-04-20
->>>>>>> parent of 0fe57a0 (Update dados_agua_df.csv)
