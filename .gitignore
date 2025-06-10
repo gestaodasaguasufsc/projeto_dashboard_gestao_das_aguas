@@ -10,9 +10,8 @@ Dados/Produtos/atualizacao_dfs
 Dados/Produtos/Auxiliar_produtos
 
 
-!Dados/Origem/GeoJson/INV_2017_edif.geojson
-!Dados/Origem/GeoJson/INSC_IMOB.geojson
-!Dados/Origem/GeoJson/Limites_UFSC_1.geojson
+!Dados/Origem/IBGE/Shapes
+!Dados/Origem/GeoJson/Shapes
+
 !P3_Dashboard_CGA_Gestao_das_Aguas.py
-!Dados/Origem/IBGE/data_sc_mun_extract.shp
-!Dados/Origem/IBGE/data_br_sc.shp
+
