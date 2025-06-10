@@ -198,8 +198,8 @@ rede_interna_UFSC = funcao_shp[4]
 limite_UFSC = funcao_shp[5]
 
 
-data_br_sc_link = 'Dados/Origem/IBGE/data_br_sc.shp'
-data_sc_mun_link = 'Dados/Origem/IBGE/data_sc_mun_extract.shp'
+data_br_sc_link = 'Dados/Origem/IBGE/Shapes/data_br_sc.shp'
+data_sc_mun_link = 'Dados/Origem/IBGE/Shapes/data_sc_mun_extract.shp'
 dgi_inv_2017_unid_link = 'Dados/Origem/GeoJson/Shapes/INV_2017_unid.shp'
 dgi_inv_2017_edif_link = 'Dados/Origem/GeoJson/Shapes/INV_2017_edif.shp'
 
