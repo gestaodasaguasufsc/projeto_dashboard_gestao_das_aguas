@@ -271,8 +271,8 @@ def camadas_shapes_func_lista_func2(lista_shapes_2):
             folium.GeoJson(
                 data=data_,
                 style_function=lambda x: {
-                  'fillColor': 'white',  # Azul marinho
-                  'color': 'black',  # Azul marinho para a borda
+                  'fillColor': 'white',  
+                  'color': 'black',  
                   'weight': 1.2,  # Espessura da linha
                   'fillOpacity': 0.05  }, # Opacidade do preenchimento (opcional)
                 # Give it a name
@@ -540,7 +540,11 @@ def adicionar_camadas_de_fundo_func(map):
         name='Google Satellite'
     ).add_to(map)
     
-  
+    folium.TileLayer(
+        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attr="OpenStreetMap",
+        name="OpenStreetMap",
+    ).add_to(map)
   
 
     # Adicionar LayerControl para permitir a seleção de camadas
@@ -1458,7 +1462,7 @@ with tab2:
     
 
 
-    #camadas_shapes_func_lista_func1(lista_shapes_1)
+    camadas_shapes_func_lista_func1(lista_shapes_1)
     #camadas_shapes_func_lista_func2(lista_shapes_2)         
     try:
         df = df_i[(df_i['ANO'] == ano_selecionado_mapa) & (df_i['MES_N'] == mes_selecionado_mapa)]
