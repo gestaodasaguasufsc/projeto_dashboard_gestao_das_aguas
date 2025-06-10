@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import folium
 import folium.plugins as plugins
+from folium.features import GeoJsonTooltip, GeoJsonPopup
 import base64 #pip install pybase4
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -57,7 +58,7 @@ def tratamento_de_dados_func(pasta_projeto):
         pass
     
     
-    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' ,'dados_agua_df.csv'),encoding='utf-8')
+    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' ,'dados_agua_df_atualizado.csv'),encoding='utf-8')
     df['ANO'] = df['ANO'].astype('int')
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
@@ -197,17 +198,97 @@ rede_interna_UFSC = funcao_shp[4]
 limite_UFSC = funcao_shp[5]
 
 
+data_br_sc_link = 'Dados/Origem/IBGE/data_br_sc.shp'
+data_sc_mun_link = 'Dados/Origem/IBGE/data_sc_mun_extract.shp'
+dgi_inv_2017_unid_link = 'Dados/Origem/GeoJson/Shapes/INV_2017_unid.shp'
+dgi_inv_2017_edif_link = 'Dados/Origem/GeoJson/Shapes/INV_2017_edif.shp'
+
+lista_shapes_1 = [
+                    data_br_sc_link, 
+                    data_sc_mun_link
+                    ]
+
+lista_shapes_2 = [
+                    dgi_inv_2017_unid_link,
+                    dgi_inv_2017_edif_link
+                    ]
+
 #Plot with folium
 #https://geopandas.org/en/stable/gallery/plotting_with_folium.html
 
 # Map Folium - Defs
 
 
+#def camadas_shapes_func_lista_func(lista_shapes_1, lista_shapes_2):
+
+def camadas_shapes_func_lista_func1(lista_shapes_1):
+
+   
+    lista_shapes_group1 = folium.FeatureGroup(name="Limites municípios e de SC", show=True)
+    
+    for i, item_link in enumerate(lista_shapes_1):
+        data_ = gpd.read_file(item_link)
+        data_ = data_.to_crs(epsg=4326)
+        for index, row in data_.iterrows():
+            if i == 0:
+                #popup_content = f"Sigla:{row['SIGLA_UF']} /n Área:{row['AREA_KM2']} km2"
+                popup_fields = ['SIGLA_UF', 'AREA_KM2']
+            elif i == 1:
+                #popup_content = f"Sigla:{row['NM_MUN']} /n Área:{row['AREA_KM2']} km2"
+                popup_fields = ['NM_MUN', 'AREA_KM2']
+            else:
+                popup_fields = []
+            folium.GeoJson(
+                data=data_,
+                style_function=lambda x: {
+                  'fillColor': 'white',  # Azul marinho
+                  'color': 'black',  # Azul marinho para a borda
+                  'weight': 1.2,  # Espessura da linha
+                  'fillOpacity': 0.05  },# Opacidade do preenchimento (opcional)
+                # Give it a name
+                #style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
+                #tooltip=None,  # Disable tooltip for this layer
+                popup=folium.GeoJsonPopup(fields=popup_fields, max_width=300)
+                
+                ).add_to(lista_shapes_group1)
+
+    lista_shapes_group1.add_to(map)
+    
+def camadas_shapes_func_lista_func2(lista_shapes_2):
+
+   
+    lista_shapes_group2 = folium.FeatureGroup(name="lista_shapes2", show=True)
+
+    for i, item_link in enumerate(lista_shapes_2):
+        data_ = gpd.read_file(item_link)
+        data_ = data_.to_crs(epsg=4326)
+        for index, row in data_.iterrows():
+            if i == 1:
+                popup_fields = []
+            else:    
+                popup_fields = ['html_1']
+            
+            folium.GeoJson(
+                data=data_,
+                style_function=lambda x: {
+                  'fillColor': 'white',  # Azul marinho
+                  'color': 'black',  # Azul marinho para a borda
+                  'weight': 1.2,  # Espessura da linha
+                  'fillOpacity': 0.05  }, # Opacidade do preenchimento (opcional)
+                # Give it a name
+                #style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
+                #tooltip=None,  # Disable tooltip for this layer
+                popup=folium.GeoJsonPopup(fields = popup_fields, max_width=300)
+                
+                ).add_to(lista_shapes_group2)
+        
+    lista_shapes_group2.add_to(map)
+
 # folium.Choropleth para subsetores_agua - Camada de fundo
 
 
 def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, subsetores_agua_shp):
-  from folium.features import GeoJsonTooltip, GeoJsonPopup
+  
 
   subsetores_agua_shp_merged = subsetores_agua_shp.merge(dados_agua_df_ano_mes_selecionado, on='Hidrometro', how='left')
 
@@ -255,6 +336,8 @@ def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, subsetores
 
 
 # demais camadas
+
+
 
 
 
@@ -1069,7 +1152,7 @@ with st.sidebar:
         link_logoGA = os.path.join(pasta_projeto,'Auxiliar', 'Logos','Gestao_das_Aguas_Logo.png')
         st.image(link_logoGA,width=100)
             
-    st.title("Dashboard Monitoramento do Consumo de Água da UFSC")        
+    st.title("Painel interativo de dados de monitoramento do consumo de água da UFSC")        
     
      
     st.sidebar.caption("Coordenadoria de Gestão Ambiental - CGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
@@ -1333,7 +1416,7 @@ with tab2:
         
         if selecao_uc_mapa == lista_uc_local[index_visao_geral]:
             
-            map = folium.Map(width = 1150, height=750, location=[-27.6, -48.52], zoom_start=15.5)
+            map = folium.Map(width = 1150, height=750, location=[-27.6, -48.52], zoom_start=7.5)
             uc_selecionada = selecao_uc_mapa
         else: 
             
@@ -1346,7 +1429,7 @@ with tab2:
                 
             except:
                 st.caption('Localização da unidade consumidora (UC) indisponível. Escolha outra UC. ')
-                map = folium.Map(width = 1150, height=750, location=[-27.6, -48.52], zoom_start=15.5)
+                map = folium.Map(width = 1150, height=750, location=[-27.6, -48.52], zoom_start=7.5)
                 selecao_uc_mapa == lista_uc_local[index_visao_geral]
                 uc_selecionada = selecao_uc_mapa
                 
@@ -1372,7 +1455,11 @@ with tab2:
             
     else:
         df_i = dados_agua_df_sHU
-            
+    
+
+
+    #camadas_shapes_func_lista_func1(lista_shapes_1)
+    #camadas_shapes_func_lista_func2(lista_shapes_2)         
     try:
         df = df_i[(df_i['ANO'] == ano_selecionado_mapa) & (df_i['MES_N'] == mes_selecionado_mapa)]
         df = df.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
@@ -1380,9 +1467,13 @@ with tab2:
                  
         chropleth_subsetores_agua_func(df, subsetores_agua_shp)
         #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
-               
+        
+        
+        #camadas_shapes_func_lista_func(lista_shapes_1, lista_shapes_2)
         camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
-                        
+        
+
+                
         adicionar_camadas_de_fundo_func(map)
             
         folium_static(map, width=1200, height=800)
