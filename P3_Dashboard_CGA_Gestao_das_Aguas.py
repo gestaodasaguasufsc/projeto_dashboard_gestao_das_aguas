@@ -558,9 +558,9 @@ def adicionar_camadas_de_fundo_func(map):
 
 def barplot_para_mes_ano_selecionado_func(df):
     fig1 = px.bar(df, x='Hidrometro', y='VOLUME_FATURADO',
-                  labels={'Hidrometro': 'Hidrômetro', 'VOLUME_FATURADO': 'Volume Faturado (m³)'})
+                  labels={'Hidrometro': 'Hidrômetro', 'VOLUME_FATURADO': 'Volume Faturado (m³)','LOCAL':'Local'})
     fig2 = px.bar(df, x='Hidrometro', y='VALOR_TOTAL',
-                  labels={'Hidrometro': 'Hidrômetro', 'VALOR_TOTAL': 'Custo Faturado (R$)'})
+                  labels={'Hidrometro': 'Hidrômetro', 'VALOR_TOTAL': 'Custo Faturado (R$)','LOCAL':'Local'})
     
     return fig1 , fig2
 
