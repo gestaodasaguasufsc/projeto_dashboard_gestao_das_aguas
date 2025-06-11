@@ -1457,7 +1457,7 @@ with tab2:
                 # Give it a name
                 #style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
                 #tooltip=None,  # Disable tooltip for this layer
-                popup=folium.GeoJsonPopup(fields = popup_fields, max_width=300)
+                #popup=folium.GeoJsonPopup(fields = popup_fields, max_width=300)
                 
                 ).add_to(lista_shapes_group2)
         
