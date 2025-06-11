@@ -1464,7 +1464,7 @@ with tab2:
 
   
     
-    #camadas_shapes_func_lista_func1(lista_shapes_1)
+    camadas_shapes_func_lista_func1(lista_shapes_1)
     #camadas_shapes_func_lista_func2(lista_shapes_2)         
     
     try:
