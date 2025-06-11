@@ -1464,8 +1464,8 @@ with tab2:
 
   
     
-    camadas_shapes_func_lista_func1(lista_shapes_1)
-    camadas_shapes_func_lista_func2(lista_shapes_2)         
+    #camadas_shapes_func_lista_func1(lista_shapes_1)
+    #camadas_shapes_func_lista_func2(lista_shapes_2)         
     
     try:
         df = df_i[(df_i['ANO'] == ano_selecionado_mapa) & (df_i['MES_N'] == mes_selecionado_mapa)]
