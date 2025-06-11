@@ -198,10 +198,10 @@ rede_interna_UFSC = funcao_shp[4]
 limite_UFSC = funcao_shp[5]
 
 
-data_br_sc_link = os.path.join(pasta_projeto,'Dados/Origem/IBGE/Shapes/data_br_sc.shp')
-data_sc_mun_link = os.path.join(pasta_projeto,'Dados/Origem/IBGE/Shapes/data_sc_mun_extract.shp')
-dgi_inv_2017_unid_link = os.path.join(pasta_projeto,'Dados/Origem/GeoJson/Shapes/INV_2017_unid.shp')
-dgi_inv_2017_edif_link = os.path.join(pasta_projeto,'Dados/Origem/GeoJson/Shapes/INV_2017_edif.shp')
+data_br_sc_link = os.path.join(pasta_projeto,'Dados','Origem','IBGE', 'Shapes','data_br_sc.shp')
+data_sc_mun_link = os.path.join(pasta_projeto,'Dados','Origem','IBGE', 'Shapes', 'data_sc_mun_extract.shp')
+dgi_inv_2017_unid_link = os.path.join(pasta_projeto,'Dados','Origem','GeoJson','Shapes','INV_2017_unid.shp')
+dgi_inv_2017_edif_link = os.path.join(pasta_projeto,'Dados','Origem','GeoJson','Shapes','INV_2017_edif.shp')
 
 lista_shapes_1 = [
                     data_br_sc_link, 
