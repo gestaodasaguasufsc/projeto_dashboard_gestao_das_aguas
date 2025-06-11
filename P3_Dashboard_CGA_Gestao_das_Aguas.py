@@ -221,7 +221,69 @@ lista_shapes_2 = [
 
 #def camadas_shapes_func_lista_func(lista_shapes_1, lista_shapes_2):
 
+@st.cache_data
+def camadas_shapes_func_lista_func1(lista_shapes_1):
 
+
+    lista_shapes_group1 = folium.FeatureGroup(name="Limites municípios e de SC", show=True)
+    
+    for i, item_link in enumerate(lista_shapes_1):
+        data_ = gpd.read_file(item_link)
+        data_ = data_.to_crs(epsg=4326)
+        for index, row in data_.iterrows():
+            if i == 0:
+                #popup_content = f"Sigla:{row['SIGLA_UF']} /n Área:{row['AREA_KM2']} km2"
+                popup_fields = ['SIGLA_UF', 'AREA_KM2']
+            elif i == 1:
+                #popup_content = f"Sigla:{row['NM_MUN']} /n Área:{row['AREA_KM2']} km2"
+                popup_fields = ['NM_MUN', 'AREA_KM2']
+            else:
+                popup_fields = []
+            folium.GeoJson(
+                data=data_,
+                style_function=lambda x: {
+                  'fillColor': 'white',  # Azul marinho
+                  'color': 'black',  # Azul marinho para a borda
+                  'weight': 1.2,  # Espessura da linha
+                  'fillOpacity': 0.05  },# Opacidade do preenchimento (opcional)
+                # Give it a name
+                #style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
+                #tooltip=None,  # Disable tooltip for this layer
+                popup=folium.GeoJsonPopup(fields=popup_fields, max_width=300)
+                
+                ).add_to(lista_shapes_group1)
+    
+    lista_shapes_group1.add_to(map)
+    
+@st.cache_data
+def camadas_shapes_func_lista_func2(lista_shapes_2):    
+    
+    lista_shapes_group2 = folium.FeatureGroup(name="lista_shapes2", show=True)
+    
+    for i, item_link in enumerate(lista_shapes_2):
+        data_ = gpd.read_file(item_link)
+        data_ = data_.to_crs(epsg=4326)
+        for index, row in data_.iterrows():
+            if i == 1:
+                popup_fields = []
+            else:    
+                popup_fields = ['html_1']
+            
+            folium.GeoJson(
+                data=data_,
+                style_function=lambda x: {
+                  'fillColor': 'white',  
+                  'color': 'black',  
+                  'weight': 1.2,  # Espessura da linha
+                  'fillOpacity': 0.05  }, # Opacidade do preenchimento (opcional)
+                # Give it a name
+                #style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
+                #tooltip=None,  # Disable tooltip for this layer
+                #popup=folium.GeoJsonPopup(fields = popup_fields, max_width=300)
+                
+                ).add_to(lista_shapes_group2)
+        
+    lista_shapes_group2.add_to(map)
 
 # folium.Choropleth para subsetores_agua - Camada de fundo
 
@@ -1400,70 +1462,11 @@ with tab2:
         df_i = dados_agua_df_sHU
     
 
-
-
-   
-    lista_shapes_group1 = folium.FeatureGroup(name="Limites municípios e de SC", show=True)
+  
     
-    for i, item_link in enumerate(lista_shapes_1):
-        data_ = gpd.read_file(item_link)
-        data_ = data_.to_crs(epsg=4326)
-        for index, row in data_.iterrows():
-            if i == 0:
-                #popup_content = f"Sigla:{row['SIGLA_UF']} /n Área:{row['AREA_KM2']} km2"
-                popup_fields = ['SIGLA_UF', 'AREA_KM2']
-            elif i == 1:
-                #popup_content = f"Sigla:{row['NM_MUN']} /n Área:{row['AREA_KM2']} km2"
-                popup_fields = ['NM_MUN', 'AREA_KM2']
-            else:
-                popup_fields = []
-            folium.GeoJson(
-                data=data_,
-                style_function=lambda x: {
-                  'fillColor': 'white',  # Azul marinho
-                  'color': 'black',  # Azul marinho para a borda
-                  'weight': 1.2,  # Espessura da linha
-                  'fillOpacity': 0.05  },# Opacidade do preenchimento (opcional)
-                # Give it a name
-                #style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
-                #tooltip=None,  # Disable tooltip for this layer
-                popup=folium.GeoJsonPopup(fields=popup_fields, max_width=300)
-                
-                ).add_to(lista_shapes_group1)
-
-    lista_shapes_group1.add_to(map)
+    camadas_shapes_func_lista_func1(lista_shapes_1)
+    camadas_shapes_func_lista_func2(lista_shapes_2)         
     
-
-
-   
-    lista_shapes_group2 = folium.FeatureGroup(name="lista_shapes2", show=True)
-
-    for i, item_link in enumerate(lista_shapes_2):
-        data_ = gpd.read_file(item_link)
-        data_ = data_.to_crs(epsg=4326)
-        for index, row in data_.iterrows():
-            if i == 1:
-                popup_fields = []
-            else:    
-                popup_fields = ['html_1']
-            
-            folium.GeoJson(
-                data=data_,
-                style_function=lambda x: {
-                  'fillColor': 'white',  
-                  'color': 'black',  
-                  'weight': 1.2,  # Espessura da linha
-                  'fillOpacity': 0.05  }, # Opacidade do preenchimento (opcional)
-                # Give it a name
-                #style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
-                #tooltip=None,  # Disable tooltip for this layer
-                #popup=folium.GeoJsonPopup(fields = popup_fields, max_width=300)
-                
-                ).add_to(lista_shapes_group2)
-        
-    lista_shapes_group2.add_to(map)
-    #camadas_shapes_func_lista_func1(lista_shapes_1)
-    #camadas_shapes_func_lista_func2(lista_shapes_2)         
     try:
         df = df_i[(df_i['ANO'] == ano_selecionado_mapa) & (df_i['MES_N'] == mes_selecionado_mapa)]
         df = df.sort_values(by=['VOLUME_FATURADO'], ascending=False).reset_index(drop=True)
