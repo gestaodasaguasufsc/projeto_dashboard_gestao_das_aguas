@@ -4,8 +4,7 @@ temp-plot.html
 Auxiliar/Info_Hidrometros/Auxiliar
 Dados/Origem/CSVs
 Dados/Origem/xls_origem
-Dados/Origem/GeoJson
-Dados/Origem/IBGE
+
 Dados/Produtos/atualizacao_dfs
 Dados/Produtos/Auxiliar_produtos
 
@@ -14,4 +13,5 @@ Dados/Produtos/Auxiliar_produtos
 !Dados/Origem/GeoJson/Shapes
 
 !P3_Dashboard_CGA_Gestao_das_Aguas.py
-
+Dados/Origem/GeoJson
+Dados/Origem/IBGE

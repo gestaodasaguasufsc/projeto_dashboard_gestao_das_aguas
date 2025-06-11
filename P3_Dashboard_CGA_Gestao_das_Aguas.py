@@ -1461,7 +1461,7 @@ with tab2:
                 
                 ).add_to(lista_shapes_group2)
         
-    #lista_shapes_group2.add_to(map)
+    lista_shapes_group2.add_to(map)
     #camadas_shapes_func_lista_func1(lista_shapes_1)
     #camadas_shapes_func_lista_func2(lista_shapes_2)         
     try:
