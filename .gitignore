@@ -1,17 +1,22 @@
 desktop.ini
 temp-plot.html
 *.py
+*.GeoJson
+*.js
+*.json
+*.html
+Dados/Origem/GeoJson/Shapes_Nao_Usado
 Auxiliar/Info_Hidrometros/Auxiliar
 Dados/Origem/CSVs
 Dados/Origem/xls_origem
 
 Dados/Produtos/atualizacao_dfs
 Dados/Produtos/Auxiliar_produtos
+Dados/Origem/GeoJson/
+Dados/Origem/IBGE/BR_UF_2024
+Dados/Origem/IBGE/SC_Municipios_2024
 
 
-!Dados/Origem/IBGE/Shapes
 !Dados/Origem/GeoJson/Shapes
-
 !P3_Dashboard_CGA_Gestao_das_Aguas.py
-Dados/Origem/GeoJson
-Dados/Origem/IBGE
+
