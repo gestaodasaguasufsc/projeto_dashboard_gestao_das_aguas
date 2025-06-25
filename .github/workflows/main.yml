@@ -2,14 +2,28 @@ name: run schedule.py
 
 on:
   schedule:
-    - cron: '22 19 * * *'    #runs at 00:00 UTC everyday
+    - cron: '28 19 * * *'    #runs at 00:00 UTC everyday
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Setup Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x' # Install the Python version needed
+
+      # Step 3: Install dependencies
+      - name: Install webbrowser
+        run: pip install webbrowser
+
+      # Step 4: Run py
       - name: execute py script # run file
         run: |
           schedule.py
