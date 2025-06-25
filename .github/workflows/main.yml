@@ -19,11 +19,9 @@ jobs:
         with:
           python-version: '3.x' # Install the Python version needed
 
-      # Step 3: Install dependencies
-      #- name: Install webbrowser
-       # run: pip install webbrowser
+     
 
-      # Step 4: Run py
+      # Step 3: Run py
       - name: execute py script # run file
         run: |
           python schedule.py
