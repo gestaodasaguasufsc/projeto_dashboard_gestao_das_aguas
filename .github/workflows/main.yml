@@ -20,8 +20,8 @@ jobs:
           python-version: '3.x' # Install the Python version needed
 
       # Step 3: Install dependencies
-      - name: Install webbrowser
-        run: pip install webbrowser
+      #- name: Install webbrowser
+       # run: pip install webbrowser
 
       # Step 4: Run py
       - name: execute py script # run file
