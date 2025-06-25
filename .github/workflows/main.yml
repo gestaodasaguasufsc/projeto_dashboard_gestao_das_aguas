@@ -2,7 +2,7 @@ name: run schedule py
 
 on:
   schedule:
-    - cron: '30 19 * * *'    #runs at 00:00 UTC everyday
+    - cron: '32 19 * * *'    #runs at 00:00 UTC everyday
 
 jobs:
   build:
@@ -26,4 +26,4 @@ jobs:
       # Step 4: Run py
       - name: execute py script # run file
         run: |
-          schedule.py
+          python schedule.py
