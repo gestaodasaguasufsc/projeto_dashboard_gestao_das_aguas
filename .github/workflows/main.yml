@@ -1,8 +1,8 @@
-name: py
+name: run schedule.py
 
 on:
   schedule:
-    - cron: "04 19 * * *"    #runs at 00:00 UTC everyday
+    - cron: '08 19 * * *'    #runs at 00:00 UTC everyday
 
 jobs:
   build:
