@@ -1,0 +1,13 @@
+on:
+  schedule:
+    - cron: "02 19 * * *"    #runs at 19:02 UTC everyday
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+              
+      - name: execute py script # run file
+        run: |
+          schedule.py
