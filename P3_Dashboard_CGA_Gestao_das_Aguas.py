@@ -52,8 +52,7 @@ def tratamento_de_dados_func(pasta_projeto):
     link = os.path.join(pasta_projeto, 'Dados', 'Origem', 'Planilha_de_referencia_cadastro_hidrometros.csv')
     df_cad = pd.read_csv(link, encoding='utf-8', sep = ';')
     try:
-        df_cad = df_cad.drop(columns=['Consumo médio dos últimos 6 meses (m3) - ref 9_2024','Atualizacao_Cadastro'], axis=1)
-        df_cad = df_cad.rename(columns={'Observacao': 'Faturamento'})
+            df_cad = df_cad.rename(columns={'Observacao': 'Faturamento'})
     except:
         pass
     
@@ -154,28 +153,15 @@ dict_shapes = dict_shapes_func()
 
 #Passo 3 - edição hidrometros_shp
 
-
-#remover colunas 4 e 5 hidrometro_shp
-
 def carregar_shapes_func(dict_shapes, cadastro_hidrometros_df):
     
     #shape 1: hidrometros_shp
-    
-    x = 4 #coluna 4 - Xcoord
-    y = 5 #coluna 5 - Ycoord
     hidrometros_shp = dict_shapes['hidrometros']
-    colunas_a_manter = np.r_[0:x, x+1:y, y+1:hidrometros_shp.shape[1]]
-    hidrometros_shp = hidrometros_shp.iloc[:,colunas_a_manter]
-    hidrometros_shp.rename(columns={'Nome_hidro': 'Hidrometro'}, inplace=True)
-    
+        
     #shape 2: subsetores_agua_shp
-    
     subsetores_agua_shp = dict_shapes['SubSetores_Agua']
-    subsetores_agua_shp.rename(columns={'Hidrômetr': 'Hidrometro'}, inplace=True)
-    #filtered_subsetores_agua = subsetores_agua[subsetores_agua['Hidrometro'] != 'H014']
     hidrometros_shp_merge = hidrometros_shp.merge(cadastro_hidrometros_df, on='Hidrometro', how='left')
-    
-    
+        
     #shape 3, 4, 5 e 6: shapes fixos
     
     reservatorios = dict_shapes['Reservatorios']
@@ -293,7 +279,7 @@ def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, subsetores
 
   subsetores_agua_shp_merged = subsetores_agua_shp.merge(dados_agua_df_ano_mes_selecionado, on='Hidrometro', how='left')
 
-  subsetores_group = folium.FeatureGroup(name="Subsetores", show=True)
+  #subsetores_group = folium.FeatureGroup(name="Subsetores", show=True)
 
   # Create Choropleth layer (without tooltip)
   choropleth = folium.Choropleth(
@@ -316,8 +302,8 @@ def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, subsetores
       style_function=lambda x: {'color': 'transparent', 'fillColor': 'transparent'},  # Make it invisible
       tooltip=None,  # Disable tooltip for this layer
       popup=folium.GeoJsonPopup(
-          fields=['Hidrometro', 'Local','Setor', 'SubSetor', 'Campus','Cidade','VOLUME_FATURADO','VALOR_TOTAL'],
-          aliases=['Hidrometro', 'Local','Setor', 'SubSetor:', 'Campus','Cidade', 'Volume Faturado para o ano e mês selecionados (m³):','Valor total para o ano e mês selecionados (m³):'],
+          fields=['Hidrometro', 'Local','Setor de Abastecimento CGA', 'Setor de Abastecimento CGA_1', 'Campus','Cidade','VOLUME_FATURADO','VALOR_TOTAL'],
+          aliases=['Hidrometro', 'Local','Setor de Abastecimento CGA', 'SubSetor de Abastecimento CGA:', 'Campus','Cidade', 'Volume Faturado para o ano e mês selecionados (m³):','Valor total para o ano e mês selecionados (m³):'],
           localize=True,
           style="""
               background-color: #F0EFEF;
@@ -328,8 +314,8 @@ def chropleth_subsetores_agua_func(dados_agua_df_ano_mes_selecionado, subsetores
           """
       )
   ).add_to(map)
-
-
+  
+  
 
 
 #### ____________________________________________________________________________________________________________________________
@@ -1463,11 +1449,15 @@ with tab2:
     else:
         df_i = dados_agua_df_sHU
     
-
-  
     
-    camadas_shapes_func_lista_func1(lista_shapes_1)
+    try:
+        camadas_shapes_func_lista_func1(lista_shapes_1)
+    except:
+        pass
     #camadas_shapes_func_lista_func2(lista_shapes_2)         
+    
+    
+    
     
     try:
         df = df_i[(df_i['ANO'] == ano_selecionado_mapa) & (df_i['MES_N'] == mes_selecionado_mapa)]
@@ -1478,7 +1468,7 @@ with tab2:
         #NÃO UTILIZADO - classificar_hidrometros_volume_func(hidrometros_shp_filtered, dados_agua_df_ano_mes_selecionado)
         
         
-        #camadas_shapes_func_lista_func(lista_shapes_1, lista_shapes_2)
+        
         camadas_shapes_func(reservatorios, redes_CASAN, rede_interna_UFSC, limite_UFSC, hidrometros_shp_merge, uc_selecionada)
         
 
