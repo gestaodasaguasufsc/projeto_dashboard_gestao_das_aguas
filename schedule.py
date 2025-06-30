@@ -1,7 +1,5 @@
-import webbrowser
+import requests
 
-# URL of the website you want to open
 url = 'https://projetodashboardgestaodasaguasufsc.streamlit.app/'
-
-# Open the website
-webbrowser.open(url)
+response = requests.get(url)
+print(f"Status code: {response.status_code}")
