@@ -2,7 +2,7 @@ name: Keep Streamlit Apps Alive
 
 on:
   schedule:
-    - cron: '38 18 * * *'
+    - cron: '*/5 * * * *'
 
   workflow_dispatch:
 
