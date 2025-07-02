@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Warm up and check Streamlit app
-      run: |
-        curl -s -o /dev/null -w "%{http_code}" https://projetodashboardgestaodasaguasufsc.streamlit.app/
-        sleep 10
-        code=$(curl -s -o /dev/null -w "%{http_code}" https://projetodashboardgestaodasaguasufsc.streamlit.app/)
-        echo "HTTP code: $code"
-        if [ "$code" != "200" ]; then
-          echo "Streamlit app is down or still waking up!"
-          exit 1
-        fi
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" https://projetodashboardgestaodasaguasufsc.streamlit.app/
+          sleep 10
+          code=$(curl -s -o /dev/null -w "%{http_code}" https://projetodashboardgestaodasaguasufsc.streamlit.app/)
+          echo "HTTP code: $code"
+          if [ "$code" != "200" ]; then
+            echo "Streamlit app is down or still waking up!"
+            exit 1
+          fi
