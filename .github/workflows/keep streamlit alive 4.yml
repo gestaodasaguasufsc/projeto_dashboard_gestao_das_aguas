@@ -14,3 +14,8 @@ jobs:
         with:
           default_author: github_actions
           message: 'update commit for streamlit keep alive'
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl Streamlit app
+        run: curl -s https://projetodashboardgestaodasaguasufsc.streamlit.app/
