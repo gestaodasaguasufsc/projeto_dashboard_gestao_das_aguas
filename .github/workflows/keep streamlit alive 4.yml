@@ -1,0 +1,17 @@
+name: keep streamlit alive 4
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:
+  push:
+
+jobs:
+  
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl Streamlit app
+        run: curl -s https://projetodashboardgestaodasaguasufsc.streamlit.app/
+      - name: Curl Streamlit app 2
+        run: curl -s https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fprojetodashboardgestaodasaguasufsc.streamlit.app%2F
