@@ -1,15 +1,5 @@
-name: py
+import requests
 
-on:
-  schedule:
-    - cron: "00 00 * * *"    #runs at 00:00 UTC everyday
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      
-      - name: execute py script # run file
-        run: |
-          python schedule.py
+url = 'https://projetodashboardgestaodasaguasufsc.streamlit.app/'
+response = requests.get(url)
+print(f"Status code: {response.status_code}")

@@ -3,12 +3,9 @@ GR - Gabinete da Reitoria
 DGG - Direção Geral do Gabinete
 CGA - Coordenadoria de Gestão Ambiental
 
-Projeto de Dashboard:
--> Engenheiro Sanitarista e Ambiental Djesser Zechner Sergio
+Painel Interativo de Dados do Monitoramento do Consumo de água da UFSC:
+-> projeto: Djesser Zechner Sergio
 -> contato: gestaodasaguas@contato.ufsc.br
-
-Projeto:
-Dashboard Monitoramento do Consumo de Água da UFSC
 
 Versão inicial divulgada: 24/04/2025
 
@@ -23,6 +20,5 @@ Pastas:
 
 Arquivos principais:
 Arquivo main = P3_Dashboard_CGA_Gestao_das_Aguas.py
-Arquivo run = Run_Streamlit.py para rodar em localhost o arquivo main.
 requirements.txt requerido pelo streamlit cloud para importar bibliotecas quando do deploy.
 Obs: No requirements.txt é necessário retirar os módulos de windows pywin32.
