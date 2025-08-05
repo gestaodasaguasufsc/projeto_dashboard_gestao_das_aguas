@@ -1160,7 +1160,7 @@ with st.sidebar:
 
     
 
-st.write('Atenção: Dados de Julho parciais em 05/08/2025. Faltam divulgação de informações de Joinville, Blumenau e Sapiens Park(Florianópolis).')  
+st.write('Atenção: Dados de Julho parciais em 05/08/2025. Faltam divulgação de informações de Joinville e Sapiens Park(Florianópolis).')  
 
 tab1, tab2, tab3, tab4 = st.tabs(['Indicadores', 'Mapa cadastral', 'Dados por agrupamentos e individualizados por UC', 
                                   'Dados gerais de UCs por ano e mês selecionado'])
