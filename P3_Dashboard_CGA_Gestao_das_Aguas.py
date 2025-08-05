@@ -57,7 +57,7 @@ def tratamento_de_dados_func(pasta_projeto):
         pass
     
     
-    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' ,'dados_agua_df_atualizado.csv'),encoding='utf-8')
+    df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' ,'dados_agua_df.csv'),encoding='utf-8')
     df['ANO'] = df['ANO'].astype('int')
     df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
@@ -1160,7 +1160,7 @@ with st.sidebar:
 
     
 
-
+st.write('Atenção: Dados de Julho parciais em 05/08/2025. Faltam divulgação de informações de Joinville, Blumenau e Sapiens Park(Florianópolis).')  
 
 tab1, tab2, tab3, tab4 = st.tabs(['Indicadores', 'Mapa cadastral', 'Dados por agrupamentos e individualizados por UC', 
                                   'Dados gerais de UCs por ano e mês selecionado'])
