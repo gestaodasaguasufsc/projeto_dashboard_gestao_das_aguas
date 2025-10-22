@@ -26,7 +26,7 @@ import streamlit_analytics2 as streamlit_analytics
 streamlit_analytics.start_tracking()
 
 
-mensagem_inicio = ''
+mensagem_inicio = 'Atenção: Dados referência 09/2025 atualizados com apenas ausência de dados do Sapiens Park'
 
 #Configurações Streamlit 1
 
