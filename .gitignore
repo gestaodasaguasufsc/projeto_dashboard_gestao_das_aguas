@@ -16,8 +16,11 @@ Dados/Origem/IBGE/SC_Municipios_2024
 
 
 !Dados/Origem/GeoJson/Shapes
+!P3_Dashboard_CGA_Gestao_das_Aguas1.py
 !P3_Dashboard_CGA_Gestao_das_Aguas.py
-!P2_Atualizar_dados_agua_df.py
+!P2_Atualizar_dados_agua_df_novo.py
+!P1_1_gerar_csvs_a_partir_M0_dados.py
+
 !schedule.py
 
 
