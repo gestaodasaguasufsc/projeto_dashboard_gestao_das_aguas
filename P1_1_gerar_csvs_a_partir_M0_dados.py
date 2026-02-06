@@ -33,7 +33,7 @@ dados_agua_df_vazio = pd.read_csv(caminho_colunas_df_droped_csv)
 # =============================================================================
 
 
-caminho_dados_csvs3 = os.path.join(pasta_projeto,'Dados' , 'Origem','CSVs_3')
+caminho_dados_csvs = os.path.join(pasta_projeto,'Dados' , 'Origem','CSVs')
 
 for sheet_name in xls_file.sheet_names:
     if 'planilha_de_referencia_cadastro' in sheet_name.lower():
@@ -110,7 +110,7 @@ for sheet_name in xls_file.sheet_names:
         df.columns = dados_agua_df_vazio.columns
         
         csv_name = sheet_name+'.csv'
-        df.to_csv(os.path.join(caminho_dados_csvs3,csv_name),index=False)
+        df.to_csv(os.path.join(caminho_dados_csvs,csv_name),index=False)
 
 # =============================================================================
 #         if sheet_name == "2025_12": #limite de geração de CSVs
