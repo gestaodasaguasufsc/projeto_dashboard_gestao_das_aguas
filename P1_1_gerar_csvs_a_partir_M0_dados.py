@@ -13,12 +13,6 @@ from datetime import datetime
 
 pasta_projeto = os.path.dirname(os.path.abspath('__file__')) 
 
-caminho_dados_agua_csv = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df - Copia.csv')
-caminho_dados_csvs2 = os.path.join(pasta_projeto,'Dados' , 'Origem','CSVs_2')
-dados_agua_df_copia = pd.read_csv(caminho_dados_agua_csv)
-
-data_lista = dados_agua_df_copia['Dtime'].unique()
-
     
 nome_arquivo_xls = 'M00 - Dados mensais.xlsx'
 xls_file = pd.ExcelFile(os.path.join(pasta_projeto, 'Dados', 'Origem', 'xls_origem', nome_arquivo_xls))
