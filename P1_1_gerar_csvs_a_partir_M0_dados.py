@@ -7,15 +7,24 @@ Created on Mon Mar 31 09:16:47 2025
 import os
 import pandas as pd
 import numpy as np
-import glob
-from datetime import datetime
-
+import shutil
 
 pasta_projeto = os.path.dirname(os.path.abspath('__file__')) 
-
     
 nome_arquivo_xls = 'M00 - Dados mensais.xlsx'
-xls_file = pd.ExcelFile(os.path.join(pasta_projeto, 'Dados', 'Origem', 'xls_origem', nome_arquivo_xls))
+
+pasta_google_drive = 'G:\Meu Drive\Gestão das Águas - Pastas compartilhadas\p02 - Água\Monitoramento do Consumo'
+
+xls_file_src = pd.ExcelFile(os.path.join(pasta_google_drive, nome_arquivo_xls))
+
+pasta_projeto = os.path.dirname(os.path.abspath('__file__'))  
+
+xls_file_copied = pd.ExcelFile(os.path.join(pasta_projeto, 'Dados', 'Origem', 'xls_origem', nome_arquivo_xls))
+
+# Copies file content + metadata (timestamps, permissions)
+#copia o arquivo 'M00 - Dados mensais.xlsx' da pasta do google drive. Google drive precisa estar ativado
+shutil.copy2(xls_file_src, xls_file_copied)
+
 
 caminho_colunas_df_droped_csv = os.path.join(pasta_projeto,'Dados' , 'Origem','colunas_df_droped.csv')
 dados_agua_df_vazio = pd.read_csv(caminho_colunas_df_droped_csv)
@@ -29,7 +38,7 @@ dados_agua_df_vazio = pd.read_csv(caminho_colunas_df_droped_csv)
 
 caminho_dados_csvs = os.path.join(pasta_projeto,'Dados' , 'Origem','CSVs')
 
-for sheet_name in xls_file.sheet_names:
+for sheet_name in xls_file_copied.sheet_names:
     if 'planilha_de_referencia_cadastro' in sheet_name.lower():
         pass
     elif 'auxiliar_referencia' in sheet_name.lower():
@@ -38,9 +47,13 @@ for sheet_name in xls_file.sheet_names:
         pass
     elif 'aux' in sheet_name.lower():
         pass
-    else:
+    
+    # Fazer ELIF '2026_01' se quiser apenas a aba de um mês (no caso o atual), senão alterar para ELSE e PASS para gerar csv de tudo
+    # O ARQUIVO 
+    elif '2026_01' in sheet_name.lower():
+    
         print(sheet_name)
-        df = pd.read_excel(xls_file, sheet_name)
+        df = pd.read_excel(xls_file_copied, sheet_name)
         ## - corrige texto da coluna Mês e associa a coluna mês-N o número do mês
         df.dropna(subset=['Código'])
                 
@@ -105,13 +118,9 @@ for sheet_name in xls_file.sheet_names:
         
         csv_name = sheet_name+'.csv'
         df.to_csv(os.path.join(caminho_dados_csvs,csv_name),index=False)
-
-# =============================================================================
-#         if sheet_name == "2025_12": #limite de geração de CSVs
-#             break
-#         else:
-#             pass
-# =============================================================================
+        
+    else:
+        pass
         
 # 
 #

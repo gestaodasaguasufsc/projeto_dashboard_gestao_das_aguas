@@ -9,7 +9,7 @@ import os
 import pandas as pd
 import numpy as np
 import glob
-
+import shutil
 
 pasta_projeto = os.path.dirname(os.path.abspath('__file__')) 
 pasta_atualizacao_df = os.path.join(pasta_projeto,'Dados','Produtos','atualizacao_dfs')
@@ -42,12 +42,17 @@ for csv in os.listdir(pasta_dados_csv):
     df = df.sort_values(by='CODIGO', ascending=True)
     df.columns = dados_agua_df_vazio.columns
     dados_agua_df = pd.concat([dados_agua_df,df], ignore_index=True)
-    if csv == "2025_12.csv":
+    print(csv)
+    if csv == "2026_01.csv":
         break
     else:
         pass
     
-caminho_dados_agua_df_saida = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df_.csv')
+caminho_dados_agua_df_copia_antigo = os.path.join(pasta_projeto,'Dados' , 'Produtos','Auxiliar_produtos','dados_agua_df_antigo.csv')     
+caminho_dados_agua_df_saida = os.path.join(pasta_projeto,'Dados' , 'Produtos','dados_agua_df.csv')
+
+shutil.copy2(caminho_dados_agua_df_saida, caminho_dados_agua_df_copia_antigo)
+
 dados_agua_df.to_csv(caminho_dados_agua_df_saida, index=False)
 
 
