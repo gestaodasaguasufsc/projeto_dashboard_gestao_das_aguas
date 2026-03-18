@@ -50,7 +50,7 @@ for sheet_name in xls_file_copied.sheet_names:
     
     # Fazer ELIF '2026_01' se quiser apenas a aba de um mês (no caso o atual), senão alterar para ELSE e PASS para gerar csv de tudo
     # O ARQUIVO 
-    elif '2026_01' in sheet_name.lower():
+    elif '2026_02' in sheet_name.lower():
     
         print(sheet_name)
         df = pd.read_excel(xls_file_copied, sheet_name)
