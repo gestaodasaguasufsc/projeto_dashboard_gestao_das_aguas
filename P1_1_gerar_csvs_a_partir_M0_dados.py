@@ -48,8 +48,11 @@ for sheet_name in xls_file_copied.sheet_names:
     elif 'aux' in sheet_name.lower():
         pass
     
-    # Fazer ELIF '2026_01' se quiser apenas a aba de um mês (no caso o atual), senão alterar para ELSE e PASS para gerar csv de tudo
-    # O ARQUIVO 
+    # Fazer ELIF 'ANO_MES no formato AAAA_MM' se quiser apenas a aba de um mês (no caso o atual), 
+    #senão alterar para ELSE e PASS para gerar csv de tudo que estiver no arquivo excel
+    
+    
+    #else:
     elif '2026_02' in sheet_name.lower():
     
         print(sheet_name)
