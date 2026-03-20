@@ -8,8 +8,8 @@ temp-plot.html
 Dados/Origem/GeoJson/Shapes_Nao_Usado
 Auxiliar/Info_Hidrometros/Auxiliar
 
-Dados/Origem/CSVs
-Dados/Origem/xls_origem
+!Dados/Origem/CSVs
+!Dados/Origem/xls_origem
 
 Dados/Origem/IBGE/BR_UF_2024
 Dados/Origem/IBGE/SC_Municipios_2024
