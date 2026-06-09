@@ -43,7 +43,7 @@ for csv in os.listdir(pasta_dados_csv):
     df.columns = dados_agua_df_vazio.columns
     dados_agua_df = pd.concat([dados_agua_df,df], ignore_index=True)
     print(csv)
-    if csv == "2026_04.csv":
+    if csv == "2026_05.csv":
         break
     else:
         pass
