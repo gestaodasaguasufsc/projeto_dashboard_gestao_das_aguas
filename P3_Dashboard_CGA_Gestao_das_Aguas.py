@@ -26,7 +26,7 @@ import streamlit_analytics2 as streamlit_analytics
 streamlit_analytics.start_tracking()
 
 
-mensagem_inicio = ''
+mensagem_inicio = 'Unidades no Sapiens Park: H130 - InpetusHUB e H131 - Fotovoltaica com dados ausentes desde a ref. 05/2026'
 
 #Configurações Streamlit 1
 
