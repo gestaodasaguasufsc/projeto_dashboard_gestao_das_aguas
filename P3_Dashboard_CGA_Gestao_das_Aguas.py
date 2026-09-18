@@ -26,7 +26,7 @@ import streamlit_analytics2 as streamlit_analytics
 streamlit_analytics.start_tracking()
 
 
-mensagem_inicio = 'Unidades no Sapiens Park: H130 - InpetusHUB e H131 - Fotovoltaica com dados ausentes desde a ref. 05/2026'
+mensagem_inicio = 'Unidades no Sapiens Park: H130 - InpetusHUB e H131 - Fotovoltaica com dados atualizados para as ref. 06, 07 e 08/2026. Dados incompletos na ref. 05/2026.'
 
 #Configurações Streamlit 1
 
@@ -1148,7 +1148,7 @@ with st.sidebar:
     st.title("Painel interativo de dados de monitoramento do consumo de água da UFSC")        
     
      
-    st.sidebar.caption("Coordenadoria de Gestão Ambiental - CGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
+    st.sidebar.caption("Gestão das Águas - Departamento de Gestão Ambiental - DGA/DGG/GR/UFSC https://gestaoambiental.ufsc.br")
     st.sidebar.caption("Projeto desenvolvido em Python 3.10.11")
     st.sidebar.caption("Contato: gestaodasaguas@contato.ufsc.br")
     st.sidebar.caption("Desenvolvido por: djesser.zechner@ufsc.br")
