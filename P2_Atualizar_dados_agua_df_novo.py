@@ -56,8 +56,32 @@ shutil.copy2(caminho_dados_agua_df_saida, caminho_dados_agua_df_copia_antigo)
 dados_agua_df.to_csv(caminho_dados_agua_df_saida, index=False)
 
 
+#### Parte 2 - copia das faturas do google drive para pasta de projeto no mês de referência
 
 
+
+meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+meses_n = np.arange(13)[1:]
+
+meses_dict = {}
+
+for i in range(len(meses)):
+
+    if meses_n[i] < 10:
+        mes = "0" + str(meses_n[i])
+        meses_dict[mes] = mes + " - " + meses[i].upper()
+    else:
+        mes = str(meses_n[i])
+        meses_dict[mes] = mes + " - " + meses[i].upper()
+#print(meses_dict)
+
+
+ref_ano = referencia.split("_")[0]
+ref_mes = referencia.split("_")[1]
+
+caminho_faturas_drive = r'G:\Meu Drive\Gestão das Águas - Pastas compartilhadas\p09 - Site Gestao das Aguas - CGA\2 - Faturas de água e esgoto'
+
+caminho_faturas_drive_ano_mes = os.path.join(caminho_faturas_drive,ref_ano, meses_dict[ref_mes])
 
 
 
