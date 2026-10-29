@@ -59,7 +59,7 @@ meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'A
 meses_n = np.arange(13)[1:]
 
 meses_dict = {}
-ref_mes = "09"
+
 
 for i in range(len(meses)):
 
