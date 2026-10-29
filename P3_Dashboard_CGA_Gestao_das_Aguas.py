@@ -59,7 +59,7 @@ def tratamento_de_dados_func(pasta_projeto):
     
     df = pd.read_csv(os.path.join(pasta_projeto,'Dados', 'Produtos' ,'dados_agua_df.csv'),encoding='utf-8')
     df['ANO'] = df['ANO'].astype('int')
-    df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'], axis=1)
+    df = df.drop(columns=['CONCESSIONARIA','MATRICULA', 'CAMPUS','LOCAL','CIDADE','N_HIDROMETRO'])
     df = df.rename(columns={'COD_HIDROMETRO': 'Hidrometro'})
     df = df.merge(df_cad, on='Hidrometro', how='left')
     df['Dtime'] = pd.to_datetime(df['Dtime'])
