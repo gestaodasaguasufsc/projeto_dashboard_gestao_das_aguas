@@ -955,18 +955,22 @@ def indicadores_vol_cus_func(
     df_selecionado_ind['VOLUME_FATURADO'] = df_selecionado_ind['VOLUME_FATURADO'].astype(int)
     #gerando a coluna de médias
 
+        # Inicializando as colunas para evitar o aviso de Copy-on-Write
+    df_selecionado_ind = df_selecionado_ind.copy()
+    df_selecionado_ind['VOL_MED_U6M'] = 0.0
+    df_selecionado_ind['VOL_VAR_ABS'] = 0.0
+    df_selecionado_ind['VOL_VAR_PER'] = 0.0
+    df_selecionado_ind['CUS_MED_U6M'] = 0.0
+    df_selecionado_ind['CUS_VAR_ABS'] = 0.0
+    df_selecionado_ind['CUS_VAR_PER'] = 0.0
+
+    idx_list = df_selecionado_ind.index
+    
     lm = []
 
 
-    df_selecionado_ind['VOL_MED_U6M'] = 0
-    df_selecionado_ind['VOL_VAR_ABS'] = 0 #VOLUME NO MÊS - MEDIA
-    df_selecionado_ind['VOL_VAR_PER'] = 0
-    df_selecionado_ind['CUS_MED_U6M'] = 0
-    df_selecionado_ind['CUS_VAR_ABS'] = 0 #VOLUME NO MÊS - MEDIA
-    df_selecionado_ind['CUS_VAR_PER'] = 0
-
-
     for i, item in enumerate(df_selecionado_ind['VOLUME_FATURADO']):
+        row_idx = idx_list[i]
         if i<=5:
             lm.append(item)
         
@@ -981,12 +985,15 @@ def indicadores_vol_cus_func(
                 variacao_per = "Divisão por zero" 
             else: 
                 variacao_per = float("{:.2f}".format(variacao_abs/item))
-            df_selecionado_ind['VOL_MED_U6M'][i] = media
-            df_selecionado_ind['VOL_VAR_ABS'][i] = variacao_abs
-            df_selecionado_ind['VOL_VAR_PER'][i] = variacao_per
+                
+             # Uso correto do .loc
+            df_selecionado_ind.loc[row_idx, 'VOL_MED_U6M'] = media
+            df_selecionado_ind.loc[row_idx, 'VOL_VAR_ABS'] = variacao_abs
+            df_selecionado_ind.loc[row_idx, 'VOL_VAR_PER'] = variacao_per
 
     lm = []
     for i, item in enumerate(df_selecionado_ind['VALOR_TOTAL']):
+        row_idx = idx_list[i]
         if i<=5:
             lm.append(item)
         
@@ -1002,9 +1009,10 @@ def indicadores_vol_cus_func(
             else: 
                 variacao_per = float("{:.2f}".format(variacao_abs/item))
             
-            df_selecionado_ind['CUS_MED_U6M'][i] = media
-            df_selecionado_ind['CUS_VAR_ABS'][i] = variacao_abs
-            df_selecionado_ind['CUS_VAR_PER'][i] = variacao_per
+            # Uso correto do .loc
+            df_selecionado_ind.loc[row_idx, 'CUS_MED_U6M'] = media
+            df_selecionado_ind.loc[row_idx, 'CUS_VAR_ABS'] = variacao_abs
+            df_selecionado_ind.loc[row_idx, 'CUS_VAR_PER'] = variacao_per
 
 
     return df_selecionado_ind, df
