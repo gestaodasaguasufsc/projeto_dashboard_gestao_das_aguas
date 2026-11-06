@@ -70,7 +70,6 @@ for i in range(len(meses)):
         mes = str(meses_n[i])
         meses_dict[mes] = mes + " - " + meses[i].upper()
 print(meses_dict)
-referencia = "2026_09"
 
 ref_ano = referencia.split("_")[0]
 ref_mes = referencia.split("_")[1]
@@ -99,12 +98,13 @@ except:
 
 
 for fatura in os.listdir(caminho_faturas_drive_ano_mes):
+    origem = os.path.join(caminho_faturas_drive_ano_mes, fatura)
     if fatura.endswith(".pdf"):
-        destino = os.path.join(caminho_faturas_drive_ano_mes,fatura)
+        destino = os.path.join(caminho_faturas_saida, fatura)
         if os.path.isfile(destino):
             print(f"arquivo {fatura} já existe na pasta")
             pass
         else:
-            shutil.copy2(destino, caminho_faturas_saida)
+            shutil.copy2(origem, destino)
             print(f"arquivo {fatura} criado na pasta")
     
