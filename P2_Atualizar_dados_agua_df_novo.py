@@ -29,7 +29,7 @@ pasta_dados_csv = os.path.join(pasta_projeto, 'Dados', 'Origem', 'CSVs')
 
 dados_agua_df = dados_agua_df_vazio
 
-referencia = "2026_09" #<----- atualizar aqui
+referencia = "2026_10" #<----- atualizar aqui
 
 ref_csv = referencia +".csv"
 for csv in os.listdir(pasta_dados_csv):
